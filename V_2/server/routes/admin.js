@@ -1,0 +1,46 @@
+const express = require('express');
+const router = express.Router();
+const { requireAuth } = require('../middleware/auth');
+const adminController = require('../controllers/adminController');
+
+// Toutes les routes admin nécessitent l'authentification
+router.use(requireAuth);
+
+// Dashboard
+router.get('/dashboard/stats', adminController.getDashboardStats);
+
+// Gestion des chauffeurs
+router.get('/drivers', adminController.getDrivers);
+router.put('/drivers/:driverId/status', adminController.updateDriverStatus);
+router.post('/drivers/:driverId/notify', adminController.sendNotificationToDriver);
+
+// Gestion des employeurs
+router.get('/employers', adminController.getEmployers);
+router.put('/employers/:employerId/status', adminController.updateEmployerStatus);
+
+// Gestion des candidatures
+router.get('/applications', adminController.getApplications);
+
+// Gestion des missions
+router.get('/missions', adminController.getMissions);
+
+// Gestion des véhicules
+router.get('/vehicles', adminController.getVehicles);
+
+// Gestion des offres
+router.get('/offers', adminController.getOffers);
+router.get('/offers/:offerId', adminController.getOfferById);
+router.put('/offers/:offerId/moderate', adminController.moderateOffer);
+
+// Gestion des transactions
+router.get('/transactions', adminController.getTransactions);
+
+// Gestion des tickets de support
+router.get('/tickets', adminController.getTickets);
+router.put('/tickets/:ticketId/assign', adminController.assignTicket);
+
+// Configuration de la plateforme
+router.get('/configs', adminController.getPlatformConfigs);
+router.put('/configs/:configId', adminController.updatePlatformConfig);
+
+module.exports = router;
