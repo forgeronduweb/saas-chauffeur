@@ -7,12 +7,12 @@ function getTransporter() {
   if (!transporter) {
     const nodemailer = require('nodemailer');
     transporter = nodemailer.createTransporter({
-      host: process.env.SMTP_HOST || 'smtp.gmail.com',
-      port: process.env.SMTP_PORT || 587,
+      host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+      port: process.env.EMAIL_PORT || 587,
       secure: false,
       auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD
       }
     });
   }
@@ -58,7 +58,7 @@ const sendVerificationCode = async (req, res) => {
 
     // Contenu de l'email
     const mailOptions = {
-      from: process.env.SMTP_FROM || 'noreply@godriver.com',
+      from: `"GoDriver" <${process.env.EMAIL_USER}>`,
       to: user.email,
       subject: 'Code de vérification - GoDriver',
       html: `
@@ -209,7 +209,7 @@ const resendVerificationCode = async (req, res) => {
 
     // Contenu de l'email
     const mailOptions = {
-      from: process.env.SMTP_FROM || 'noreply@godriver.com',
+      from: `"GoDriver" <${process.env.EMAIL_USER}>`,
       to: user.email,
       subject: 'Nouveau code de vérification - GoDriver',
       html: `

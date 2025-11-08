@@ -2,6 +2,7 @@ const Driver = require('../models/Driver');
 const User = require('../models/User');
 const Offer = require('../models/Offer');
 const Application = require('../models/Application');
+const { sendDriverValidationEmail, sendDriverRejectionEmail } = require('../services/emailService');
 
 // Récupérer les statistiques du dashboard admin
 exports.getDashboardStats = async (req, res) => {
@@ -166,7 +167,22 @@ exports.updateDriverStatus = async (req, res) => {
       return res.status(404).json({ error: 'Chauffeur non trouvé' });
     }
 
-    res.json({ message: 'Statut mis à jour', driver });
+    // Envoyer un email selon le nouveau statut
+    if (status === 'approved') {
+      // Email de validation
+      await sendDriverValidationEmail(driver);
+      console.log(`✅ Email de validation envoyé à ${driver.email}`);
+    } else if (status === 'rejected') {
+      // Email de rejet avec raison
+      await sendDriverRejectionEmail(driver, reason);
+      console.log(`📧 Email de rejet envoyé à ${driver.email}`);
+    }
+
+    res.json({ 
+      message: 'Statut mis à jour', 
+      driver,
+      emailSent: status === 'approved' || status === 'rejected'
+    });
   } catch (error) {
     console.error('Erreur updateDriverStatus:', error);
     res.status(500).json({ error: 'Erreur lors de la mise à jour du statut' });

@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const Driver = require('../models/Driver');
 const Employer = require('../models/Employer');
+const { sendVerificationEmail } = require('../services/emailService');
 
 // Générer un token JWT
 const generateToken = (user) => {
@@ -16,73 +17,6 @@ const generateToken = (user) => {
     { expiresIn: '7d' }
   );
 };
-
-// Fonction pour envoyer l'email de vérification
-async function sendVerificationEmail(user, code) {
-  try {
-    const nodemailer = require('nodemailer');
-    const transporter = nodemailer.createTransporter({
-      host: process.env.SMTP_HOST || 'smtp.gmail.com',
-      port: process.env.SMTP_PORT || 587,
-      secure: false,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
-      }
-    });
-
-    const mailOptions = {
-      from: process.env.SMTP_FROM || 'noreply@godriver.com',
-      to: user.email,
-      subject: 'Vérifiez votre email - GoDriver',
-      html: `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <style>
-            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: #f97316; color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-            .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
-            .code { font-size: 32px; font-weight: bold; color: #f97316; text-align: center; padding: 20px; background: white; border-radius: 8px; margin: 20px 0; letter-spacing: 5px; }
-            .footer { text-align: center; margin-top: 30px; color: #6b7280; font-size: 14px; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>🚗 GoDriver</h1>
-              <p>Bienvenue !</p>
-            </div>
-            <div class="content">
-              <p>Bonjour ${user.firstName || 'Utilisateur'},</p>
-              <p>Merci de vous être inscrit sur GoDriver ! Pour finaliser votre inscription, veuillez vérifier votre adresse email avec le code ci-dessous :</p>
-              <div class="code">${code}</div>
-              <p>Ce code est valable pendant <strong>10 minutes</strong>.</p>
-              <p>Si vous n'avez pas créé de compte, ignorez simplement cet email.</p>
-              <p>Cordialement,<br>L'équipe GoDriver</p>
-            </div>
-            <div class="footer">
-              <p>Cet email a été envoyé automatiquement, merci de ne pas y répondre.</p>
-            </div>
-          </div>
-        </body>
-        </html>
-      `
-    };
-
-    await transporter.sendMail(mailOptions);
-    console.log(`✅ Email de vérification envoyé à ${user.email}`);
-    
-    // En développement, afficher le code dans la console
-    if (process.env.NODE_ENV !== 'production') {
-      console.log(`🔢 Code de vérification (dev): ${code}`);
-    }
-  } catch (error) {
-    console.error('❌ Erreur envoi email:', error);
-    throw error;
-  }
-}
 
 // Inscription
 const register = async (req, res) => {
@@ -214,6 +148,9 @@ const register = async (req, res) => {
     user.emailVerificationExpires = Date.now() + 600000; // 10 minutes
     await user.save();
 
+    console.log(`📧 INSCRIPTION - Envoi email de vérification à: ${user.email}`);
+    console.log(`🔢 Code généré: ${verificationCode}`);
+
     // Envoyer le code par email (asynchrone, ne pas bloquer l'inscription)
     sendVerificationEmail(user, verificationCode).catch(err => {
       console.error('❌ Erreur envoi email de vérification:', err);
@@ -271,6 +208,15 @@ const login = async (req, res) => {
     if (!isPasswordValid) {
       return res.status(401).json({ 
         error: 'Email ou mot de passe incorrect' 
+      });
+    }
+
+    // Vérifier si l'email est vérifié
+    if (!user.isEmailVerified) {
+      return res.status(403).json({ 
+        error: 'Veuillez vérifier votre email avant de vous connecter',
+        requiresEmailVerification: true,
+        email: user.email
       });
     }
 

@@ -1,25 +1,18 @@
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
+const nodemailer = require('nodemailer');
 
-// Configuration de l'envoi d'email (lazy loading)
-let transporter = null;
-
-function getTransporter() {
-  if (!transporter) {
-    const nodemailer = require('nodemailer');
-    transporter = nodemailer.createTransporter({
-      host: process.env.SMTP_HOST || 'smtp.gmail.com',
-      port: process.env.SMTP_PORT || 587,
-      secure: false,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
-      }
-    });
+// Utiliser le transporter centralisé
+const transporter = nodemailer.createTransport({
+  host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+  port: parseInt(process.env.EMAIL_PORT) || 587,
+  secure: false,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD
   }
-  return transporter;
-}
+});
 
 // Demande de réinitialisation de mot de passe
 const forgotPassword = async (req, res) => {
@@ -55,7 +48,7 @@ const forgotPassword = async (req, res) => {
 
     // Contenu de l'email
     const mailOptions = {
-      from: process.env.SMTP_FROM || 'noreply@godriver.com',
+      from: `"GoDriver" <${process.env.EMAIL_USER}>`,
       to: user.email,
       subject: 'Réinitialisation de votre mot de passe - GoDriver',
       html: `
@@ -99,8 +92,7 @@ const forgotPassword = async (req, res) => {
 
     // Envoyer l'email
     try {
-      const emailTransporter = getTransporter();
-      await emailTransporter.sendMail(mailOptions);
+      await transporter.sendMail(mailOptions);
       console.log(`✅ Email de réinitialisation envoyé à ${user.email}`);
     } catch (emailError) {
       console.error('❌ Erreur envoi email:', emailError);
