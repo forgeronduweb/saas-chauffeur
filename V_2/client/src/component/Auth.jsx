@@ -65,7 +65,15 @@ export default function Auth() {
             navigate('/');
           }, 1500);
         } else {
-          setError(result.error || 'Identifiants incorrects');
+          // Vérifier si l'erreur est liée à la vérification d'email
+          if (result.requiresEmailVerification) {
+            setError('Veuillez vérifier votre email avant de vous connecter');
+            setTimeout(() => {
+              navigate(`/verify-email?email=${encodeURIComponent(result.email)}`);
+            }, 2000);
+          } else {
+            setError(result.error || 'Identifiants incorrects');
+          }
         }
       } else {
         // Inscription

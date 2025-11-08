@@ -52,6 +52,15 @@ export const AuthProvider = ({ children }) => {
       const data = await response.json();
 
       if (!response.ok) {
+        // Si l'email n'est pas vérifié (403), retourner les infos supplémentaires
+        if (response.status === 403 && data.requiresEmailVerification) {
+          return { 
+            success: false, 
+            error: data.error,
+            requiresEmailVerification: true,
+            email: data.email
+          };
+        }
         throw new Error(data.error || 'Erreur de connexion');
       }
 

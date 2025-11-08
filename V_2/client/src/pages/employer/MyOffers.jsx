@@ -12,6 +12,7 @@ export default function MyOffers() {
   const [filter, setFilter] = useState('all'); // all, active, closed
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [offerToDelete, setOfferToDelete] = useState(null);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   useEffect(() => {
     if (!user || user.role !== 'employer') {
@@ -89,46 +90,81 @@ export default function MyOffers() {
       <SimpleHeader />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-6 sm:mb-8">
-          <h1 className="text-xl sm:text-2xl lg:text-3xl text-gray-900 font-bold">Mes annonces</h1>
-          <p className="text-sm sm:text-base text-gray-600 mt-2">Gérez vos offres d'emploi publiées</p>
-        </div>
-
-        {/* Filtres */}
-        <div className="bg-white rounded-lg border border-gray-200 p-3 sm:p-4 mb-6">
-          <div className="flex flex-wrap gap-2 sm:gap-3">
+        {/* Header avec filtres */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-2">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl text-gray-900">Mes annonces</h1>
+            
+            {/* Bouton filtres mobile */}
             <button
-              onClick={() => setFilter('all')}
-              className={`px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                filter === 'all'
-                  ? 'bg-orange-500 text-white shadow-md'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
+              onClick={() => setShowMobileFilters(true)}
+              className="sm:hidden flex items-center gap-1.5 px-3 py-1.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm"
             >
-              Toutes ({offers.length})
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+              </svg>
+              Filtres
             </button>
-            <button
-              onClick={() => setFilter('active')}
-              className={`px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                filter === 'active'
-                  ? 'bg-orange-500 text-white shadow-md'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Actives ({offers.filter(o => o.status === 'active').length})
-            </button>
-            <button
-              onClick={() => setFilter('closed')}
-              className={`px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                filter === 'closed'
-                  ? 'bg-orange-500 text-white shadow-md'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Fermées ({offers.filter(o => o.status === 'closed').length})
-            </button>
+            
+            {/* Filtres avec radio buttons - Cachés sur mobile */}
+            <form className="hidden sm:inline-flex items-center bg-white border border-gray-200 rounded-lg p-1 shadow-sm">
+              <button 
+                type="button"
+                onClick={() => setFilter('all')}
+                className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 text-gray-500 hover:text-gray-700 rounded transition-all duration-200"
+                title="Réinitialiser"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              
+              <div className="w-px h-6 bg-gray-200 mx-1"></div>
+              
+              <label className="relative cursor-pointer">
+                <input 
+                  type="radio" 
+                  name="filter" 
+                  value="all"
+                  checked={filter === 'all'}
+                  onChange={(e) => setFilter(e.target.value)}
+                  className="peer sr-only"
+                />
+                <span className="px-3 py-1.5 rounded text-xs font-medium transition-all duration-200 inline-block peer-checked:bg-orange-500 peer-checked:text-white peer-checked:shadow-sm hover:bg-gray-50">
+                  Toutes ({offers.length})
+                </span>
+              </label>
+              
+              <label className="relative cursor-pointer">
+                <input 
+                  type="radio" 
+                  name="filter" 
+                  value="active"
+                  checked={filter === 'active'}
+                  onChange={(e) => setFilter(e.target.value)}
+                  className="peer sr-only"
+                />
+                <span className="px-3 py-1.5 rounded text-xs font-medium transition-all duration-200 inline-block peer-checked:bg-orange-500 peer-checked:text-white peer-checked:shadow-sm hover:bg-gray-50">
+                  Actives ({offers.filter(o => o.status === 'active').length})
+                </span>
+              </label>
+              
+              <label className="relative cursor-pointer">
+                <input 
+                  type="radio" 
+                  name="filter" 
+                  value="closed"
+                  checked={filter === 'closed'}
+                  onChange={(e) => setFilter(e.target.value)}
+                  className="peer sr-only"
+                />
+                <span className="px-3 py-1.5 rounded text-xs font-medium transition-all duration-200 inline-block peer-checked:bg-orange-500 peer-checked:text-white peer-checked:shadow-sm hover:bg-gray-50">
+                  Fermées ({offers.filter(o => o.status === 'closed').length})
+                </span>
+              </label>
+            </form>
           </div>
+          <p className="text-gray-600 text-sm">Gérez vos offres d'emploi publiées</p>
         </div>
 
         {/* Liste des offres */}
@@ -248,6 +284,67 @@ export default function MyOffers() {
           </div>
         )}
       </main>
+
+      {/* Panneau filtres mobile */}
+      {showMobileFilters && (
+        <div className="fixed inset-0 z-50 sm:hidden">
+          {/* Overlay */}
+          <div 
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setShowMobileFilters(false)}
+          ></div>
+          
+          {/* Modal Content */}
+          <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl max-h-[70vh] overflow-y-auto">
+            {/* Header */}
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+              <h3 className="text-base font-semibold text-gray-900">Filtres</h3>
+              <button
+                onClick={() => setShowMobileFilters(false)}
+                className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Filtres */}
+            <div className="p-4 space-y-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1.5">
+                  Statut
+                </label>
+                <select 
+                  value={filter}
+                  onChange={(e) => setFilter(e.target.value)}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                >
+                  <option value="all">Toutes ({offers.length})</option>
+                  <option value="active">Actives ({offers.filter(o => o.status === 'active').length})</option>
+                  <option value="closed">Fermées ({offers.filter(o => o.status === 'closed').length})</option>
+                </select>
+              </div>
+
+              {/* Boutons */}
+              <div className="flex gap-2 pt-3">
+                <button 
+                  onClick={() => setFilter('all')}
+                  className="flex-1 px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+                >
+                  Réinitialiser
+                </button>
+                <button 
+                  onClick={() => setShowMobileFilters(false)}
+                  className="flex-1 px-3 py-2 text-sm bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium"
+                >
+                  Appliquer
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal de confirmation de suppression */}
       {showDeleteModal && (
