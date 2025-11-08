@@ -186,7 +186,7 @@ export default function MyProducts() {
 
                   <div className="flex gap-2">
                     <button 
-                      onClick={() => navigate(`/view-offer/${product._id}`)}
+                      onClick={() => navigate(`/produit/${product._id}`)}
                       className="flex-1 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm font-medium"
                     >
                       Voir

@@ -4,6 +4,16 @@ import { useAuth } from '../contexts/AuthContext';
 import SimpleHeader from '../component/common/SimpleHeader';
 import api from '../services/api';
 
+// Fonction utilitaire pour convertir un fichier en base64
+const convertToBase64 = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (error) => reject(error);
+  });
+};
+
 export default function UserProfilePage() {
   const { user, refreshUser } = useAuth();
   const navigate = useNavigate();
@@ -206,9 +216,20 @@ export default function UserProfilePage() {
     setSuccess('');
 
     try {
-      // Sauvegarder les informations personnelles
-      console.log('Mise à jour des infos personnelles:', userInfo);
-      await api.put('/auth/me', userInfo);
+      // Convertir la photo de profil en base64 si elle existe
+      let profilePhotoBase64 = null;
+      if (documents.profilePhoto) {
+        profilePhotoBase64 = await convertToBase64(documents.profilePhoto);
+      }
+
+      // Sauvegarder les informations personnelles avec la photo
+      const userDataToUpdate = {
+        ...userInfo,
+        ...(profilePhotoBase64 && { profilePhoto: profilePhotoBase64 })
+      };
+      
+      console.log('Mise à jour des infos personnelles:', userDataToUpdate);
+      await api.put('/auth/me', userDataToUpdate);
       
       // Sauvegarder les informations chauffeur si l'utilisateur est chauffeur
       if (user?.role === 'driver') {
@@ -347,8 +368,53 @@ export default function UserProfilePage() {
           </div>
         )}
 
+        {/* Photo de profil */}
+        <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6">
+          <h2 className="text-lg sm:text-xl text-gray-900 mb-3 sm:mb-4">Photo de profil</h2>
+          
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+            {/* Aperçu de la photo */}
+            <div className="flex-shrink-0">
+              {user?.profilePhotoUrl ? (
+                <img 
+                  src={user.profilePhotoUrl} 
+                  alt="Photo de profil" 
+                  className="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-gray-200"
+                />
+              ) : (
+                <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center border-4 border-gray-200">
+                  <span className="text-3xl sm:text-4xl text-white font-bold">
+                    {user?.firstName?.[0]}{user?.lastName?.[0]}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Upload de la photo */}
+            <div className="flex-1 w-full">
+              <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+                Changer la photo de profil
+              </label>
+              <input
+                type="file"
+                name="profilePhoto"
+                accept="image/*"
+                onChange={handleFileChange}
+                disabled={!isEditing}
+                className={`w-full px-4 py-2 border border-gray-300 rounded-lg text-sm ${isEditing ? 'focus:ring-2 focus:ring-orange-500' : 'bg-gray-50 cursor-not-allowed'}`}
+              />
+              {documents.profilePhoto && (
+                <p className="text-xs text-green-600 mt-2">✓ {documents.profilePhoto.name}</p>
+              )}
+              <p className="text-xs text-gray-500 mt-2">
+                Format accepté : JPG, PNG, GIF (max 5 MB)
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Informations personnelles */}
-        <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6 shadow-sm">
+        <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6">
           <h2 className="text-lg sm:text-xl text-gray-900 mb-3 sm:mb-4">Informations personnelles</h2>
           
           <div className="space-y-4">
@@ -407,18 +473,6 @@ export default function UserProfilePage() {
 
         {isDriver && (
           <>
-            <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-6">
-              <div className="flex items-center gap-3">
-                <svg className="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
-                </svg>
-                <div>
-                  <h3 className="text-green-900">Vous êtes chauffeur</h3>
-                  <p className="text-sm text-gray-700">Votre profil apparaît dans la liste des chauffeurs</p>
-                </div>
-              </div>
-            </div>
-
             {/* Informations Permis de conduire */}
             <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
               <h2 className="text-xl text-gray-900 mb-4">Permis de conduire</h2>

@@ -1,17 +1,14 @@
 // Utilitaire pour déboguer la configuration API
+import { config, logConfig } from '../config/env';
+
+// Fonction de debug pour afficher les variables d'environnement
 export const debugConfig = () => {
-  console.log('=== DEBUG API CONFIG ===');
-  console.log('VITE_API_BASE_URL:', import.meta.env.VITE_API_BASE_URL);
-  console.log('VITE_API_URL:', import.meta.env.VITE_API_URL);
-  console.log('Mode:', import.meta.env.MODE);
-  console.log('Prod:', import.meta.env.PROD);
-  console.log('Dev:', import.meta.env.DEV);
-  console.log('========================');
+  logConfig();
 };
 
 // Fonction pour tester la connexion API
 export const testApiConnection = async () => {
-  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+  const apiUrl = config.api.url;
   
   try {
     console.log('Testing connection to:', `${apiUrl}/health`);

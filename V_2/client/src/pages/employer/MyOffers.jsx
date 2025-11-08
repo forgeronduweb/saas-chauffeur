@@ -223,7 +223,7 @@ export default function MyOffers() {
                     {/* Actions */}
                     <div className="flex flex-col sm:flex-row gap-2 pt-3 border-t border-gray-100">
                       <button 
-                        onClick={() => navigate(`/view-offer/${offer.id}`)}
+                        onClick={() => navigate(`/offre/${offer.id}`)}
                         className="flex-1 px-4 py-2.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm font-medium"
                       >
                         Voir détails

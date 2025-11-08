@@ -4,17 +4,14 @@ import { AuthProvider } from './contexts/AuthContext'
 import PublicRoute from './component/PublicRoute'
 import PrivateRoute from './component/PrivateRoute'
 import HomePage from './pages/HomePage.jsx'
-import DriversPage from './pages/DriversPage.jsx'
-import DriverDetailPage from './pages/DriverDetailPage.jsx'
 import DriverProfilePage from './pages/DriverProfilePage.jsx'
 import OffersPage from './pages/OffersPage.jsx'
 import OfferDetailPage from './pages/OfferDetailPage.jsx'
 import CreateOfferPage from './pages/CreateOfferPage.jsx'
 import MarketingVentePage from './pages/MarketingVentePage.jsx'
 import ProductDetailPage from './pages/ProductDetailPage.jsx'
-import ViewOfferPage from './pages/ViewOfferPage.jsx'
-import EditOfferPage from './pages/EditOfferPage.jsx'
 import EditJobOfferPage from './pages/EditJobOfferPage.jsx'
+import EditProductOfferPage from './pages/EditProductOfferPage.jsx'
 import UserProfilePage from './pages/UserProfilePage.jsx'
 import Auth from './component/Auth.jsx'
 import AuthCallback from './pages/AuthCallback.jsx'
@@ -27,14 +24,12 @@ import DevenirPartenairePage from './pages/DevenirPartenairePage.jsx'
 import FormationsPage from './pages/FormationsPage.jsx'
 import CertificationsPage from './pages/CertificationsPage.jsx'
 import CentreAidePage from './pages/CentreAidePage.jsx'
-import StatsTestPage from './pages/StatsTestPage.jsx'
 import MyCandidates from './pages/employer/MyCandidates.jsx'
 import MyOffers from './pages/employer/MyOffers.jsx'
 import MyProducts from './pages/employer/MyProducts.jsx'
 import DriverMyProducts from './pages/driver/MyProducts.jsx'
 import MyApplications from './pages/driver/MyApplications.jsx'
 import MessagesPage from './pages/MessagesPage.jsx'
-import MarketingPage from './pages/MarketingPage.jsx'
 
 function App() {
   return (
@@ -48,12 +43,12 @@ function App() {
               element={<HomePage />} 
             />
 
-            {/* Page des chauffeurs */}
+            {/* Page de recherche de chauffeurs (même que l'accueil) */}
             <Route 
               path="/chauffeurs" 
-              element={<DriversPage />} 
+              element={<HomePage />} 
             />
-            
+
             {/* Page de détails chauffeur protégée */}
             <Route 
               path="/driver/:id" 
@@ -102,32 +97,22 @@ function App() {
               } 
             />
 
-            {/* Page de visualisation d'offre (Mes offres) */}
-            <Route 
-              path="/view-offer/:id" 
-              element={
-                <PrivateRoute>
-                  <ViewOfferPage />
-                </PrivateRoute>
-              } 
-            />
-
-            {/* Page d'édition d'offre marketing */}
-            <Route 
-              path="/edit-offer/:id" 
-              element={
-                <PrivateRoute>
-                  <EditOfferPage />
-                </PrivateRoute>
-              } 
-            />
-
             {/* Page d'édition d'offre d'emploi */}
             <Route 
               path="/edit-job-offer/:id" 
               element={
                 <PrivateRoute>
                   <EditJobOfferPage />
+                </PrivateRoute>
+              } 
+            />
+
+            {/* Page d'édition d'offre marketing/produit */}
+            <Route 
+              path="/edit-offer/:id" 
+              element={
+                <PrivateRoute>
+                  <EditProductOfferPage />
                 </PrivateRoute>
               } 
             />
@@ -179,15 +164,11 @@ function App() {
             />
             
             {/* Pages publiques */}
-            <Route path="/marketing" element={<MarketingPage />} />
             <Route path="/tarifs" element={<TarifsPage />} />
             <Route path="/devenir-partenaire" element={<DevenirPartenairePage />} />
             <Route path="/formations" element={<FormationsPage />} />
             <Route path="/certifications" element={<CertificationsPage />} />
             <Route path="/centre-aide" element={<CentreAidePage />} />
-            
-            {/* Page de test des statistiques */}
-            <Route path="/test-stats" element={<StatsTestPage />} />
             
             {/* Pages employeur protégées */}
             <Route 
