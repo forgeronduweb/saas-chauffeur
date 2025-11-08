@@ -139,7 +139,11 @@ const offerSchema = new mongoose.Schema(
     mainImage: {
       type: String,
       trim: true
-    }
+    },
+    additionalImages: [{
+      type: String,
+      trim: true
+    }]
   },
   {
     timestamps: true,

@@ -355,7 +355,7 @@ const getProfile = async (req, res) => {
 const updateProfile = async (req, res) => {
   try {
     const userId = req.user.sub;
-    const { firstName, lastName, phone } = req.body;
+    const { firstName, lastName, phone, profilePhoto } = req.body;
 
     const user = await User.findById(userId);
     if (!user) {
@@ -368,6 +368,11 @@ const updateProfile = async (req, res) => {
     if (firstName !== undefined) user.firstName = firstName;
     if (lastName !== undefined) user.lastName = lastName;
     if (phone !== undefined) user.phone = phone;
+    
+    // Mettre à jour la photo de profil (base64)
+    if (profilePhoto !== undefined) {
+      user.profilePhotoUrl = profilePhoto;
+    }
 
     await user.save();
 
@@ -379,7 +384,8 @@ const updateProfile = async (req, res) => {
         role: user.role,
         firstName: user.firstName,
         lastName: user.lastName,
-        phone: user.phone
+        phone: user.phone,
+        profilePhotoUrl: user.profilePhotoUrl
       }
     });
 

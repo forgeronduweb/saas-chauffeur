@@ -176,7 +176,17 @@ const createOffer = async (req, res) => {
       employerId: userId
     };
 
+    console.log('📸 Images à créer:', {
+      mainImage: offerData.mainImage ? 'Oui' : 'Non',
+      additionalImages: offerData.additionalImages?.length || 0
+    });
+
     const offer = await Offer.create(offerData);
+    
+    console.log('✅ Offre créée avec images:', {
+      mainImage: offer.mainImage ? 'Oui' : 'Non',
+      additionalImages: offer.additionalImages?.length || 0
+    });
     
     // Populer les informations de l'employeur
     await offer.populate('employer', 'firstName lastName email');
@@ -270,6 +280,9 @@ const updateOffer = async (req, res) => {
     const { offerId } = req.params;
     const userId = req.user.sub;
     
+    console.log('📝 Mise à jour offre:', offerId);
+    console.log('👤 Utilisateur:', userId);
+    
     const offer = await Offer.findOne({ 
       _id: offerId, 
       employerId: userId 
@@ -281,10 +294,26 @@ const updateOffer = async (req, res) => {
       });
     }
 
+    // Log des images avant mise à jour
+    console.log('📸 Images avant:', {
+      mainImage: offer.mainImage ? 'Oui' : 'Non',
+      additionalImages: offer.additionalImages?.length || 0
+    });
+
+    // Mettre à jour toutes les propriétés
     Object.assign(offer, req.body);
+    
+    // Log des images après mise à jour
+    console.log('📸 Images après:', {
+      mainImage: offer.mainImage ? 'Oui' : 'Non',
+      additionalImages: offer.additionalImages?.length || 0
+    });
+
     await offer.save();
 
     await offer.populate('employer', 'firstName lastName email');
+
+    console.log('✅ Offre mise à jour avec succès');
 
     res.json({
       message: 'Offre mise à jour avec succès',
@@ -292,7 +321,7 @@ const updateOffer = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Erreur lors de la mise à jour de l\'offre:', error);
+    console.error('❌ Erreur lors de la mise à jour de l\'offre:', error);
     
     if (error.name === 'ValidationError') {
       return res.status(400).json({ 
