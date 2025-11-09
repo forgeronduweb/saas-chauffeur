@@ -107,7 +107,8 @@ export default function UserProfilePage() {
           licenseType: driver.licenseType || 'B',
           licenseExpiryDate: driver.licenseExpiryDate ? driver.licenseExpiryDate.split('T')[0] : '',
           experience: driver.experience || '1-3',
-          workZone: driver.workZone || ''
+          workZone: driver.workZone || '',
+          profilePhotoUrl: driver.profilePhotoUrl || ''
         });
         
         // Charger les expériences professionnelles
@@ -247,7 +248,8 @@ export default function UserProfilePage() {
           workZone: driverInfo.workZone,
           workExperience: workExperiences.filter(exp => 
             exp.company || exp.position || exp.startDate || exp.endDate || exp.description
-          )
+          ),
+          ...(profilePhotoBase64 && { profilePhotoUrl: profilePhotoBase64 })
         };
         
         console.log('Données chauffeur à envoyer:', driverData);
@@ -375,9 +377,9 @@ export default function UserProfilePage() {
           <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
             {/* Aperçu de la photo */}
             <div className="flex-shrink-0">
-              {user?.profilePhotoUrl ? (
+              {(isDriver ? driverInfo?.profilePhotoUrl : user?.profilePhotoUrl) ? (
                 <img 
-                  src={user.profilePhotoUrl} 
+                  src={isDriver ? driverInfo.profilePhotoUrl : user.profilePhotoUrl} 
                   alt="Photo de profil" 
                   className="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-gray-200"
                 />
@@ -466,6 +468,38 @@ export default function UserProfilePage() {
                   className={`w-full px-4 py-2 border border-gray-300 rounded-lg ${isEditing ? 'focus:ring-2 focus:ring-orange-500 focus:border-transparent' : 'bg-gray-50 cursor-not-allowed'}`}
                 />
               </div>
+
+              {isDriver && (
+                <div>
+                  <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">Lieu d'habitation</label>
+                  <select
+                    name="workZone"
+                    value={driverInfo.workZone}
+                    onChange={handleDriverInfoChange}
+                    disabled={!isEditing}
+                    className={`w-full px-4 py-2 border border-gray-300 rounded-lg ${isEditing ? 'focus:ring-2 focus:ring-orange-500' : 'bg-gray-50 cursor-not-allowed'}`}
+                  >
+                    <option value="">Sélectionnez une ville</option>
+                    <option value="Abidjan">Abidjan</option>
+                    <option value="Cocody">Cocody</option>
+                    <option value="Plateau">Plateau</option>
+                    <option value="Yopougon">Yopougon</option>
+                    <option value="Abobo">Abobo</option>
+                    <option value="Marcory">Marcory</option>
+                    <option value="Koumassi">Koumassi</option>
+                    <option value="Treichville">Treichville</option>
+                    <option value="Bouaké">Bouaké</option>
+                    <option value="Yamoussoukro">Yamoussoukro</option>
+                    <option value="San-Pédro">San-Pédro</option>
+                    <option value="Daloa">Daloa</option>
+                    <option value="Korhogo">Korhogo</option>
+                    <option value="Man">Man</option>
+                    <option value="Gagnoa">Gagnoa</option>
+                    <option value="Divo">Divo</option>
+                    <option value="Abengourou">Abengourou</option>
+                  </select>
+                </div>
+              )}
             </div>
 
           </div>
@@ -527,35 +561,6 @@ export default function UserProfilePage() {
                     <option value="1-3">1 à 3 ans</option>
                     <option value="3-5">3 à 5 ans</option>
                     <option value="5+">Plus de 5 ans</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Zone de travail / Ville</label>
-                  <select
-                    name="workZone"
-                    value={driverInfo.workZone}
-                    onChange={handleDriverInfoChange}
-                    disabled={!isEditing}
-                    className={`w-full px-4 py-2 border border-gray-300 rounded-lg ${isEditing ? 'focus:ring-2 focus:ring-orange-500' : 'bg-gray-50 cursor-not-allowed'}`}
-                  >
-                    <option value="">Sélectionnez une ville</option>
-                    <option value="Abidjan">Abidjan</option>
-                    <option value="Cocody">Cocody</option>
-                    <option value="Plateau">Plateau</option>
-                    <option value="Yopougon">Yopougon</option>
-                    <option value="Abobo">Abobo</option>
-                    <option value="Marcory">Marcory</option>
-                    <option value="Koumassi">Koumassi</option>
-                    <option value="Treichville">Treichville</option>
-                    <option value="Bouaké">Bouaké</option>
-                    <option value="Yamoussoukro">Yamoussoukro</option>
-                    <option value="San-Pédro">San-Pédro</option>
-                    <option value="Daloa">Daloa</option>
-                    <option value="Korhogo">Korhogo</option>
-                    <option value="Man">Man</option>
-                    <option value="Gagnoa">Gagnoa</option>
-                    <option value="Divo">Divo</option>
-                    <option value="Abengourou">Abengourou</option>
                   </select>
                 </div>
               </div>

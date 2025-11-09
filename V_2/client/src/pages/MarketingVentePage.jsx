@@ -19,23 +19,14 @@ export default function MarketingVentePage() {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
   const [selectedPriceRange, setSelectedPriceRange] = useState('');
+  const [selectedCondition, setSelectedCondition] = useState('');
 
-  // Bannières publicitaires
-  const banners = [
-    {
-      id: 1,
-      image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&h=400&fit=crop',
-      title: 'Vendez vos produits facilement',
-      subtitle: 'Rejoignez notre marketplace',
-      link: '/auth'
-    },
-    {
-      id: 2,
-      image: 'https://images.unsplash.com/photo-1556740758-90de374c12ad?w=1200&h=400&fit=crop',
-      title: 'Achetez en toute confiance',
-      subtitle: 'Des milliers de produits disponibles',
-      link: '/auth'
-    }
+  // Catégories spécialisées pour chauffeurs
+  const categories = [
+    { value: 'vehicules', label: 'Véhicules Professionnels', icon: '🚗', count: 0 },
+    { value: 'pieces', label: 'Pièces & Accessoires', icon: '🔧', count: 0 },
+    { value: 'services', label: 'Entretien & Réparation', icon: '⚙️', count: 0 },
+    { value: 'equipements', label: 'Équipements Pro', icon: '👔', count: 0 }
   ];
 
   useEffect(() => {
@@ -63,14 +54,12 @@ export default function MarketingVentePage() {
     fetchProducts();
   }, []);
 
-  // Défilement automatique du carrousel
+  // Calculer le nombre de produits par catégorie
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % banners.length);
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [banners.length]);
+    categories.forEach(cat => {
+      cat.count = products.filter(p => p.category?.toLowerCase() === cat.value).length;
+    });
+  }, [products]);
 
   // Filtrage combiné (recherche + filtres)
   const filteredProducts = products.filter(product => {
@@ -89,7 +78,11 @@ export default function MarketingVentePage() {
       (product.location?.city && product.location.city.toLowerCase().includes(selectedCity.toLowerCase())) ||
       (product.location && typeof product.location === 'string' && product.location.toLowerCase().includes(selectedCity.toLowerCase()));
     
-    // Filtre par prix (si implémenté)
+    // Filtre par condition
+    const matchesCondition = selectedCondition === '' ||
+      (product.condition && product.condition.toLowerCase() === selectedCondition.toLowerCase());
+    
+    // Filtre par prix
     let matchesPrice = true;
     if (selectedPriceRange && product.price) {
       const priceValue = typeof product.price === 'string' 
@@ -97,8 +90,11 @@ export default function MarketingVentePage() {
         : product.price;
       
       switch(selectedPriceRange) {
-        case '0-500000':
-          matchesPrice = priceValue < 500000;
+        case '0-100000':
+          matchesPrice = priceValue < 100000;
+          break;
+        case '100000-500000':
+          matchesPrice = priceValue >= 100000 && priceValue < 500000;
           break;
         case '500000-2000000':
           matchesPrice = priceValue >= 500000 && priceValue < 2000000;
@@ -114,7 +110,7 @@ export default function MarketingVentePage() {
       }
     }
     
-    return matchesSearch && matchesCategory && matchesCity && matchesPrice;
+    return matchesSearch && matchesCategory && matchesCity && matchesCondition && matchesPrice;
   });
 
   return (
@@ -128,7 +124,7 @@ export default function MarketingVentePage() {
 
       {/* Contenu principal */}
       <main className="max-w-7xl mx-auto px-4 lg:px-6 pb-8 pt-6">
-        {/* Titre section produits avec bouton filtres mobile */}
+        {/* Titre section avec compteur et bouton filtres mobile */}
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-xl lg:text-2xl font-normal text-gray-900">
             Produits & Services <span className="text-gray-500">({filteredProducts.length})</span>
@@ -163,12 +159,10 @@ export default function MarketingVentePage() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                 >
                   <option value="">Toutes les catégories</option>
-                  <option value="vehicules">Véhicules</option>
+                  <option value="vehicules">Véhicules Professionnels</option>
                   <option value="pieces">Pièces & Accessoires</option>
-                  <option value="services">Services</option>
-                  <option value="assurances">Assurances</option>
-                  <option value="formations">Formations</option>
-                  <option value="equipements">Équipements</option>
+                  <option value="services">Entretien & Réparation</option>
+                  <option value="equipements">Équipements Pro</option>
                 </select>
               </div>
 
@@ -177,7 +171,11 @@ export default function MarketingVentePage() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Condition
                 </label>
-                <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                <select 
+                  value={selectedCondition}
+                  onChange={(e) => setSelectedCondition(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                >
                   <option value="">Toutes conditions</option>
                   <option value="neuf">Neuf</option>
                   <option value="occasion">Occasion</option>
@@ -240,10 +238,11 @@ export default function MarketingVentePage() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                 >
                   <option value="">Tous les prix</option>
-                  <option value="0-50000">0 - 50,000 FCFA</option>
-                  <option value="50000-100000">50,000 - 100,000 FCFA</option>
+                  <option value="0-100000">Moins de 100,000 FCFA</option>
                   <option value="100000-500000">100,000 - 500,000 FCFA</option>
-                  <option value="500000+">500,000+ FCFA</option>
+                  <option value="500000-2000000">500,000 - 2,000,000 FCFA</option>
+                  <option value="2000000-5000000">2,000,000 - 5,000,000 FCFA</option>
+                  <option value="5000000+">Plus de 5,000,000 FCFA</option>
                 </select>
               </div>
 
@@ -253,6 +252,7 @@ export default function MarketingVentePage() {
                   setSelectedCategory('');
                   setSelectedCity('');
                   setSelectedPriceRange('');
+                  setSelectedCondition('');
                 }}
                 className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
               >
@@ -397,12 +397,10 @@ export default function MarketingVentePage() {
                   className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                 >
                   <option value="">Toutes les catégories</option>
-                  <option value="vehicules">Véhicules</option>
+                  <option value="vehicules">Véhicules Professionnels</option>
                   <option value="pieces">Pièces & Accessoires</option>
-                  <option value="services">Services</option>
-                  <option value="assurances">Assurances</option>
-                  <option value="formations">Formations</option>
-                  <option value="equipements">Équipements</option>
+                  <option value="services">Entretien & Réparation</option>
+                  <option value="equipements">Équipements Pro</option>
                 </select>
               </div>
 
@@ -411,7 +409,11 @@ export default function MarketingVentePage() {
                 <label className="block text-xs font-medium text-gray-700 mb-1.5">
                   Condition
                 </label>
-                <select className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                <select 
+                  value={selectedCondition}
+                  onChange={(e) => setSelectedCondition(e.target.value)}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                >
                   <option value="">Toutes conditions</option>
                   <option value="neuf">Neuf</option>
                   <option value="occasion">Occasion</option>
@@ -448,10 +450,11 @@ export default function MarketingVentePage() {
                   className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                 >
                   <option value="">Tous les prix</option>
-                  <option value="0-50000">0 - 50,000 FCFA</option>
-                  <option value="50000-100000">50,000 - 100,000 FCFA</option>
+                  <option value="0-100000">Moins de 100,000 FCFA</option>
                   <option value="100000-500000">100,000 - 500,000 FCFA</option>
-                  <option value="500000+">500,000+ FCFA</option>
+                  <option value="500000-2000000">500,000 - 2,000,000 FCFA</option>
+                  <option value="2000000-5000000">2,000,000 - 5,000,000 FCFA</option>
+                  <option value="5000000+">Plus de 5,000,000 FCFA</option>
                 </select>
               </div>
 
@@ -462,6 +465,7 @@ export default function MarketingVentePage() {
                     setSelectedCategory('');
                     setSelectedCity('');
                     setSelectedPriceRange('');
+                    setSelectedCondition('');
                   }}
                   className="flex-1 px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
                 >

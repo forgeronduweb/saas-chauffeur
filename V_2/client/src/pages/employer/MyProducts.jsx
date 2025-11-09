@@ -146,7 +146,7 @@ export default function MyProducts() {
                     </h3>
                     <div className="flex items-baseline gap-1 flex-shrink-0">
                       <span className="text-base text-orange-600 font-bold whitespace-nowrap">
-                        {parseInt(product.price).toLocaleString()}
+                        {(Number(product.price) || 0).toLocaleString()}
                       </span>
                       <span className="text-xs text-gray-600">F</span>
                     </div>

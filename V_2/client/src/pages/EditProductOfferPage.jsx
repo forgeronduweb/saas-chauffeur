@@ -19,12 +19,14 @@ export default function EditProductOfferPage() {
     category: '',
     price: '',
     condition: '',
+    brand: '',
+    deliveryOptions: '',
     location: {
       city: '',
       address: ''
     },
-    contactPhone: '',
-    contactEmail: '',
+    requirementsList: [],
+    benefits: [],
     mainImage: '',
     additionalImages: []
   });
@@ -43,6 +45,17 @@ export default function EditProductOfferPage() {
       const response = await offersApi.getById(id);
       const offer = response.data;
       
+      console.log('📦 Données reçues de l\'API:', offer);
+      console.log('📋 Champs disponibles:', {
+        category: offer.category,
+        price: offer.price,
+        condition: offer.condition,
+        brand: offer.brand,
+        deliveryOptions: offer.deliveryOptions,
+        requirementsList: offer.requirementsList,
+        benefits: offer.benefits
+      });
+      
       // Vérifier que c'est bien une offre marketing de l'utilisateur
       if (offer.type !== 'Autre') {
         setError('Cette offre n\'est pas une offre marketing');
@@ -60,12 +73,14 @@ export default function EditProductOfferPage() {
         category: offer.category || '',
         price: offer.price || '',
         condition: offer.condition || '',
+        brand: offer.brand || '',
+        deliveryOptions: offer.deliveryOptions || '',
         location: {
           city: offer.location?.city || '',
           address: offer.location?.address || ''
         },
-        contactPhone: offer.contactPhone || '',
-        contactEmail: offer.contactEmail || '',
+        requirementsList: offer.requirementsList || [],
+        benefits: offer.benefits || [],
         mainImage: offer.mainImage || '',
         additionalImages: offer.additionalImages || []
       });
@@ -176,7 +191,35 @@ export default function EditProductOfferPage() {
     setError('');
 
     try {
-      await offersApi.update(id, formData);
+      console.log('💰 Prix avant conversion:', formData.price, 'Type:', typeof formData.price);
+      const convertedPrice = formData.price ? Number(formData.price) : 0;
+      console.log('💰 Prix après conversion:', convertedPrice, 'Type:', typeof convertedPrice);
+      
+      // Préparer les données avec tous les champs nécessaires
+      const dataToSubmit = {
+        title: formData.title,
+        description: formData.description || '',
+        type: 'Autre',
+        category: formData.category || '',
+        price: convertedPrice,
+        brand: formData.brand || '',
+        condition: formData.condition || '',
+        deliveryOptions: formData.deliveryOptions || '',
+        location: {
+          city: formData.location?.city || '',
+          address: formData.location?.address || ''
+        },
+        requirementsList: formData.requirementsList.filter(item => item.trim() !== ''),
+        benefits: formData.benefits.filter(item => item.trim() !== ''),
+        mainImage: formData.mainImage || '',
+        additionalImages: formData.additionalImages || [],
+        images: [formData.mainImage, ...(formData.additionalImages || [])].filter(Boolean)
+      };
+
+      console.log('📤 Données envoyées:', dataToSubmit);
+      console.log('📤 Prix dans dataToSubmit:', dataToSubmit.price);
+
+      await offersApi.update(id, dataToSubmit);
       alert('Offre mise à jour avec succès !');
       navigate('/employer/my-products');
     } catch (error) {
@@ -351,7 +394,7 @@ export default function EditProductOfferPage() {
           {/* Catégorie */}
           <div className="mb-6">
             <label className="block text-sm lg:text-lg text-gray-700 mb-2">
-              Catégorie *
+              Catégorie <span className="text-red-500">*</span>
             </label>
             <select
               name="category"
@@ -361,13 +404,10 @@ export default function EditProductOfferPage() {
               className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-orange-500 transition-colors"
             >
               <option value="">Sélectionnez une catégorie</option>
-              <option value="Véhicules">Véhicules</option>
-              <option value="Pièces détachées">Pièces détachées</option>
-              <option value="Accessoires">Accessoires</option>
-              <option value="Services">Services</option>
-              <option value="Formation">Formation</option>
-              <option value="Équipements">Équipements</option>
-              <option value="Autres">Autres</option>
+              <option value="vehicules">Véhicules Professionnels</option>
+              <option value="pieces">Pièces & Accessoires</option>
+              <option value="services">Entretien & Réparation</option>
+              <option value="equipements">Équipements Pro</option>
             </select>
           </div>
 
@@ -375,7 +415,7 @@ export default function EditProductOfferPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
               <label className="block text-sm lg:text-lg text-gray-700 mb-2">
-                Prix (FCFA) *
+                Prix (FCFA) <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
@@ -390,7 +430,7 @@ export default function EditProductOfferPage() {
             </div>
             <div>
               <label className="block text-sm lg:text-lg text-gray-700 mb-2">
-                État *
+                État <span className="text-red-500">*</span>
               </label>
               <select
                 name="condition"
@@ -400,19 +440,51 @@ export default function EditProductOfferPage() {
                 className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-orange-500 transition-colors"
               >
                 <option value="">Sélectionnez l'état</option>
-                <option value="Neuf">Neuf</option>
-                <option value="Très bon état">Très bon état</option>
-                <option value="Bon état">Bon état</option>
-                <option value="État correct">État correct</option>
-                <option value="À rénover">À rénover</option>
+                <option value="new">Neuf</option>
+                <option value="like_new">Comme neuf</option>
+                <option value="good">Bon état</option>
+                <option value="fair">État correct</option>
               </select>
             </div>
+          </div>
+
+          {/* Marque */}
+          <div className="mb-6">
+            <label className="block text-sm lg:text-lg text-gray-700 mb-2">
+              Marque
+            </label>
+            <input
+              type="text"
+              name="brand"
+              value={formData.brand}
+              onChange={handleChange}
+              className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-orange-500 transition-colors"
+              placeholder="Ex: Toyota, Michelin..."
+            />
+          </div>
+
+          {/* Options de livraison */}
+          <div className="mb-6">
+            <label className="block text-sm lg:text-lg text-gray-700 mb-2">
+              Options de livraison
+            </label>
+            <select
+              name="deliveryOptions"
+              value={formData.deliveryOptions}
+              onChange={handleChange}
+              className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-orange-500 transition-colors"
+            >
+              <option value="">Sélectionnez</option>
+              <option value="pickup">Retrait sur place uniquement</option>
+              <option value="delivery">Livraison disponible</option>
+              <option value="both">Retrait ou livraison</option>
+            </select>
           </div>
 
           {/* Description */}
           <div className="mb-6">
             <label className="block text-sm lg:text-lg text-gray-700 mb-2">
-              Description *
+              Description <span className="text-red-500">*</span>
             </label>
             <textarea
               name="description"
@@ -425,11 +497,49 @@ export default function EditProductOfferPage() {
             />
           </div>
 
+          {/* Caractéristiques */}
+          <div className="mb-6">
+            <label className="block text-sm lg:text-lg text-gray-700 mb-2">
+              Caractéristiques du produit
+            </label>
+            <textarea
+              name="requirementsList"
+              value={formData.requirementsList.join('\n')}
+              onChange={(e) => {
+                const lines = e.target.value.split('\n');
+                setFormData(prev => ({ ...prev, requirementsList: lines }));
+              }}
+              rows="4"
+              className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-orange-500 transition-colors"
+              placeholder="Une caractéristique par ligne&#10;Ex:&#10;Garantie 2 ans&#10;Compatible tous véhicules"
+            />
+            <p className="text-xs text-gray-500 mt-2">Une caractéristique par ligne</p>
+          </div>
+
+          {/* Avantages */}
+          <div className="mb-6">
+            <label className="block text-sm lg:text-lg text-gray-700 mb-2">
+              Avantages / Points forts
+            </label>
+            <textarea
+              name="benefits"
+              value={formData.benefits.join('\n')}
+              onChange={(e) => {
+                const lines = e.target.value.split('\n');
+                setFormData(prev => ({ ...prev, benefits: lines }));
+              }}
+              rows="4"
+              className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-orange-500 transition-colors"
+              placeholder="Un avantage par ligne&#10;Ex:&#10;Livraison rapide&#10;Prix compétitif"
+            />
+            <p className="text-xs text-gray-500 mt-2">Un avantage par ligne</p>
+          </div>
+
           {/* Localisation */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
               <label className="block text-sm lg:text-lg text-gray-700 mb-2">
-                Ville *
+                Ville <span className="text-red-500">*</span>
               </label>
               <select
                 name="location.city"

@@ -4,6 +4,7 @@ import { AuthProvider } from './contexts/AuthContext'
 import PublicRoute from './component/PublicRoute'
 import PrivateRoute from './component/PrivateRoute'
 import HomePage from './pages/HomePage.jsx'
+import DriversPage from './pages/DriversPage.jsx'
 import DriverProfilePage from './pages/DriverProfilePage.jsx'
 import OffersPage from './pages/OffersPage.jsx'
 import OfferDetailPage from './pages/OfferDetailPage.jsx'
@@ -37,16 +38,16 @@ function App() {
       <Router>
         <div className="App">
           <Routes>
-            {/* Page d'accueil publique - marketplace des chauffeurs */}
+            {/* Page d'accueil publique */}
             <Route 
               path="/" 
               element={<HomePage />} 
             />
 
-            {/* Page de recherche de chauffeurs (même que l'accueil) */}
+            {/* Page de recherche de chauffeurs */}
             <Route 
               path="/chauffeurs" 
-              element={<HomePage />} 
+              element={<DriversPage />} 
             />
 
             {/* Page de détails chauffeur protégée */}

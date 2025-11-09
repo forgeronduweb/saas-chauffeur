@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { driversService, offersApi } from '../services/api';
 import SimpleHeader from '../component/common/SimpleHeader';
 import Footer from '../component/common/Footer';
+import DriverCard from '../component/common/DriverCard';
 import OfferCard from '../component/common/OfferCard';
 import ProductCard from '../component/common/ProductCard';
 import api from '../services/api';
@@ -139,7 +140,7 @@ export default function HomePage() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <SimpleHeader 
-        activeTab="accueil" 
+        activeTab="" 
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
       />
@@ -207,7 +208,7 @@ export default function HomePage() {
             Chauffeurs <span className="text-gray-500">({totalDrivers})</span>
           </h2>
           <Link 
-            to="/drivers" 
+            to="/chauffeurs" 
             className="text-sm font-medium text-orange-500 hover:text-orange-600 transition-colors"
           >
             Voir tout →
@@ -216,10 +217,10 @@ export default function HomePage() {
 
         {/* Liste des chauffeurs */}
         {loading ? (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-              <div key={i} className="bg-white border border-gray-200 rounded-lg overflow-hidden animate-pulse">
-                <div className="h-48 bg-gray-200"></div>
+          <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(i => (
+              <div key={i} className="bg-white rounded-xl shadow-xl overflow-hidden animate-pulse">
+                <div className="h-32 lg:h-40 bg-gray-200"></div>
                 <div className="p-4">
                   <div className="h-4 bg-gray-200 rounded w-3/4 mb-3"></div>
                   <div className="h-3 bg-gray-200 rounded w-1/2 mb-2"></div>
@@ -229,59 +230,9 @@ export default function HomePage() {
             ))}
           </div>
         ) : filteredDrivers.length > 0 ? (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
             {filteredDrivers.map(driver => (
-              <div 
-                key={driver._id} 
-                className="bg-white border border-gray-200 rounded-lg hover:border-gray-300 hover:shadow-sm transition-all duration-200 overflow-hidden cursor-pointer"
-                onClick={() => navigate(`/driver/${driver._id}`)}
-              >
-                {/* Photo en haut */}
-                <figure className="relative h-32 lg:h-48 bg-gray-100 overflow-hidden">
-                  {driver.profilePhotoUrl ? (
-                    <img 
-                      src={driver.profilePhotoUrl} 
-                      alt={`${driver.firstName} ${driver.lastName}`}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <svg className="w-12 lg:w-20 h-12 lg:h-20 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd"/>
-                      </svg>
-                    </div>
-                  )}
-                </figure>
-
-                {/* Contenu compact */}
-                <div className="p-2 lg:p-4">
-                  <h3 className="text-xs lg:text-base font-semibold text-gray-900 mb-1 truncate">
-                    {driver.firstName} {driver.lastName}
-                  </h3>
-                  
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs lg:text-sm font-bold text-gray-900">
-                      {driver.rating ? driver.rating.toFixed(1) : '5.0'}
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      {driver.totalRides || 0} courses
-                    </span>
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-1 text-xs text-gray-600">
-                      <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd"/>
-                      </svg>
-                      <span className="truncate">{driver.workZone || 'Abidjan'}</span>
-                    </div>
-                    
-                    <div className="text-xs text-gray-600 truncate">
-                      {driver.vehicleType || 'Professionnel'}
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <DriverCard key={driver._id} driver={driver} />
             ))}
           </div>
         ) : (

@@ -4,14 +4,13 @@ export default function ProductOfferForm({ onSubmit, loading, error, initialData
   const [formData, setFormData] = useState(initialData || {
     title: '',
     description: '',
-    type: 'Produit', // Type spécifique pour les produits
+    type: 'Autre', // Type pour les offres marketing/produits
     
     // Informations produit (stockées dans tags ou description)
     category: '',
     price: '',
     brand: '',
     condition: 'new',
-    stock: '',
     deliveryOptions: '', // Options de livraison
     
     location: {
@@ -146,7 +145,7 @@ export default function ProductOfferForm({ onSubmit, loading, error, initialData
         </div>
         <div className="flex justify-between mt-2 sm:mt-3 text-sm lg:text-lg font-medium text-gray-600">
           <span>Informations produit</span>
-          <span>Contact & Livraison</span>
+          <span>Localisation & Livraison</span>
         </div>
       </div>
 
@@ -187,14 +186,11 @@ export default function ProductOfferForm({ onSubmit, loading, error, initialData
                   required
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
                 >
-                  <option value="">Sélectionnez</option>
-                  <option value="Pièces auto">Pièces auto</option>
-                  <option value="Accessoires">Accessoires</option>
-                  <option value="Entretien">Produits d'entretien</option>
-                  <option value="Électronique">Électronique</option>
-                  <option value="Sécurité">Équipement de sécurité</option>
-                  <option value="Services">Services</option>
-                  <option value="Autre">Autre</option>
+                  <option value="">Sélectionnez une catégorie</option>
+                  <option value="vehicules">Véhicules Professionnels</option>
+                  <option value="pieces">Pièces & Accessoires</option>
+                  <option value="services">Entretien & Réparation</option>
+                  <option value="equipements">Équipements Pro</option>
                 </select>
               </div>
 
@@ -261,21 +257,6 @@ export default function ProductOfferForm({ onSubmit, loading, error, initialData
                   <option value="fair">État correct</option>
                 </select>
               </div>
-            </div>
-
-            <div>
-              <label className="block text-sm lg:text-lg font-medium text-gray-700 mb-2">
-                Stock disponible <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                name="stock"
-                value={formData.stock}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                placeholder="Quantité"
-              />
             </div>
 
             {/* Caractéristiques */}
@@ -375,41 +356,9 @@ export default function ProductOfferForm({ onSubmit, loading, error, initialData
           </>
         )}
 
-        {/* Étape 2: Contact & Livraison */}
+        {/* Étape 2: Localisation & Livraison */}
         {currentStep === 2 && (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm lg:text-lg font-medium text-gray-700 mb-2">
-                  Email de contact <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="email"
-                  name="contactInfo.email"
-                  value={formData.contactInfo.email}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                  placeholder="contact@entreprise.com"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm lg:text-lg font-medium text-gray-700 mb-2">
-                  Téléphone de contact <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="tel"
-                  name="contactInfo.phone"
-                  value={formData.contactInfo.phone}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                  placeholder="+225 XX XX XX XX XX"
-                />
-              </div>
-            </div>
-
             <div>
               <label className="block text-sm lg:text-lg font-medium text-gray-700 mb-2">
                 Ville <span className="text-red-500">*</span>

@@ -99,11 +99,13 @@ export default function ProductDetailPage() {
               />
               
               {/* Badge catégorie */}
-              <div className="absolute top-4 left-4">
-                <span className="px-3 py-1.5 bg-white/90 backdrop-blur-sm text-gray-900 text-sm font-semibold rounded shadow-sm">
-                  {product.category}
-                </span>
-              </div>
+              {product.category && (
+                <div className="absolute top-4 left-4">
+                  <span className="px-3 py-1.5 bg-white/90 backdrop-blur-sm text-gray-900 text-sm font-semibold rounded shadow-sm">
+                    {product.category}
+                  </span>
+                </div>
+              )}
 
               {/* Navigation images si plusieurs */}
               {product.images.length > 1 && (
@@ -193,10 +195,14 @@ export default function ProductDetailPage() {
                   </svg>
                   <span>{product.location?.city || product.location || 'Non spécifié'}</span>
                 </div>
-                <span>•</span>
-                <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded font-medium">
-                  {product.condition || product.category || product.type}
-                </span>
+                {(product.condition || product.category || product.type) && (
+                  <>
+                    <span>•</span>
+                    <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded font-medium">
+                      {product.condition || product.category || product.type}
+                    </span>
+                  </>
+                )}
               </div>
             </div>
 
@@ -255,10 +261,19 @@ export default function ProductDetailPage() {
                     try {
                       setContacting(true);
                       const employerId = product.employerId?._id || product.employerId;
+                      console.log('📤 Envoi du message automatique pour l\'offre:', product._id);
+                      
                       const response = await messagesApi.createOrGetConversation(
                         employerId,
                         { type: 'product_inquiry', offerId: product._id }
                       );
+                      
+                      console.log('✅ Conversation créée:', response.data.conversation._id);
+                      console.log('📨 Messages reçus:', response.data.messages?.length || 0);
+                      
+                      // Délai pour s'assurer que le message est bien sauvegardé
+                      await new Promise(resolve => setTimeout(resolve, 1000));
+                      
                       navigate(`/messages?conversation=${response.data.conversation._id}`);
                     } catch (error) {
                       console.error('Erreur:', error);

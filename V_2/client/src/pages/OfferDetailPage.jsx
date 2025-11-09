@@ -275,34 +275,34 @@ export default function OfferDetailPage() {
                 <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Informations</h3>
                 <div className="space-y-3">
                   <div>
-                    <p className="text-xs lg:text-lg text-gray-500 mb-1">Localisation</p>
-                    <p className="text-xs lg:text-lg font-medium text-gray-900">
+                    <p className="text-sm lg:text-lg text-gray-500 mb-1">Localisation</p>
+                    <p className="text-base lg:text-lg font-medium text-gray-900">
                       {offer.location?.address && offer.location?.city 
                         ? `${offer.location.address}, ${offer.location.city}`
                         : offer.location?.city || offer.location || 'Non spécifié'}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs lg:text-lg text-gray-500 mb-1">Salaire</p>
-                    <p className="text-xs lg:text-lg font-medium text-gray-900">
+                    <p className="text-sm lg:text-lg text-gray-500 mb-1">Salaire</p>
+                    <p className="text-base lg:text-lg font-medium text-gray-900">
                       {offer.salaryRange || (offer.conditions?.salary ? `${offer.conditions.salary.toLocaleString()} FCFA` : offer.salary || 'À négocier')}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs lg:text-lg text-gray-500 mb-1">Type de véhicule</p>
-                    <p className="text-xs lg:text-lg font-medium text-gray-900">
+                    <p className="text-sm lg:text-lg text-gray-500 mb-1">Type de véhicule</p>
+                    <p className="text-base lg:text-lg font-medium text-gray-900">
                       {offer.requirements?.vehicleType || offer.vehicleType || 'Non spécifié'}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs lg:text-lg text-gray-500 mb-1">Expérience requise</p>
-                    <p className="text-xs lg:text-lg font-medium text-gray-900">
+                    <p className="text-sm lg:text-lg text-gray-500 mb-1">Expérience requise</p>
+                    <p className="text-base lg:text-lg font-medium text-gray-900">
                       {offer.requirements?.experience || offer.experience || 'Non spécifié'}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs lg:text-lg text-gray-500 mb-1">Permis</p>
-                    <p className="text-xs lg:text-lg font-medium text-gray-900">
+                    <p className="text-sm lg:text-lg text-gray-500 mb-1">Permis</p>
+                    <p className="text-base lg:text-lg font-medium text-gray-900">
                       Permis {offer.requirements?.licenseType || offer.licenseType || 'B'}
                     </p>
                   </div>

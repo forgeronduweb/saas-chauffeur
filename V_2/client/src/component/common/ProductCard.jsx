@@ -26,11 +26,13 @@ export default function ProductCard({ product }) {
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
         {/* Badge catégorie sur l'image */}
-        <div className="absolute top-3 left-3">
-          <span className="px-2.5 py-1 bg-white/90 backdrop-blur-sm text-gray-900 text-xs font-semibold rounded shadow-sm">
-            {product.category}
-          </span>
-        </div>
+        {product.category && (
+          <div className="absolute top-3 left-3">
+            <span className="px-2.5 py-1 bg-white/90 backdrop-blur-sm text-gray-900 text-xs font-semibold rounded shadow-sm">
+              {product.category}
+            </span>
+          </div>
+        )}
       </figure>
 
       {/* Contenu compact */}
@@ -40,7 +42,7 @@ export default function ProductCard({ product }) {
         </h3>
         
         <p className="text-sm lg:text-lg font-bold text-gray-900 mb-2">
-          {typeof product.price === 'number' ? `${product.price.toLocaleString()} FCFA` : product.price}
+          {product.price ? `${(Number(product.price) || 0).toLocaleString()} FCFA` : 'Prix sur demande'}
         </p>
 
         <div className="flex items-center gap-1 text-xs text-gray-600">
@@ -52,11 +54,13 @@ export default function ProductCard({ product }) {
           </span>
         </div>
         
-        <div className="mt-1">
-          <span className="px-1.5 py-0.5 bg-gray-100 text-gray-700 text-xs rounded">
-            {product.condition}
-          </span>
-        </div>
+        {product.condition && (
+          <div className="mt-1">
+            <span className="px-1.5 py-0.5 bg-gray-100 text-gray-700 text-xs rounded">
+              {product.condition}
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );

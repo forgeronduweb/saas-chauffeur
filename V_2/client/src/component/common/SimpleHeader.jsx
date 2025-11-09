@@ -90,7 +90,7 @@ export default function SimpleHeader({ activeTab = '', searchQuery = '', onSearc
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center">
-            <span className="text-lg lg:text-2xl font-bold">
+            <span className="text-4xl lg:text-7xl font-bold">
               <span className="text-orange-500">Go</span>
               <span className="text-gray-900">Driver</span>
             </span>

@@ -126,10 +126,10 @@ export default function CreateOfferPage() {
         description: formData.description,
         type: 'Autre', // Type pour les produits
         category: formData.category,
-        price: parseFloat(formData.price) || 0,
+        price: formData.price ? Number(formData.price) : 0,
         brand: formData.brand,
         condition: formData.condition,
-        stock: parseInt(formData.stock) || 0,
+        deliveryOptions: formData.deliveryOptions,
         location: {
           address: formData.location?.address || '',
           city: formData.location?.city || 'Abidjan'
@@ -139,6 +139,7 @@ export default function CreateOfferPage() {
         benefits: formData.benefits || [],
         images: formData.images || [],
         mainImage: formData.mainImage || '',
+        additionalImages: formData.additionalImages || [],
         tags: [formData.category?.toLowerCase(), formData.brand?.toLowerCase()].filter(Boolean),
         status: 'active',
         // Champs requis par le modèle Offer
@@ -149,7 +150,7 @@ export default function CreateOfferPage() {
           zone: formData.location?.city || 'Abidjan'
         },
         conditions: {
-          salary: parseFloat(formData.price) || 0,
+          salary: formData.price ? Number(formData.price) : 0,
           salaryType: 'mensuel',
           workType: 'temps_plein',
           startDate: new Date(),
