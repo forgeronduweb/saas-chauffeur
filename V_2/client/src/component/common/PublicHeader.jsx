@@ -17,14 +17,11 @@ export default function PublicHeader() {
       <div className="max-w-7xl mx-auto px-4 lg:px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
-            <svg width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect width="40" height="40" rx="8" fill="#F97316"/>
-              <path d="M12 16L20 12L28 16V28L20 32L12 28V16Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M12 16L20 20L28 16" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M20 32V20" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            <span className="text-lg font-bold text-gray-900">GoDriver</span>
+          <Link to="/" className="flex items-center">
+            <span className="text-lg lg:text-2xl font-bold">
+              <span className="text-orange-500">Go</span>
+              <span className="text-gray-900">Driver</span>
+            </span>
           </Link>
 
           {/* Boutons d'action ou Avatar - Desktop */}

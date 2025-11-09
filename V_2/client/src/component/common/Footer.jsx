@@ -7,14 +7,11 @@ export default function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Logo et description */}
           <aside className="flex flex-col gap-3">
-            <div className="flex items-center gap-2">
-              <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect width="40" height="40" rx="8" fill="#F97316"/>
-                <path d="M12 16L20 12L28 16V28L20 32L12 28V16Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M12 16L20 20L28 16" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M20 32V20" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              <span className="text-xl font-bold text-gray-900">GoDriver</span>
+            <div className="flex items-center">
+              <span className="text-xl font-bold">
+                <span className="text-orange-500">Go</span>
+                <span className="text-gray-900">Driver</span>
+              </span>
             </div>
             <p className="text-sm text-gray-600">
               La plateforme qui connecte les chauffeurs professionnels avec les employeurs en Côte d'Ivoire.
