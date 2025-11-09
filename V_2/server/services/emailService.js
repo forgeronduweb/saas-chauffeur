@@ -1,7 +1,7 @@
 const nodemailer = require('nodemailer');
 
 // Configuration du transporteur email
-const emailPort = parseInt(process.env.EMAIL_PORT) || 465;
+const emailPort = parseInt(process.env.EMAIL_PORT) || 587;
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST || 'smtp.gmail.com',
   port: emailPort,
@@ -9,9 +9,6 @@ const transporter = nodemailer.createTransport({
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASSWORD
-  },
-  tls: {
-    rejectUnauthorized: false
   }
 });
 
@@ -397,7 +394,7 @@ const sendVerificationEmail = async (user, code) => {
       `
     };
 
-    console.log(`📤 ENVOI EMAIL - Destinataire: ${mailOptions.to}`);
+    console.log(`📤 ENVOI EMAIL - Destinataire: ${user.email}`);
     const info = await transporter.sendMail(mailOptions);
     console.log(`✅ Email de vérification envoyé à ${user.email}`);
     

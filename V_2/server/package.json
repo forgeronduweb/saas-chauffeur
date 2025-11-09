@@ -10,6 +10,7 @@
     "test": "echo \"No tests\" && exit 0"
   },
   "dependencies": {
+    "@sendinblue/client": "^3.3.1",
     "axios": "^1.12.2",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
@@ -19,6 +20,7 @@
     "mongoose": "^7.6.3",
     "morgan": "^1.10.1",
     "node-cache": "^5.1.2",
+    "node-fetch": "^2.7.0",
     "nodemailer": "^7.0.10",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0"
