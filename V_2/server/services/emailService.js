@@ -195,7 +195,7 @@ const sendWelcomeEmail = async (user) => {
         <body>
           <div class="container">
             <div class="header">
-              <h1>🚗 Bienvenue sur GoDriver !</h1>
+              <h1>Bienvenue sur <span style="color: #F97316;">Go</span>Driver !</h1>
             </div>
             <div class="content">
               <h2>Bonjour ${user.firstName} ${user.lastName},</h2>
@@ -358,7 +358,7 @@ const sendVerificationEmail = async (user, code) => {
         <body>
           <div class="container">
             <div class="header">
-              <h1>🚗 GoDriver</h1>
+              <h1><span style="color: #F97316;">Go</span>Driver</h1>
               <p>Bienvenue sur la plateforme !</p>
             </div>
             <div class="content">

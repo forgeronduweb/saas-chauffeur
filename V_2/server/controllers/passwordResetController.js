@@ -67,7 +67,7 @@ const forgotPassword = async (req, res) => {
         <body>
           <div class="container">
             <div class="header">
-              <h1>🚗 GoDriver</h1>
+              <h1><span style="color: #F97316;">Go</span>Driver</h1>
               <p>Réinitialisation de mot de passe</p>
             </div>
             <div class="content">
