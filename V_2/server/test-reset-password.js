@@ -12,8 +12,14 @@ async function testResetPassword() {
     await mongoose.connect(mongoUri);
     console.log('✅ Connecté à MongoDB\n');
 
-    // Email à tester (changez par votre email)
-    const testEmail = process.env.TEST_EMAIL || 'forgeronduweb@gmail.com';
+    // Email à tester (doit être défini dans .env)
+    const testEmail = process.env.TEST_EMAIL;
+    
+    if (!testEmail) {
+      console.error('❌ TEST_EMAIL n\'est pas défini dans le fichier .env');
+      console.log('💡 Ajoutez TEST_EMAIL=votre@email.com dans le fichier .env\n');
+      return;
+    }
     
     console.log(`📧 Test avec l'email: ${testEmail}\n`);
 

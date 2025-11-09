@@ -28,9 +28,15 @@ const driverSchema = new mongoose.Schema(
     },
     phone: { 
       type: String, 
-      required: true,
+      required: false,
       trim: true,
-      match: [/^[0-9\s\-\+\(\)]+$/, 'Format de téléphone invalide']
+      validate: {
+        validator: function(v) {
+          // Accepter les chaînes vides ou les numéros valides
+          return !v || v === '' || /^[0-9\s\-\+\(\)]+$/.test(v);
+        },
+        message: 'Format de téléphone invalide'
+      }
     },
     
     // Informations du permis
@@ -173,6 +179,12 @@ const driverSchema = new mongoose.Schema(
         maxlength: [500, 'La description ne peut pas dépasser 500 caractères']
       }
     }],
+    
+    // Photo de profil
+    profilePhotoUrl: {
+      type: String,
+      trim: true
+    },
     
     // Documents
     documents: {

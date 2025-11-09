@@ -7,6 +7,18 @@ exports.createOrGetConversation = async (req, res) => {
   try {
     const { targetUserId, context = {} } = req.body;
     const currentUserId = req.user.sub;
+    
+    console.log('🔵 createOrGetConversation appelé:', {
+      currentUserId,
+      targetUserId,
+      context
+    });
+
+    // Vérifier qu'un utilisateur ne se contacte pas lui-même
+    if (currentUserId.toString() === targetUserId.toString()) {
+      console.log('❌ Tentative de se contacter soi-même');
+      return res.status(400).json({ error: 'Vous ne pouvez pas vous contacter vous-même' });
+    }
 
     // Vérifier que l'utilisateur cible existe
     const targetUser = await User.findById(targetUserId);
@@ -20,30 +32,125 @@ exports.createOrGetConversation = async (req, res) => {
       isActive: true
     }).populate('participants', 'firstName lastName email role profilePhotoUrl');
 
+    console.log('🔍 Conversation existante trouvée:', !!conversation);
+
+    let isNewConversation = false;
+
     // Si pas de conversation, en créer une nouvelle
     if (!conversation) {
+      isNewConversation = true;
+      console.log('➕ Création d\'une nouvelle conversation');
       conversation = new Conversation({
         participants: [currentUserId, targetUserId],
         context,
         unreadCount: new Map([
           [currentUserId.toString(), 0],
-          [targetUserId.toString(), 0]
+          [targetUserId.toString(), 1] // 1 message non lu pour le destinataire
         ])
       });
       await conversation.save();
       await conversation.populate('participants', 'firstName lastName email role profilePhotoUrl');
 
-      // Message système de bienvenue
-      const systemMessage = new Message({
-        conversationId: conversation._id,
-        senderId: currentUserId,
-        content: 'Conversation démarrée',
-        type: 'system'
-      });
-      await systemMessage.save();
+      // Si c'est une demande concernant une offre marketing, créer un message personnalisé
+      if (context.type === 'product_inquiry' && context.offerId && isNewConversation) {
+        console.log('📤 Création du message automatique pour l\'offre:', context.offerId);
+        const Offer = require('../models/Offer');
+        const offer = await Offer.findById(context.offerId);
+        const currentUser = await User.findById(currentUserId);
+        
+        if (offer && currentUser) {
+          const productUrl = `${process.env.CLIENT_URL || 'http://localhost:3000'}/produit/${offer._id}`;
+          const messageContent = `Bonjour,\n\nJe suis intéressé(e) par votre offre "${offer.title}".\n\nPourriez-vous me donner plus d'informations ?\n\nLien de l'offre : ${productUrl}`;
+          
+          console.log('💬 Contenu du message:', messageContent);
+          
+          const initialMessage = new Message({
+            conversationId: conversation._id,
+            senderId: currentUserId,
+            content: messageContent,
+            type: 'text'
+          });
+          await initialMessage.save();
+          
+          console.log('✅ Message automatique sauvegardé:', initialMessage._id);
+          
+          // Mettre à jour le dernier message de la conversation
+          conversation.lastMessage = {
+            content: messageContent,
+            senderId: currentUserId,
+            createdAt: new Date()
+          };
+          await conversation.save();
+        } else {
+          console.log('❌ Offre ou utilisateur non trouvé:', { offer: !!offer, currentUser: !!currentUser });
+        }
+      } else if (isNewConversation) {
+        // Message système de bienvenue par défaut pour les nouvelles conversations
+        const systemMessage = new Message({
+          conversationId: conversation._id,
+          senderId: currentUserId,
+          content: 'Conversation démarrée',
+          type: 'system'
+        });
+        await systemMessage.save();
+      }
     }
+    
+    // Si c'est une conversation existante mais vide, et que c'est une demande d'offre, créer le message
+    if (!isNewConversation && context.type === 'product_inquiry' && context.offerId) {
+      const existingMessages = await Message.countDocuments({ conversationId: conversation._id });
+      console.log('📊 Messages existants dans la conversation:', existingMessages);
+      
+      if (existingMessages === 0) {
+        console.log('📤 Création du message automatique pour conversation existante vide');
+        const Offer = require('../models/Offer');
+        const offer = await Offer.findById(context.offerId);
+        const currentUser = await User.findById(currentUserId);
+        
+        if (offer && currentUser) {
+          const productUrl = `${process.env.CLIENT_URL || 'http://localhost:3000'}/produit/${offer._id}`;
+          const messageContent = `Bonjour,\n\nJe suis intéressé(e) par votre offre "${offer.title}".\n\nPourriez-vous me donner plus d'informations ?\n\nLien de l'offre : ${productUrl}`;
+          
+          const initialMessage = new Message({
+            conversationId: conversation._id,
+            senderId: currentUserId,
+            content: messageContent,
+            type: 'text'
+          });
+          await initialMessage.save();
+          
+          console.log('✅ Message automatique créé pour conversation existante');
+          
+          // Mettre à jour le dernier message et le compteur
+          conversation.lastMessage = {
+            content: messageContent,
+            senderId: currentUserId,
+            createdAt: new Date()
+          };
+          conversation.unreadCount.set(targetUserId.toString(), 1);
+          await conversation.save();
+        }
+      }
+    }
+    
+    console.log('📊 Conversation finale:', {
+      id: conversation._id,
+      isNew: isNewConversation,
+      contextType: context.type
+    });
 
-    res.json({ conversation });
+    // Récupérer les messages de la conversation pour les retourner
+    const messages = await Message.find({ conversationId: conversation._id })
+      .populate('senderId', 'firstName lastName profilePhotoUrl')
+      .sort({ createdAt: 1 })
+      .limit(50);
+
+    console.log('📬 Messages à retourner:', messages.length);
+
+    res.json({ 
+      conversation,
+      messages // Inclure les messages dans la réponse
+    });
   } catch (error) {
     console.error('Erreur création conversation:', error);
     res.status(500).json({ error: 'Erreur lors de la création de la conversation' });

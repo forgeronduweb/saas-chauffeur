@@ -20,6 +20,15 @@ const getAllOffers = async (req, res) => {
     // Construire les filtres
     const filters = { status: 'active' };
     
+    // Gestion du type d'offre
+    if (type) {
+      // Si un type est spécifié (ex: 'Autre' pour marketing), l'utiliser
+      filters.type = type;
+    } else {
+      // Sinon, exclure les offres marketing (pour la page offres d'emploi)
+      filters.type = { $nin: ['product', 'Autre'] };
+    }
+    
     // Filtrage des offres directes (optimisé)
     if (req.user && req.user.sub) {
       // Pour les chauffeurs, récupérer l'ID du profil Driver
@@ -57,8 +66,6 @@ const getAllOffers = async (req, res) => {
         { targetDriverId: null }
       ];
     }
-    
-    if (type) filters.type = type;
     if (zone) filters['requirements.zone'] = new RegExp(zone, 'i');
     if (workType) filters['conditions.workType'] = workType;
     
@@ -108,6 +115,8 @@ const getMyOffers = async (req, res) => {
     const userId = req.user.sub;
     const mongoose = require('mongoose');
     
+    console.log('📋 Récupération des offres pour userId:', userId);
+    
     // Convertir userId en ObjectId pour l'aggregation
     const userObjectId = new mongoose.Types.ObjectId(userId);
     
@@ -136,6 +145,8 @@ const getMyOffers = async (req, res) => {
       }
     ]);
 
+    console.log('📋 Nombre d\'offres trouvées:', offers.length);
+
     res.json(offers);
 
   } catch (error) {
@@ -152,9 +163,15 @@ const createOffer = async (req, res) => {
     const userId = req.user.sub;
     const { type } = req.body; // 'job' pour emploi, 'product' pour marketing
     
+    console.log('🆕 Création d\'offre - userId:', userId);
+    console.log('🆕 Type d\'offre:', type);
+    
     // Vérifier que l'utilisateur existe
     const user = await User.findById(userId);
+    console.log('👤 Utilisateur trouvé:', !!user);
+    
     if (!user) {
+      console.log('❌ Utilisateur non trouvé avec ID:', userId);
       return res.status(404).json({ 
         error: 'Utilisateur non trouvé' 
       });
@@ -282,6 +299,7 @@ const updateOffer = async (req, res) => {
     
     console.log('📝 Mise à jour offre:', offerId);
     console.log('👤 Utilisateur:', userId);
+    console.log('💰 Prix reçu du client:', req.body.price, 'Type:', typeof req.body.price);
     
     const offer = await Offer.findOne({ 
       _id: offerId, 
@@ -294,6 +312,8 @@ const updateOffer = async (req, res) => {
       });
     }
 
+    console.log('💰 Prix avant mise à jour:', offer.price);
+
     // Log des images avant mise à jour
     console.log('📸 Images avant:', {
       mainImage: offer.mainImage ? 'Oui' : 'Non',
@@ -303,6 +323,8 @@ const updateOffer = async (req, res) => {
     // Mettre à jour toutes les propriétés
     Object.assign(offer, req.body);
     
+    console.log('💰 Prix après Object.assign:', offer.price);
+    
     // Log des images après mise à jour
     console.log('📸 Images après:', {
       mainImage: offer.mainImage ? 'Oui' : 'Non',
@@ -310,6 +332,8 @@ const updateOffer = async (req, res) => {
     });
 
     await offer.save();
+    
+    console.log('💰 Prix après save:', offer.price);
 
     await offer.populate('employer', 'firstName lastName email');
 

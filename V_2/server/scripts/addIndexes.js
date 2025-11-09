@@ -2,9 +2,17 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 
 // Connexion à MongoDB
-mongoose.connect(process.env.MONGO_URI || 'mongodb+srv://forgeronduweb:MS2J5nSAFune9BcZ@cluster0.drfeiye.mongodb.net/chauffeur_db?retryWrites=true&w=majority&appName=Cluster0')
+if (!process.env.MONGO_URI) {
+  console.error('❌ MONGO_URI n\'est pas défini dans le fichier .env');
+  process.exit(1);
+}
+
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ Connecté à MongoDB'))
-  .catch(err => console.error('❌ Erreur de connexion:', err));
+  .catch(err => {
+    console.error('❌ Erreur de connexion:', err);
+    process.exit(1);
+  });
 
 const Driver = require('../models/Driver');
 const Offer = require('../models/Offer');

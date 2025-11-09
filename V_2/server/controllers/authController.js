@@ -100,13 +100,13 @@ const register = async (req, res) => {
           licenseType: licenseType || 'B', // Valeur par défaut
           licenseNumber: licenseNumber || `B${Math.random().toString().substr(2, 9)}`,
           licenseDate: licenseDate ? new Date(licenseDate) : new Date('2020-01-01'), // Date par défaut
-          experience: experience || '1-3', // Valeur par défaut
+          experience: experience || '<1', // Valeur par défaut
           vehicleType: vehicleType || 'berline', // Valeur par défaut
           vehicleBrand: vehicleBrand || 'Renault',
           vehicleModel: vehicleModel || 'Clio',
           vehicleYear: vehicleYear ? parseInt(vehicleYear) : 2020,
           vehicleSeats: vehicleSeats ? parseInt(vehicleSeats) : 5,
-          workZone: workZone || 'Paris', // Valeur par défaut
+          workZone: workZone || '', // Pas de valeur par défaut - à renseigner par l'utilisateur
           specialties: specialties || ['transport_personnel'],
           status: 'approved', // Approuvé directement pour simplifier les tests
           isAvailable: true // Disponible par défaut
@@ -371,6 +371,71 @@ const updateRole = async (req, res) => {
     }
 
     console.log(`✅ Rôle mis à jour pour ${user.email}: ${role}`);
+
+    // Créer le profil Driver ou Employer selon le rôle choisi
+    if (role === 'driver') {
+      // Vérifier si le profil existe déjà
+      const existingDriver = await Driver.findOne({ userId: user._id });
+      
+      if (!existingDriver) {
+        try {
+          const driverData = {
+            userId: user._id,
+            firstName: user.firstName || 'Prénom',
+            lastName: user.lastName || 'Nom',
+            phone: user.phone || '06 00 00 00 00',
+            email: user.email,
+            licenseType: 'B', // Valeur par défaut
+            licenseNumber: `B${Math.random().toString().substr(2, 9)}`,
+            licenseDate: new Date('2020-01-01'),
+            experience: '<1',
+            vehicleType: 'berline',
+            vehicleBrand: 'Renault',
+            vehicleModel: 'Clio',
+            vehicleYear: 2020,
+            vehicleSeats: 5,
+            workZone: 'Abidjan',
+            specialties: ['transport_personnel'],
+            status: 'approved',
+            isAvailable: true,
+            profilePhotoUrl: user.profilePhotoUrl || '' // Utiliser la photo Google si disponible
+          };
+
+          await Driver.create(driverData);
+          console.log(`✅ Profil chauffeur créé pour ${user.firstName} ${user.lastName}`);
+        } catch (driverError) {
+          console.error('❌ Erreur lors de la création du profil chauffeur:', driverError);
+        }
+      } else {
+        console.log(`ℹ️ Profil chauffeur existe déjà pour ${user.email}`);
+      }
+    }
+
+    if (role === 'employer') {
+      // Vérifier si le profil existe déjà
+      const existingEmployer = await Employer.findOne({ userId: user._id });
+      
+      if (!existingEmployer) {
+        try {
+          const employerData = {
+            userId: user._id,
+            firstName: user.firstName || 'Prénom',
+            lastName: user.lastName || 'Nom',
+            email: user.email,
+            phone: user.phone || '',
+            status: 'approved',
+            isActive: true
+          };
+
+          await Employer.create(employerData);
+          console.log(`✅ Profil employeur créé pour ${user.firstName} ${user.lastName}`);
+        } catch (employerError) {
+          console.error('❌ Erreur lors de la création du profil employeur:', employerError);
+        }
+      } else {
+        console.log(`ℹ️ Profil employeur existe déjà pour ${user.email}`);
+      }
+    }
 
     res.json(user);
   } catch (error) {

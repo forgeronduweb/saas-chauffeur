@@ -143,7 +143,28 @@ const offerSchema = new mongoose.Schema(
     additionalImages: [{
       type: String,
       trim: true
-    }]
+    }],
+    // Champs spécifiques pour les offres marketing/produits
+    category: {
+      type: String,
+      trim: true
+    },
+    price: {
+      type: Number,
+      min: 0
+    },
+    brand: {
+      type: String,
+      trim: true
+    },
+    condition: {
+      type: String,
+      trim: true
+    },
+    deliveryOptions: {
+      type: String,
+      trim: true
+    }
   },
   {
     timestamps: true,

@@ -74,7 +74,7 @@ const updateDriverProfile = async (req, res) => {
       'firstName', 'lastName', 'email', 'phone', 'licenseType', 'licenseNumber', 
       'licenseDate', 'vtcCard', 'experience', 'vehicleType', 'vehicleBrand', 
       'vehicleModel', 'vehicleYear', 'vehicleSeats', 'workZone', 'specialties',
-      'isAvailable', 'notifications', 'workExperience'
+      'isAvailable', 'notifications', 'workExperience', 'profilePhotoUrl'
     ];
 
     // Filtrer les champs autorisés
@@ -512,13 +512,13 @@ const becomeDriver = async (req, res) => {
       licenseNumber,
       licenseType: licenseType || 'B',
       licenseDate: new Date(),
-      experience: experience || '1-3',
+      experience: experience || 'Débutant',
       vehicleType: vehicleType || 'berline',
       vehicleBrand: vehicleBrand || '',
       vehicleModel: vehicleModel || '',
       vehicleYear: vehicleYear ? parseInt(vehicleYear) : new Date().getFullYear(),
       vehicleSeats: vehicleSeats ? parseInt(vehicleSeats) : 5,
-      workZone: workZone || 'Abidjan',
+      workZone: workZone || '',
       specialties: specialties || ['transport_personnel'],
       status: 'approved',
       isAvailable: true
