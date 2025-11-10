@@ -5,30 +5,38 @@ const User = require('../models/User');
 // Créer ou récupérer une conversation
 exports.createOrGetConversation = async (req, res) => {
   try {
-    const { targetUserId, context = {} } = req.body;
+    // Accepter à la fois participantId (nouveau) et targetUserId (ancien) pour compatibilité
+    const { participantId, targetUserId, context = {} } = req.body;
+    const targetId = participantId || targetUserId;
     const currentUserId = req.user.sub;
     
     console.log('🔵 createOrGetConversation appelé:', {
       currentUserId,
+      targetId,
+      participantId,
       targetUserId,
       context
     });
 
+    if (!targetId) {
+      return res.status(400).json({ error: 'participantId ou targetUserId requis' });
+    }
+
     // Vérifier qu'un utilisateur ne se contacte pas lui-même
-    if (currentUserId.toString() === targetUserId.toString()) {
+    if (currentUserId.toString() === targetId.toString()) {
       console.log('❌ Tentative de se contacter soi-même');
       return res.status(400).json({ error: 'Vous ne pouvez pas vous contacter vous-même' });
     }
 
     // Vérifier que l'utilisateur cible existe
-    const targetUser = await User.findById(targetUserId);
+    const targetUser = await User.findById(targetId);
     if (!targetUser) {
       return res.status(404).json({ error: 'Utilisateur non trouvé' });
     }
 
     // Vérifier si une conversation existe déjà
     let conversation = await Conversation.findOne({
-      participants: { $all: [currentUserId, targetUserId] },
+      participants: { $all: [currentUserId, targetId] },
       isActive: true
     }).populate('participants', 'firstName lastName email role profilePhotoUrl');
 
@@ -41,11 +49,11 @@ exports.createOrGetConversation = async (req, res) => {
       isNewConversation = true;
       console.log('➕ Création d\'une nouvelle conversation');
       conversation = new Conversation({
-        participants: [currentUserId, targetUserId],
+        participants: [currentUserId, targetId],
         context,
         unreadCount: new Map([
           [currentUserId.toString(), 0],
-          [targetUserId.toString(), 1] // 1 message non lu pour le destinataire
+          [targetId.toString(), 1] // 1 message non lu pour le destinataire
         ])
       });
       await conversation.save();
