@@ -1,6 +1,40 @@
+import { useState, useEffect } from 'react';
 import PublicPageLayout from '../component/common/PublicPageLayout';
+import { statsApi } from '../services/api';
 
 export default function AProposPage() {
+  const [stats, setStats] = useState({
+    totalDrivers: 0,
+    totalEmployers: 0,
+    totalOffers: 0,
+    averageRating: 0
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await statsApi.public();
+        if (response.data.success) {
+          const { totalDrivers, totalEmployers, totalOffers, averageRating } = response.data.data.overview;
+          setStats({
+            totalDrivers,
+            totalEmployers,
+            totalOffers,
+            averageRating
+          });
+        }
+      } catch (error) {
+        console.error('Erreur lors de la récupération des statistiques:', error);
+        // Garder les valeurs par défaut en cas d'erreur
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
   return (
     <PublicPageLayout activeTab="">
       <div className="min-h-screen bg-gray-50">
@@ -72,20 +106,28 @@ export default function AProposPage() {
               </h2>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="text-center">
-                  <div className="text-3xl text-orange-500 mb-2">500+</div>
+                  <div className="text-3xl text-orange-500 mb-2">
+                    {loading ? '...' : `${stats.totalDrivers.toLocaleString()}+`}
+                  </div>
                   <div className="text-sm text-gray-600">Chauffeurs inscrits</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl text-orange-500 mb-2">200+</div>
+                  <div className="text-3xl text-orange-500 mb-2">
+                    {loading ? '...' : `${stats.totalEmployers.toLocaleString()}+`}
+                  </div>
                   <div className="text-sm text-gray-600">Employeurs actifs</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl text-orange-500 mb-2">1000+</div>
+                  <div className="text-3xl text-orange-500 mb-2">
+                    {loading ? '...' : `${stats.totalOffers.toLocaleString()}+`}
+                  </div>
                   <div className="text-sm text-gray-600">Offres publiées</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl text-orange-500 mb-2">98%</div>
-                  <div className="text-sm text-gray-600">Satisfaction</div>
+                  <div className="text-3xl text-orange-500 mb-2">
+                    {loading ? '...' : `${stats.averageRating.toFixed(1)}/5`}
+                  </div>
+                  <div className="text-sm text-gray-600">Note moyenne</div>
                 </div>
               </div>
             </section>

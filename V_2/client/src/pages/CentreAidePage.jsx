@@ -20,55 +20,97 @@ export default function CentreAidePage() {
       id: 1,
       category: 'account',
       question: 'Comment créer un compte sur GoDriver ?',
-      answer: 'Cliquez sur "S\'inscrire", choisissez votre type de compte (Chauffeur ou Employeur), puis remplissez le formulaire. Vous recevrez un email de confirmation.'
+      answer: 'Cliquez sur "S\'inscrire" en haut à droite de la page. Choisissez votre type de compte : "Chauffeur" si vous cherchez un emploi, ou "Employeur" si vous recrutez. Remplissez le formulaire avec vos informations (nom, email, téléphone, mot de passe). Vous pouvez aussi vous inscrire rapidement avec votre compte Google. Une fois inscrit, vous accédez immédiatement à votre tableau de bord.'
     },
     {
       id: 2,
       category: 'account',
       question: 'Comment modifier mes informations de profil ?',
-      answer: 'Connectez-vous, accédez à "Mon Profil", puis cliquez sur "Modifier". Sauvegardez vos modifications.'
+      answer: 'Connectez-vous à votre compte, puis cliquez sur votre nom en haut à droite et sélectionnez "Mon Profil". Cliquez sur le bouton "Modifier" (en haut à droite sur PC, en bas sur mobile). Vous pouvez modifier vos informations personnelles, votre photo de profil, vos documents (pour les chauffeurs), ou les informations de votre entreprise (pour les employeurs). N\'oubliez pas de cliquer sur "Enregistrer" pour sauvegarder vos modifications.'
     },
     {
       id: 3,
       category: 'account',
       question: 'J\'ai oublié mon mot de passe, que faire ?',
-      answer: 'Sur la page de connexion, cliquez sur "Mot de passe oublié". Entrez votre email et suivez les instructions.'
+      answer: 'Sur la page de connexion, cliquez sur "Mot de passe oublié ?". Entrez l\'adresse email associée à votre compte. Vous recevrez un email avec un lien pour réinitialiser votre mot de passe. Suivez les instructions dans l\'email pour créer un nouveau mot de passe sécurisé.'
     },
     {
       id: 4,
-      category: 'offers',
-      question: 'Comment postuler à une offre ?',
-      answer: 'Parcourez les offres, cliquez sur celle qui vous intéresse, puis sur "Postuler". Vous pouvez ajouter un message personnalisé.'
+      category: 'account',
+      question: 'Quelle est la différence entre un compte Chauffeur et Employeur ?',
+      answer: 'Un compte Chauffeur vous permet de créer votre profil professionnel, postuler aux offres d\'emploi, recevoir des notifications pour les nouvelles opportunités, et communiquer avec les employeurs via la messagerie interne. Un compte Employeur vous permet de publier des offres d\'emploi, rechercher des chauffeurs qualifiés, consulter les candidatures reçues, et gérer vos recrutements. Vous pouvez aussi publier des annonces sur la marketplace (vente de véhicules, pièces, etc.).'
     },
     {
       id: 5,
       category: 'offers',
-      question: 'Comment publier une offre d\'emploi ?',
-      answer: 'En tant qu\'employeur, accédez à votre tableau de bord et cliquez sur "Créer une offre". Remplissez les détails et publiez.'
+      question: 'Comment postuler à une offre d\'emploi ?',
+      answer: 'Connectez-vous avec votre compte Chauffeur, puis allez dans "Offres d\'emploi" ou "Offres disponibles" dans votre tableau de bord. Parcourez les offres et utilisez les filtres (ville, type de contrat, horaire) pour affiner votre recherche. Cliquez sur une offre pour voir les détails complets. Si elle vous intéresse, cliquez sur "Postuler". Vous pouvez ajouter un message personnalisé pour vous présenter. L\'employeur recevra votre candidature et pourra consulter votre profil complet.'
     },
     {
       id: 6,
-      category: 'payment',
-      question: 'Comment sont effectués les paiements ?',
-      answer: 'Les paiements sont traités de manière sécurisée via notre plateforme. Plusieurs modes de paiement sont acceptés.'
+      category: 'offers',
+      question: 'Comment publier une offre d\'emploi ?',
+      answer: 'Connectez-vous avec votre compte Employeur. Cliquez sur "Publier une offre" (bouton orange en haut) ou accédez à votre tableau de bord. Choisissez "Offre d\'emploi" puis remplissez le formulaire : titre du poste, type de transport (chauffeur personnel, livraison, VIP, etc.), localisation, type de contrat (CDI, CDD, Indépendant), horaires, salaire, description détaillée, et exigences (permis, expérience, type de véhicule). Vous pouvez aussi cibler un chauffeur spécifique si vous avez déjà quelqu\'un en vue. Une fois publiée, votre offre est visible par tous les chauffeurs correspondant aux critères.'
     },
     {
       id: 7,
-      category: 'payment',
-      question: 'Y a-t-il des frais de service ?',
-      answer: 'GoDriver prélève une commission de 10% sur chaque transaction. Ce pourcentage est clairement indiqué avant toute transaction.'
+      category: 'offers',
+      question: 'Puis-je modifier ou supprimer une offre après publication ?',
+      answer: 'Oui, absolument. Depuis votre tableau de bord Employeur, accédez à "Mes offres". Vous pouvez modifier les détails d\'une offre à tout moment (description, salaire, exigences, etc.). Vous pouvez également désactiver temporairement une offre si vous avez trouvé un candidat, ou la supprimer définitivement. Les modifications sont prises en compte immédiatement.'
     },
     {
       id: 8,
-      category: 'security',
-      question: 'Comment GoDriver vérifie-t-il les chauffeurs ?',
-      answer: 'Tous les chauffeurs doivent soumettre des documents officiels. Notre équipe vérifie manuellement chaque document.'
+      category: 'offers',
+      question: 'Comment fonctionne la marketplace (Marketing & Vente) ?',
+      answer: 'La marketplace GoDriver est un espace dédié à l\'écosystème des chauffeurs professionnels. Vous pouvez y vendre ou acheter : véhicules professionnels, pièces détachées, services d\'entretien, assurances spécialisées, formations, certifications, et équipements professionnels (GPS, dashcam, uniformes). Pour publier une annonce, cliquez sur "Publier une offre" et choisissez "Produit/Service". Remplissez les détails (titre, catégorie, prix, description, photos) et publiez. Les acheteurs intéressés peuvent vous contacter directement via la messagerie interne.'
     },
     {
       id: 9,
+      category: 'payment',
+      question: 'Quels sont les tarifs de GoDriver ?',
+      answer: 'GoDriver propose 3 formules : Plan Gratuit (0 FCFA) avec 2 offres par mois et accès aux profils de base ; Plan Professionnel (15,000 FCFA/mois) avec offres illimitées, accès prioritaire aux chauffeurs, support prioritaire et statistiques avancées ; Plan Entreprise (35,000 FCFA/mois) avec tout inclus, API personnalisée, manager dédié, formation équipe et facturation mensuelle. Consultez la page "Tarifs" pour plus de détails. Aucun frais caché, les prix affichés sont les prix finaux.'
+    },
+    {
+      id: 10,
+      category: 'payment',
+      question: 'Comment effectuer le paiement de mon abonnement ?',
+      answer: 'Les paiements sont traités de manière sécurisée via notre plateforme. Nous acceptons plusieurs modes de paiement adaptés au marché ivoirien : Mobile Money (Orange Money, MTN Money, Moov Money), cartes bancaires (Visa, Mastercard), et virements bancaires. Vous pouvez gérer votre abonnement et vos paiements depuis votre tableau de bord. Des reçus sont automatiquement générés pour chaque transaction.'
+    },
+    {
+      id: 11,
+      category: 'payment',
+      question: 'Puis-je changer de plan à tout moment ?',
+      answer: 'Oui, vous pouvez upgrader ou downgrader votre plan à tout moment depuis votre tableau de bord. Si vous passez à un plan supérieur, la différence sera calculée au prorata. Si vous passez à un plan inférieur, le crédit restant sera appliqué sur votre prochaine facture. Aucune pénalité n\'est appliquée pour les changements de plan.'
+    },
+    {
+      id: 12,
+      category: 'payment',
+      question: 'Comment annuler mon abonnement ?',
+      answer: 'Vous pouvez annuler votre abonnement à tout moment depuis votre tableau de bord, section "Paramètres" > "Abonnement". L\'annulation prend effet à la fin de votre période de facturation en cours. Vous conservez l\'accès à toutes les fonctionnalités jusqu\'à cette date. Aucun remboursement n\'est effectué pour la période déjà payée, mais vous ne serez plus facturé par la suite.'
+    },
+    {
+      id: 13,
+      category: 'security',
+      question: 'Comment GoDriver vérifie-t-il les chauffeurs ?',
+      answer: 'La sécurité est notre priorité. Tous les chauffeurs doivent soumettre des documents officiels lors de leur inscription : permis de conduire (recto-verso), carte d\'identité nationale, et éventuellement certificat de bonne conduite. Notre équipe vérifie manuellement chaque document pour s\'assurer de leur authenticité. Les profils vérifiés reçoivent un badge de validation. Nous vérifions également l\'expérience professionnelle déclarée lorsque c\'est possible.'
+    },
+    {
+      id: 14,
       category: 'security',
       question: 'Mes données personnelles sont-elles sécurisées ?',
-      answer: 'Oui, nous utilisons un cryptage SSL pour protéger toutes vos données. Consultez notre politique de confidentialité.'
+      answer: 'Oui, la protection de vos données est essentielle pour nous. Nous utilisons un cryptage SSL/TLS pour toutes les communications entre votre navigateur et nos serveurs. Vos informations personnelles (email, téléphone) ne sont jamais partagées publiquement. Les employeurs ne peuvent voir vos coordonnées qu\'après acceptation de votre candidature. Nous respectons le RGPD et les lois ivoiriennes sur la protection des données. Consultez notre politique de confidentialité pour plus de détails.'
+    },
+    {
+      id: 15,
+      category: 'security',
+      question: 'Comment fonctionne la messagerie interne ?',
+      answer: 'GoDriver dispose d\'une messagerie interne sécurisée pour faciliter la communication entre chauffeurs et employeurs. Toutes les conversations sont privées et protégées. Vous recevez des notifications pour les nouveaux messages. La messagerie permet de discuter des détails d\'une offre, organiser un entretien, ou demander des informations complémentaires sans partager vos coordonnées personnelles. Accédez à vos messages via l\'icône en haut à droite ou depuis votre tableau de bord.'
+    },
+    {
+      id: 16,
+      category: 'security',
+      question: 'Que faire en cas de problème avec un utilisateur ?',
+      answer: 'Si vous rencontrez un problème avec un utilisateur (comportement inapproprié, fausse information, arnaque), vous pouvez le signaler à notre équipe. Utilisez le bouton "Signaler" sur le profil concerné ou contactez-nous directement à support@godriver.ci. Notre équipe examine chaque signalement et prend les mesures appropriées (avertissement, suspension, bannissement). Nous prenons la sécurité de notre communauté très au sérieux.'
     }
   ];
 
