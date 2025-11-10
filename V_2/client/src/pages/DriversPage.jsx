@@ -80,7 +80,9 @@ export default function DriversPage() {
         {/* Titre section avec bouton filtres mobile */}
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-xl lg:text-2xl font-normal text-gray-900">
-            Chauffeurs disponibles <span className="text-gray-500">({filteredDrivers.length})</span>
+            <span className="lg:hidden">Chauffeurs</span>
+            <span className="hidden lg:inline">Chauffeurs disponibles</span>
+            {' '}<span className="text-gray-500">({filteredDrivers.length})</span>
           </h2>
           
           {/* Bouton filtres mobile */}

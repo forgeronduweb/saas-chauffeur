@@ -115,7 +115,9 @@ export default function OffersPage() {
         {/* Titre section offres avec bouton filtres mobile */}
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-xl lg:text-2xl font-normal text-gray-900">
-            Offres d'emploi <span className="text-gray-500">({filteredOffers.length})</span>
+            <span className="lg:hidden">Offres</span>
+            <span className="hidden lg:inline">Offres d'emploi</span>
+            {' '}<span className="text-gray-500">({filteredOffers.length})</span>
           </h2>
           
           {/* Bouton filtres mobile */}

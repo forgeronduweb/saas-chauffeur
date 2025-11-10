@@ -127,7 +127,9 @@ export default function MarketingVentePage() {
         {/* Titre section avec compteur et bouton filtres mobile */}
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-xl lg:text-2xl font-normal text-gray-900">
-            Produits & Services <span className="text-gray-500">({filteredProducts.length})</span>
+            <span className="lg:hidden">Marketplace</span>
+            <span className="hidden lg:inline">Produits & Services</span>
+            {' '}<span className="text-gray-500">({filteredProducts.length})</span>
           </h2>
           
           {/* Bouton filtres mobile */}

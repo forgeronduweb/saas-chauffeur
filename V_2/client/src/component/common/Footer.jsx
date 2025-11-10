@@ -18,31 +18,25 @@ export default function Footer() {
             </p>
           </aside>
 
-          {/* Services */}
+          {/* Entreprise */}
           <nav className="flex flex-col gap-2">
-            <h6 className="font-semibold text-gray-900 mb-2">Pour les chauffeurs</h6>
-            <Link to="/auth" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">Créer un compte</Link>
-            <Link to="/drivers" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">Trouver un emploi</Link>
-            <Link to="/formations" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">Formations</Link>
-            <Link to="/certifications" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">Certifications</Link>
+            <h6 className="text-gray-900 mb-2">Entreprise</h6>
+            <Link to="/a-propos" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">À propos</Link>
+            <Link to="/contact" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">Contact</Link>
           </nav>
 
-          {/* Employeurs */}
+          {/* Légal */}
           <nav className="flex flex-col gap-2">
-            <h6 className="font-semibold text-gray-900 mb-2">Pour les employeurs</h6>
-            <Link to="/auth" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">Publier une offre</Link>
-            <Link to="/drivers" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">Trouver un chauffeur</Link>
-            <Link to="/tarifs" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">Tarifs</Link>
-            <Link to="/partenaire" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">Devenir partenaire</Link>
-          </nav>
-
-          {/* À propos */}
-          <nav className="flex flex-col gap-2">
-            <h6 className="font-semibold text-gray-900 mb-2">À propos</h6>
-            <Link to="/aide" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">Centre d'aide</Link>
-            <a href="mailto:contact@godriver.ci" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">Contact</a>
+            <h6 className="text-gray-900 mb-2">Légal</h6>
             <Link to="/conditions" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">Conditions d'utilisation</Link>
             <Link to="/confidentialite" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">Politique de confidentialité</Link>
+          </nav>
+
+          {/* Support */}
+          <nav className="flex flex-col gap-2">
+            <h6 className="text-gray-900 mb-2">Support</h6>
+            <Link to="/aide" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">Centre d'aide</Link>
+            <a href="mailto:contact@godriver.ci" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">Email</a>
           </nav>
         </div>
 

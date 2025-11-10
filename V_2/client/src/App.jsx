@@ -25,6 +25,10 @@ import DevenirPartenairePage from './pages/DevenirPartenairePage.jsx'
 import FormationsPage from './pages/FormationsPage.jsx'
 import CertificationsPage from './pages/CertificationsPage.jsx'
 import CentreAidePage from './pages/CentreAidePage.jsx'
+import ConditionsPage from './pages/ConditionsPage.jsx'
+import ConfidentialitePage from './pages/ConfidentialitePage.jsx'
+import AProposPage from './pages/AProposPage.jsx'
+import ContactPage from './pages/ContactPage.jsx'
 import MyCandidates from './pages/employer/MyCandidates.jsx'
 import MyOffers from './pages/employer/MyOffers.jsx'
 import MyProducts from './pages/employer/MyProducts.jsx'
@@ -167,9 +171,15 @@ function App() {
             {/* Pages publiques */}
             <Route path="/tarifs" element={<TarifsPage />} />
             <Route path="/devenir-partenaire" element={<DevenirPartenairePage />} />
+            <Route path="/partenaire" element={<DevenirPartenairePage />} />
             <Route path="/formations" element={<FormationsPage />} />
             <Route path="/certifications" element={<CertificationsPage />} />
             <Route path="/centre-aide" element={<CentreAidePage />} />
+            <Route path="/aide" element={<CentreAidePage />} />
+            <Route path="/conditions" element={<ConditionsPage />} />
+            <Route path="/confidentialite" element={<ConfidentialitePage />} />
+            <Route path="/a-propos" element={<AProposPage />} />
+            <Route path="/contact" element={<ContactPage />} />
             
             {/* Pages employeur protégées */}
             <Route 
