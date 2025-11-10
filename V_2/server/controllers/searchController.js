@@ -63,34 +63,30 @@ exports.globalSearch = async (req, res) => {
   try {
     const { query } = req.query;
     
-    if (!query || query.trim().length < 2) {
+    if (!query || query.trim().length < 1) {
       return res.json({
         drivers: [],
         offers: [],
         products: [],
-        message: 'Veuillez entrer au moins 2 caractères'
+        message: 'Veuillez entrer au moins 1 caractère'
       });
     }
 
     const normalizedQuery = normalizeText(query);
     const queryWords = normalizedQuery.split(/\s+/).filter(w => w.length > 0);
     
-    // Recherche des chauffeurs avec regex pour pré-filtrer (optimisé)
-    const searchRegex = new RegExp(queryWords.join('|'), 'i');
-    const allDrivers = await Driver.find({ 
-      isActive: true,
-      $or: [
-        { vehicleBrand: searchRegex },
-        { vehicleModel: searchRegex },
-        { workZone: searchRegex },
-        { city: searchRegex },
-        { specialties: { $in: queryWords.map(w => new RegExp(w, 'i')) } }
-      ]
-    })
+    // Créer une regex plus permissive pour les recherches courtes
+    const isShortQuery = query.trim().length <= 2;
+    
+    // Récupérer tous les chauffeurs actifs (on filtre après en JavaScript)
+    const allDrivers = await Driver.find({ isActive: true })
       .populate('userId', 'firstName lastName')
       .select('userId vehicleBrand vehicleModel workZone city specialties experience rating totalRides')
-      .limit(30) // Réduit de 50 à 30 pour plus de rapidité
+      .limit(100)
       .lean();
+    
+    // Seuil de similarité très bas pour être ultra-permissif
+    const similarityThreshold = 0.1; // Accepter presque tout
     
     const matchedDrivers = allDrivers
       .map(driver => {
@@ -110,13 +106,18 @@ exports.globalSearch = async (req, res) => {
           if (field) {
             const normalizedField = normalizeText(field);
             queryWords.forEach(word => {
-              const similarity = calculateSimilarity(word, normalizedField);
-              if (similarity > 0.6) {
-                score += similarity;
+              // Bonus si le champ commence par le mot (recherche courte)
+              if (normalizedField.startsWith(word)) {
+                score += 2;
               }
               // Bonus si le mot est contenu dans le champ
               if (normalizedField.includes(word)) {
-                score += 0.5;
+                score += 1;
+              }
+              // Score de similarité
+              const similarity = calculateSimilarity(word, normalizedField);
+              if (similarity > similarityThreshold) {
+                score += similarity;
               }
             });
           }
@@ -128,21 +129,14 @@ exports.globalSearch = async (req, res) => {
       .sort((a, b) => b.score - a.score)
       .slice(0, 10);
 
-    // Recherche des offres d'emploi avec pré-filtrage (optimisé)
+    // Recherche des offres d'emploi (récupérer toutes les offres actives sauf produits et "Autre")
     const allOffers = await Offer.find({ 
       status: 'active',
-      type: { $ne: 'product' },
-      $or: [
-        { title: searchRegex },
-        { description: searchRegex },
-        { type: searchRegex },
-        { location: searchRegex },
-        { vehicleType: searchRegex }
-      ]
+      type: { $nin: ['product', 'Autre'] } // Tout sauf les produits et offres marketing
     })
       .populate('employer', 'firstName lastName companyName')
       .select('title description type location employer vehicleType licenseType createdAt')
-      .limit(30) // Réduit pour plus de rapidité
+      .limit(100)
       .lean();
     
     const matchedOffers = allOffers
@@ -162,12 +156,27 @@ exports.globalSearch = async (req, res) => {
           if (field) {
             const normalizedField = normalizeText(field);
             queryWords.forEach(word => {
-              const similarity = calculateSimilarity(word, normalizedField);
-              if (similarity > 0.6) {
-                score += similarity;
+              // Bonus si le champ commence par le mot
+              if (normalizedField.startsWith(word)) {
+                score += 3;
               }
+              // Bonus si le mot est contenu dans le champ
               if (normalizedField.includes(word)) {
-                score += 0.5;
+                score += 2;
+              }
+              // Bonus pour chaque mot du champ qui commence par la recherche
+              const fieldWords = normalizedField.split(/\s+/);
+              fieldWords.forEach(fieldWord => {
+                if (fieldWord.startsWith(word)) {
+                  score += 2;
+                }
+              });
+              // Score de similarité (toujours ajouter au moins un petit score)
+              const similarity = calculateSimilarity(word, normalizedField);
+              if (similarity > similarityThreshold) {
+                score += similarity;
+              } else if (similarity > 0) {
+                score += 0.1; // Score minimum pour toute similarité
               }
             });
           }
@@ -175,24 +184,24 @@ exports.globalSearch = async (req, res) => {
         
         return { ...offer, score };
       })
+      .map(offer => {
+        if (offer.title && offer.title.toLowerCase().includes('poids')) {
+          console.log(`🔍 Offre "${offer.title}" - Score: ${offer.score}`);
+        }
+        return offer;
+      })
       .filter(offer => offer.score > 0)
       .sort((a, b) => b.score - a.score)
       .slice(0, 10);
 
-    // Recherche des offres marketing/produits avec pré-filtrage (optimisé)
+    // Recherche des offres marketing/produits (récupérer tous les produits actifs)
     const allProducts = await Offer.find({ 
       status: 'active',
-      type: 'product',
-      $or: [
-        { title: searchRegex },
-        { description: searchRegex },
-        { category: searchRegex },
-        { location: searchRegex }
-      ]
+      type: { $in: ['product', 'Autre'] } // Produits et offres marketing
     })
       .populate('employer', 'firstName lastName companyName')
-      .select('title description category location employer price createdAt')
-      .limit(30) // Réduit pour plus de rapidité
+      .select('title description category location employer price images createdAt')
+      .limit(100)
       .lean();
     
     const matchedProducts = allProducts
@@ -210,12 +219,18 @@ exports.globalSearch = async (req, res) => {
           if (field) {
             const normalizedField = normalizeText(field);
             queryWords.forEach(word => {
-              const similarity = calculateSimilarity(word, normalizedField);
-              if (similarity > 0.6) {
-                score += similarity;
+              // Bonus si le champ commence par le mot
+              if (normalizedField.startsWith(word)) {
+                score += 2;
               }
+              // Bonus si le mot est contenu dans le champ
               if (normalizedField.includes(word)) {
-                score += 0.5;
+                score += 1;
+              }
+              // Score de similarité
+              const similarity = calculateSimilarity(word, normalizedField);
+              if (similarity > similarityThreshold) {
+                score += similarity;
               }
             });
           }
@@ -227,6 +242,9 @@ exports.globalSearch = async (req, res) => {
       .sort((a, b) => b.score - a.score)
       .slice(0, 10);
 
+    console.log(`🔍 Recherche: "${query}"`);
+    console.log(`📊 Résultats: ${matchedDrivers.length} chauffeurs, ${matchedOffers.length} offres, ${matchedProducts.length} produits`);
+    
     res.json({
       query,
       results: {

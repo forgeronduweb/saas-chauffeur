@@ -67,16 +67,25 @@ exports.createOrGetConversation = async (req, res) => {
         const currentUser = await User.findById(currentUserId);
         
         if (offer && currentUser) {
-          const productUrl = `${process.env.CLIENT_URL || 'http://localhost:3000'}/produit/${offer._id}`;
+          const productUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/produit/${offer._id}`;
           const messageContent = `Bonjour,\n\nJe suis intéressé(e) par votre offre "${offer.title}".\n\nPourriez-vous me donner plus d'informations ?\n\nLien de l'offre : ${productUrl}`;
           
           console.log('💬 Contenu du message:', messageContent);
+          
+          // Message texte avec les infos
+          const metadata = new Map();
+          metadata.set('productId', offer._id.toString());
+          metadata.set('productTitle', offer.title);
+          metadata.set('productPrice', offer.price);
+          metadata.set('productImage', offer.images && offer.images.length > 0 ? offer.images[0] : null);
+          metadata.set('productUrl', productUrl);
           
           const initialMessage = new Message({
             conversationId: conversation._id,
             senderId: currentUserId,
             content: messageContent,
-            type: 'text'
+            type: 'text',
+            metadata: metadata
           });
           await initialMessage.save();
           
@@ -116,14 +125,22 @@ exports.createOrGetConversation = async (req, res) => {
         const currentUser = await User.findById(currentUserId);
         
         if (offer && currentUser) {
-          const productUrl = `${process.env.CLIENT_URL || 'http://localhost:3000'}/produit/${offer._id}`;
+          const productUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/produit/${offer._id}`;
           const messageContent = `Bonjour,\n\nJe suis intéressé(e) par votre offre "${offer.title}".\n\nPourriez-vous me donner plus d'informations ?\n\nLien de l'offre : ${productUrl}`;
+          
+          const metadata = new Map();
+          metadata.set('productId', offer._id.toString());
+          metadata.set('productTitle', offer.title);
+          metadata.set('productPrice', offer.price);
+          metadata.set('productImage', offer.images && offer.images.length > 0 ? offer.images[0] : null);
+          metadata.set('productUrl', productUrl);
           
           const initialMessage = new Message({
             conversationId: conversation._id,
             senderId: currentUserId,
             content: messageContent,
-            type: 'text'
+            type: 'text',
+            metadata: metadata
           });
           await initialMessage.save();
           
