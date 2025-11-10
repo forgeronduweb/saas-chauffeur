@@ -221,9 +221,9 @@ export default function CreateOfferPage() {
           </p>
         </div>
 
-        {/* Sélection du type d'offre - Masqué sur mobile */}
+        {/* Sélection du type d'offre */}
         {!offerType ? (
-          <div className={`hidden lg:grid gap-6 ${user?.role === 'employer' ? 'grid-cols-2' : 'grid-cols-1 max-w-md mx-auto'}`}>
+          <div className={`grid gap-6 ${user?.role === 'employer' ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1 max-w-md mx-auto'}`}>
             {console.log('User role:', user?.role, 'Is employer:', user?.role === 'employer')}
             {/* Offre d'emploi - UNIQUEMENT pour les employeurs */}
             {user?.role === 'employer' && (
@@ -280,8 +280,8 @@ export default function CreateOfferPage() {
         )}
       </main>
 
-      {/* Bouton FAB mobile - Affiché uniquement pour les employeurs si aucun type n'est sélectionné */}
-      {!offerType && user?.role === 'employer' && (
+      {/* Bouton FAB mobile - Masqué car remplacé par le bouton dans le header */}
+      {false && !offerType && user?.role === 'employer' && (
         <>
           {/* Bouton principal */}
           <button

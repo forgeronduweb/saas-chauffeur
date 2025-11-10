@@ -230,8 +230,8 @@ export const chatService = {
 // API pour les messages (système complet)
 export const messagesApi = {
   // Conversations
-  createOrGetConversation: (targetUserId, context = {}) => 
-    api.post('/messages/conversations', { targetUserId, context }),
+  createOrGetConversation: (participantId, context = {}) => 
+    api.post('/messages/conversations', { participantId, context }),
   getConversations: () => api.get('/messages/conversations'),
   markAsRead: (conversationId) => api.put(`/messages/conversations/${conversationId}/read`),
   deleteConversation: (conversationId) => api.delete(`/messages/conversations/${conversationId}`),

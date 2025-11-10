@@ -1,22 +1,63 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import SubNavigation from './SubNavigation';
 import SearchResults from './SearchResults';
-import { searchService } from '../../services/api';
+import MessagingSystem from '../messaging/MessagingSystem';
+import FloatingMessagingButton from '../messaging/FloatingMessagingButton';
+import { searchService, messagesApi } from '../../services/api';
 
 export default function SimpleHeader({ activeTab = '', searchQuery = '', onSearchChange = () => {}, readOnly = false, hideSubNav = false }) {
   const { user, logout } = useAuth();
+  const location = useLocation();
   const [showMenu, setShowMenu] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [localSearchQuery, setLocalSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState(null);
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const [showMessaging, setShowMessaging] = useState(false);
+  const [initialConversationId, setInitialConversationId] = useState(null);
+  const [unreadCount, setUnreadCount] = useState(0);
   const searchTimeoutRef = useRef(null);
   const searchContainerDesktopRef = useRef(null);
   const searchContainerMobileRef = useRef(null);
   
+  // Charger le compteur de messages non lus
+  useEffect(() => {
+    if (user) {
+      loadUnreadCount();
+      // Actualiser toutes les 30 secondes
+      const interval = setInterval(loadUnreadCount, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [user]);
+
+  // Écouter les événements d'ouverture de messagerie
+  useEffect(() => {
+    const handleOpenMessaging = (event) => {
+      const { conversationId } = event.detail || {};
+      console.log('🎯 SimpleHeader reçoit openMessaging:', { conversationId });
+      
+      if (conversationId) {
+        setInitialConversationId(conversationId);
+      }
+      setShowMessaging(true);
+    };
+
+    window.addEventListener('openMessaging', handleOpenMessaging);
+    return () => window.removeEventListener('openMessaging', handleOpenMessaging);
+  }, []);
+
+  const loadUnreadCount = async () => {
+    try {
+      const response = await messagesApi.getUnreadCount();
+      setUnreadCount(response.data?.count || 0);
+    } catch (error) {
+      console.error('Erreur chargement compteur:', error);
+    }
+  };
+
   // Gestion de la recherche avec debounce
   useEffect(() => {
     if (searchTimeoutRef.current) {
@@ -85,7 +126,8 @@ export default function SimpleHeader({ activeTab = '', searchQuery = '', onSearc
   };
 
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
+    <>
+    <header className={`bg-white border-b border-gray-200 sticky top-0 z-40 ${showMessaging ? 'hidden lg:block' : ''}`}>
       <div className="max-w-7xl mx-auto px-4 lg:px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
@@ -142,17 +184,33 @@ export default function SimpleHeader({ activeTab = '', searchQuery = '', onSearc
             )}
             <Link
               to="/publier-offre"
-              className="px-2 py-1 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors hidden lg:inline-block"
+              className="font-medium text-gray-700 hover:text-gray-900 transition-colors"
             >
-              Publier une offre
+              <span className="text-xs lg:hidden">Publier</span>
+              <span className="hidden lg:inline text-sm">Publier une offre</span>
             </Link>
             {user ? (
               <div className="relative">
                 <button
                   onClick={() => setShowMenu(!showMenu)}
-                  className="px-4 py-2 bg-orange-500 text-white text-sm lg:text-base font-medium rounded hover:bg-orange-600 transition-colors"
+                  className="flex items-center gap-2"
                 >
-                  Mon espace
+                  {/* Avatar sur mobile */}
+                  <div className="lg:hidden w-9 h-9 rounded-full bg-orange-500 flex items-center justify-center text-white font-semibold text-sm overflow-hidden">
+                    {user.profilePhotoUrl ? (
+                      <img 
+                        src={user.profilePhotoUrl} 
+                        alt={`${user.firstName} ${user.lastName}`}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span>{user.firstName?.[0]}{user.lastName?.[0]}</span>
+                    )}
+                  </div>
+                  {/* Bouton Mon espace sur desktop */}
+                  <span className="hidden lg:inline px-4 py-2 bg-orange-500 text-white text-base font-medium rounded hover:bg-orange-600 transition-colors">
+                    Mon espace
+                  </span>
                 </button>
 
                 {/* Menu dropdown */}
@@ -224,12 +282,6 @@ export default function SimpleHeader({ activeTab = '', searchQuery = '', onSearc
                             </li>
                           </>
                         )}
-                        <li className="flex items-center justify-between gap-3 cursor-pointer px-3 py-2 rounded hover:bg-gray-500/20 transition">
-                          <Link to="/messages" onClick={() => setShowMenu(false)}>Messages</Link>
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z" fill="#1F2937" fillOpacity=".8"/>
-                          </svg>
-                        </li>
                         <div className="w-full h-px bg-gray-300/50 my-2"></div>
                         <li className="flex items-center text-red-600/80 justify-between gap-3 cursor-pointer px-3 py-2 rounded hover:bg-red-600/20 transition">
                           <button onClick={() => { logout(); setShowMenu(false); }} className="text-left w-full">Déconnexion</button>
@@ -297,5 +349,30 @@ export default function SimpleHeader({ activeTab = '', searchQuery = '', onSearc
       {/* Sous-menu */}
       {!hideSubNav && <SubNavigation activeTab={activeTab} />}
     </header>
+
+    {/* Système de messagerie - en dehors du header */}
+    <MessagingSystem 
+      isOpen={showMessaging}
+      initialConversationId={initialConversationId}
+      onClose={() => {
+        setShowMessaging(false);
+        setInitialConversationId(null); // Réinitialiser
+        loadUnreadCount(); // Recharger le compteur à la fermeture
+      }}
+    />
+
+    {/* Bouton flottant de messagerie (visible uniquement si connecté et pas sur pages formulaires) - en dehors du header */}
+    {user && 
+     !location.pathname.includes('/publier-offre') && 
+     !location.pathname.includes('/poster-annonce') &&
+     !location.pathname.includes('/formulaire') && 
+     !location.pathname.includes('/auth') && (
+      <FloatingMessagingButton
+        isOpen={showMessaging}
+        onClick={() => setShowMessaging(!showMessaging)}
+        unreadCount={unreadCount}
+      />
+    )}
+    </>
   );
 }

@@ -15,6 +15,12 @@ export default function MessagesPage() {
   const [loading, setLoading] = useState(true);
   const [isMobileView, setIsMobileView] = useState(window.innerWidth < 1024);
 
+  // Redirection vers la page d'accueil (les modales sont maintenant utilisées partout)
+  useEffect(() => {
+    navigate('/');
+    return;
+  }, [navigate]);
+
   // Charger les conversations
   useEffect(() => {
     if (!user) {

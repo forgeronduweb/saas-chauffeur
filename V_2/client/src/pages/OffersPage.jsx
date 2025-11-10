@@ -275,8 +275,8 @@ export default function OffersPage() {
         </div>
       </main>
 
-      {/* Bouton Flottant (FAB) - Mobile uniquement */}
-      <div className="fixed bottom-6 right-6 z-50 lg:hidden">
+      {/* Bouton Flottant (FAB) - Masqué car remplacé par le bouton Publier dans le header */}
+      <div className="hidden fixed bottom-6 right-6 z-50 lg:hidden">
         {/* Menu des options */}
         {showFabMenu && (
           <>

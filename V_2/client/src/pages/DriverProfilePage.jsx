@@ -47,14 +47,53 @@ export default function DriverProfilePage() {
 
     try {
       setContacting(true);
+      
+      // Log pour déboguer
+      console.log('Création conversation avec:', {
+        participantId: driver.userId._id || driver.userId,
+        context: { type: 'driver_inquiry', driverId: driver._id }
+      });
+      
       const response = await messagesApi.createOrGetConversation(
         driver.userId._id || driver.userId,
         { type: 'driver_inquiry', driverId: driver._id }
       );
-      navigate(`/messages?conversation=${response.data.conversation._id}`);
+      
+      console.log('Réponse conversation:', response);
+      
+      // Récupérer l'ID de la conversation créée
+      const conversationId = response.data?.conversation?._id || response.data?._id;
+      console.log('ID conversation créée:', conversationId);
+      
+      if (!conversationId) {
+        console.error('Pas d\'ID de conversation dans la réponse');
+        return;
+      }
+      
+      // Sur PC (≥1024px), émettre un événement pour ouvrir les modales
+      if (window.innerWidth >= 1024) {
+        const event = new CustomEvent('openMessaging', { 
+          detail: { conversationId } 
+        });
+        window.dispatchEvent(event);
+      } else {
+        // Sur mobile, rediriger vers la page complète
+        navigate(`/messages?conversation=${conversationId}`);
+      }
     } catch (error) {
-      console.error('Erreur:', error);
-      alert('Erreur lors de la création de la conversation');
+      console.error('Erreur complète:', error);
+      console.error('Détails erreur:', error.response?.data);
+      
+      // SOLUTION TEMPORAIRE : Si erreur backend, ouvrir quand même la messagerie
+      // L'utilisateur pourra chercher le contact manuellement
+      console.warn('⚠️ Erreur backend lors de la création de conversation. Ouverture de la messagerie...');
+      
+      if (window.innerWidth >= 1024) {
+        const event = new CustomEvent('openMessaging');
+        window.dispatchEvent(event);
+      } else {
+        navigate('/messages');
+      }
     } finally {
       setContacting(false);
     }
