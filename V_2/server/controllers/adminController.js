@@ -192,11 +192,22 @@ exports.updateDriverStatus = async (req, res) => {
 // Récupérer toutes les offres avec filtres
 exports.getOffers = async (req, res) => {
   try {
-    const { status, type, search, page = 1, limit = 20 } = req.query;
+    const { status, type, search, category, page = 1, limit = 20 } = req.query;
     
     const filter = {};
     if (status) filter.status = status;
     if (type) filter.type = type;
+    
+    // Filtrage par catégorie
+    if (category === 'job') {
+      // Offres d'emploi : exclure les offres marketing
+      filter.type = { $nin: ['product', 'Autre'] };
+    } else if (category === 'marketing') {
+      // Offres marketing : uniquement 'product' ou 'Autre'
+      filter.type = { $in: ['product', 'Autre'] };
+    }
+    // Si category === 'all' ou non défini, pas de filtre sur le type
+    
     if (search) {
       filter.$or = [
         { title: { $regex: search, $options: 'i' } },
