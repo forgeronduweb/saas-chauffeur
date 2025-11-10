@@ -111,7 +111,7 @@ export default function DriverProfilePage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl text-gray-900 mb-4">Chauffeur non trouvé</h2>
+          <h2 className="text-xl text-gray-900 mb-4">Chauffeur non trouvé</h2>
           <Link to="/" className="text-orange-500 hover:text-orange-600">
             Retour à l'accueil
           </Link>
@@ -161,7 +161,7 @@ export default function DriverProfilePage() {
               <div className="flex-1">
                 <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
                   <div>
-                    <h1 className="text-2xl lg:text-3xl text-gray-900 mb-2">
+                    <h1 className="text-xl lg:text-3xl text-gray-900 mb-2">
                       {driver.firstName} {driver.lastName}
                     </h1>
                     <div className="flex items-center gap-2 mb-3">
@@ -306,15 +306,15 @@ export default function DriverProfilePage() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">Courses effectuées</span>
-                  <span className="text-2xl text-orange-500">{driver.totalRides || 0}</span>
+                  <span className="text-xl lg:text-2xl text-orange-500">{driver.totalRides || 0}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">Note moyenne</span>
-                  <span className="text-2xl text-orange-500">{driver.rating ? driver.rating.toFixed(1) : '5.0'}</span>
+                  <span className="text-xl lg:text-2xl text-orange-500">{driver.rating ? driver.rating.toFixed(1) : '5.0'}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">Taux d'acceptation</span>
-                  <span className="text-2xl text-orange-500">98%</span>
+                  <span className="text-xl lg:text-2xl text-orange-500">98%</span>
                 </div>
               </div>
             </div>
@@ -338,7 +338,7 @@ export default function DriverProfilePage() {
 
         {/* Expériences professionnelles - En bas */}
         <div className="bg-white border border-gray-200 p-6 lg:p-8 mt-8">
-          <h2 className="text-xl text-gray-900 mb-6 flex items-center gap-2">
+          <h2 className="text-lg lg:text-xl text-gray-900 mb-6 flex items-center gap-2">
             <Briefcase className="w-6 h-6 text-orange-500" />
             Expériences professionnelles
           </h2>

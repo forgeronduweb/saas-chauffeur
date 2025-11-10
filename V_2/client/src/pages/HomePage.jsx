@@ -204,7 +204,7 @@ export default function HomePage() {
       <main className="max-w-7xl mx-auto px-4 lg:px-6 pb-8">
         {/* Titre section chauffeurs */}
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-xl lg:text-2xl font-normal text-gray-900">
+          <h2 className="text-lg lg:text-2xl font-normal text-gray-900">
             Chauffeurs <span className="text-gray-500">({totalDrivers})</span>
           </h2>
           <Link 
@@ -248,7 +248,7 @@ export default function HomePage() {
         {/* Section Offres d'emploi */}
         <div className="mt-16">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl lg:text-2xl font-normal text-gray-900">
+            <h2 className="text-lg lg:text-2xl font-normal text-gray-900">
               Offres d'emploi <span className="text-gray-500">({totalOffers})</span>
             </h2>
             <Link 
@@ -279,7 +279,7 @@ export default function HomePage() {
         {/* Section Marketing & Vente */}
         <div className="mt-16">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl lg:text-2xl font-normal text-gray-900">
+            <h2 className="text-lg lg:text-2xl font-normal text-gray-900">
               Marketing & Vente <span className="text-gray-500">({products.length})</span>
             </h2>
             <Link 

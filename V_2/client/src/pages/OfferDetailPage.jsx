@@ -127,7 +127,7 @@ export default function OfferDetailPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Offre non trouvée</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Offre non trouvée</h2>
           <Link to="/offres" className="text-gray-600 hover:text-gray-900">
             Retour aux offres
           </Link>
@@ -148,7 +148,7 @@ export default function OfferDetailPage() {
           <div className="lg:col-span-2">
             {/* En-tête */}
             <div className="bg-white border border-gray-200 rounded-lg p-6 lg:p-8 mb-6">
-              <h1 className="text-base sm:text-lg lg:text-xl font-semibold text-gray-900 mb-3">
+              <h1 className="text-base sm:text-lg lg:text-2xl font-semibold text-gray-900 mb-3">
                 {offer.title}
               </h1>
               <div className="mb-4">
@@ -252,7 +252,7 @@ export default function OfferDetailPage() {
             {/* Avantages */}
             {offer.benefits && Array.isArray(offer.benefits) && offer.benefits.length > 0 && (
               <div className="bg-white border border-gray-200 rounded-lg p-6 lg:p-8">
-                <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Avantages</h2>
+                <h2 className="text-base sm:text-xl font-semibold text-gray-900 mb-4">Avantages</h2>
                 <ul className="space-y-2">
                   {offer.benefits.map((benefit, index) => (
                   <li key={index} className="flex items-start gap-2 text-gray-700">

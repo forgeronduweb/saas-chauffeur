@@ -205,10 +205,10 @@ export default function CentreAidePage() {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <HelpCircle className="w-16 h-16 mx-auto mb-6" />
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
+            <h1 className="text-2xl md:text-5xl font-bold mb-6">
               Centre d'aide GoDriver
             </h1>
-            <p className="text-xl md:text-2xl text-blue-100 mb-8">
+            <p className="text-base md:text-2xl text-blue-100 mb-8">
               Trouvez rapidement des réponses à vos questions
             </p>
 
@@ -278,7 +278,7 @@ export default function CentreAidePage() {
       <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+            <h2 className="text-xl md:text-3xl font-bold text-gray-900 mb-8 text-center">
               Questions fréquentes
             </h2>
 
@@ -325,10 +325,10 @@ export default function CentreAidePage() {
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              <h2 className="text-xl md:text-4xl font-bold text-gray-900 mb-4">
                 Besoin d'aide supplémentaire ?
               </h2>
-              <p className="text-xl text-gray-600">
+              <p className="text-base text-gray-600">
                 Notre équipe est là pour vous aider
               </p>
             </div>
@@ -358,10 +358,10 @@ export default function CentreAidePage() {
       <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
         <div className="container mx-auto px-4 text-center">
           <MessageCircle className="w-16 h-16 mx-auto mb-6" />
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
+          <h2 className="text-xl md:text-4xl font-bold mb-6">
             Vous n'avez pas trouvé votre réponse ?
           </h2>
-          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-base text-blue-100 mb-8 max-w-2xl mx-auto">
             Notre équipe de support est disponible pour répondre à toutes vos questions
           </p>
           <button className="inline-block bg-white text-blue-600 px-10 py-5 rounded-lg font-bold text-xl hover:bg-gray-100 transition-all transform hover:scale-105 shadow-2xl">

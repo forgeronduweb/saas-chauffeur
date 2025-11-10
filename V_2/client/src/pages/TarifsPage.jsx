@@ -40,10 +40,10 @@ export default function TarifsPage() {
       <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-20">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
+            <h1 className="text-2xl md:text-5xl font-bold mb-6">
               Des tarifs transparents pour tous
             </h1>
-            <p className="text-xl md:text-2xl text-blue-100 mb-8">
+            <p className="text-base md:text-2xl text-blue-100 mb-8">
               Choisissez le plan qui correspond à vos besoins. Sans engagement, sans surprise.
             </p>
             
@@ -148,7 +148,7 @@ export default function TarifsPage() {
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12">
+            <h2 className="text-xl md:text-4xl font-bold text-center text-gray-900 mb-12">
               Pourquoi choisir GoDriver ?
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -189,7 +189,7 @@ export default function TarifsPage() {
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12">
+            <h2 className="text-xl md:text-4xl font-bold text-center text-gray-900 mb-12">
               Questions fréquentes
             </h2>
             <div className="space-y-6">
@@ -233,10 +233,10 @@ export default function TarifsPage() {
       {/* CTA Section */}
       <section className="py-16 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
+          <h2 className="text-xl md:text-4xl font-bold mb-6">
             Prêt à commencer ?
           </h2>
-          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-base text-blue-100 mb-8 max-w-2xl mx-auto">
             Rejoignez des centaines d'entreprises qui font confiance à GoDriver pour leurs besoins en chauffeurs professionnels.
           </p>
           <Link

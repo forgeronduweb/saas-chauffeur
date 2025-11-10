@@ -329,7 +329,7 @@ export default function UserProfilePage() {
 
       <main className="max-w-4xl mx-auto px-3 sm:px-4 py-4 sm:py-6 lg:py-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 mb-4 sm:mb-6">
-          <h1 className="text-xl sm:text-2xl lg:text-3xl text-gray-900">Mon Profil</h1>
+          <h1 className="text-lg sm:text-2xl lg:text-3xl text-gray-900">Mon Profil</h1>
           <div className="flex gap-2 w-full sm:w-auto">
             {!isEditing ? (
               <button
@@ -372,7 +372,7 @@ export default function UserProfilePage() {
 
         {/* Photo de profil */}
         <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6">
-          <h2 className="text-lg sm:text-xl text-gray-900 mb-3 sm:mb-4">Photo de profil</h2>
+          <h2 className="text-base sm:text-xl text-gray-900 mb-3 sm:mb-4">Photo de profil</h2>
           
           <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
             {/* Aperçu de la photo */}
@@ -417,7 +417,7 @@ export default function UserProfilePage() {
 
         {/* Informations personnelles */}
         <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6">
-          <h2 className="text-lg sm:text-xl text-gray-900 mb-3 sm:mb-4">Informations personnelles</h2>
+          <h2 className="text-base sm:text-xl text-gray-900 mb-3 sm:mb-4">Informations personnelles</h2>
           
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

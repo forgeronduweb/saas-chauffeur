@@ -196,6 +196,58 @@ const ChatModal = ({ isOpen, conversation, onClose, onBack }) => {
                         className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
                       >
                         <div className={`max-w-[75%] ${isOwn ? 'order-2' : 'order-1'}`}>
+                          {/* Carte produit si métadonnées présentes */}
+                          {(() => {
+                            // MongoDB Map est converti en objet par Mongoose
+                            const metadata = message.metadata;
+                            
+                            // Log pour déboguer
+                            if (metadata) {
+                              console.log('🔍 Metadata trouvé:', metadata);
+                              console.log('🔍 Type de metadata:', typeof metadata);
+                              console.log('🔍 Keys:', Object.keys(metadata || {}));
+                            }
+                            
+                            const productImage = metadata?.productImage || metadata?.get?.('productImage');
+                            const productTitle = metadata?.productTitle || metadata?.get?.('productTitle');
+                            const productPrice = metadata?.productPrice || metadata?.get?.('productPrice');
+                            const productUrl = metadata?.productUrl || metadata?.get?.('productUrl');
+                            
+                            console.log('🖼️ Product Image:', productImage);
+                            
+                            if (!productImage) return null;
+                            
+                            return (
+                              <div className={`mb-2 rounded-lg overflow-hidden border ${
+                                isOwn ? 'border-orange-300' : 'border-gray-200'
+                              }`}>
+                                <a 
+                                  href={productUrl} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="block hover:opacity-90 transition-opacity"
+                                >
+                                  <img 
+                                    src={productImage} 
+                                    alt={productTitle}
+                                    className="w-full h-32 object-cover"
+                                  />
+                                  <div className="p-2 bg-white">
+                                    <p className="text-sm font-medium text-gray-900 truncate">
+                                      {productTitle}
+                                    </p>
+                                    {productPrice && (
+                                      <p className="text-xs font-semibold text-green-600 mt-1">
+                                        {productPrice} FCFA
+                                      </p>
+                                    )}
+                                  </div>
+                                </a>
+                              </div>
+                            );
+                          })()}
+                          
+                          {/* Bulle de message */}
                           <div
                             className={`px-4 py-2 rounded-2xl ${
                               isOwn

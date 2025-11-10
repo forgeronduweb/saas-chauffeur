@@ -18,39 +18,23 @@ const MessagingSystem = ({ isOpen, onClose, initialConversationId = null }) => {
   const [showChat, setShowChat] = useState(false);
   const [selectedConversation, setSelectedConversation] = useState(null);
 
-  // Réinitialiser les états quand la messagerie s'ouvre
+  // Réinitialiser les états quand la messagerie s'ouvre (sauf si initialConversationId est fourni)
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !initialConversationId) {
       setShowConversations(true);
       setShowChat(false);
       setSelectedConversation(null);
     }
-  }, [isOpen]);
+  }, [isOpen, initialConversationId]);
 
   // Gestion conversation initiale (ouverture directe d'un chat)
   useEffect(() => {
     if (isOpen && initialConversationId) {
+      console.log('🎯 Chargement conversation initiale:', initialConversationId);
       // Charger la conversation et ouvrir directement le chat
       loadAndOpenConversation(initialConversationId);
     }
   }, [isOpen, initialConversationId]);
-
-  // Écouter les événements personnalisés d'ouverture de messagerie
-  useEffect(() => {
-    const handleOpenMessaging = (event) => {
-      const { conversationId } = event.detail || {};
-      
-      console.log('📨 Événement openMessaging reçu:', { conversationId, isOpen });
-      
-      if (conversationId && isOpen) {
-        // Si déjà ouvert, charger la conversation
-        loadAndOpenConversation(conversationId);
-      }
-    };
-
-    window.addEventListener('openMessaging', handleOpenMessaging);
-    return () => window.removeEventListener('openMessaging', handleOpenMessaging);
-  }, [isOpen]);
 
   const loadAndOpenConversation = async (conversationId) => {
     try {

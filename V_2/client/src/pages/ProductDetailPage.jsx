@@ -70,7 +70,7 @@ export default function ProductDetailPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Produit non trouvé</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Produit non trouvé</h2>
           <Link to="/marketing-vente" className="text-gray-600 hover:text-gray-900">
             Retour à la marketplace
           </Link>
@@ -157,7 +157,7 @@ export default function ProductDetailPage() {
             {/* En-tête */}
             <div className="mb-6">
               <div className="flex items-start justify-between mb-3">
-                <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-gray-900 flex-1">
+                <h1 className="text-base sm:text-2xl lg:text-3xl font-semibold text-gray-900 flex-1">
                   {product.title}
                 </h1>
                 
@@ -185,7 +185,7 @@ export default function ProductDetailPage() {
                   </div>
                 )}
               </div>
-              <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4">
+              <p className="text-lg sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4">
                 {product.price ? `${product.price.toLocaleString()} FCFA` : 'Prix sur demande'}
               </p>
               <div className="flex items-center gap-3 text-sm text-gray-600">
@@ -261,23 +261,36 @@ export default function ProductDetailPage() {
                     try {
                       setContacting(true);
                       const employerId = product.employerId?._id || product.employerId;
-                      console.log('📤 Envoi du message automatique pour l\'offre:', product._id);
+                      console.log('📤 Création/récupération de la conversation pour le produit:', {
+                        productId: product._id,
+                        productTitle: product.title,
+                        employerId: employerId
+                      });
                       
                       const response = await messagesApi.createOrGetConversation(
                         employerId,
                         { type: 'product_inquiry', offerId: product._id }
                       );
                       
-                      console.log('✅ Conversation créée:', response.data.conversation._id);
-                      console.log('📨 Messages reçus:', response.data.messages?.length || 0);
+                      console.log('📨 Réponse complète:', response.data);
+                      console.log('💬 Messages reçus:', response.data.messages);
+                      console.log('📊 Nombre de messages:', response.data.messages?.length || 0);
                       
-                      // Délai pour s'assurer que le message est bien sauvegardé
-                      await new Promise(resolve => setTimeout(resolve, 1000));
+                      const conversationId = response.data.conversation._id;
+                      console.log('✅ Conversation prête:', conversationId);
                       
-                      navigate(`/messages?conversation=${response.data.conversation._id}`);
+                      // Attendre un peu pour s'assurer que tout est sauvegardé
+                      await new Promise(resolve => setTimeout(resolve, 500));
+                      
+                      // Ouvrir la messagerie avec cette conversation
+                      console.log('🚀 Dispatch événement openMessaging avec conversationId:', conversationId);
+                      window.dispatchEvent(new CustomEvent('openMessaging', {
+                        detail: { conversationId }
+                      }));
                     } catch (error) {
-                      console.error('Erreur:', error);
-                      alert('Erreur lors de la création de la conversation');
+                      console.error('❌ Erreur complète:', error);
+                      console.error('📋 Détails:', error.response?.data || error.message);
+                      alert('Erreur lors de l\'ouverture de la conversation');
                     } finally {
                       setContacting(false);
                     }
@@ -285,7 +298,7 @@ export default function ProductDetailPage() {
                   disabled={contacting}
                   className="block w-full py-3 bg-orange-500 text-white text-center font-medium rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50"
                 >
-                  {contacting ? 'Connexion...' : 'Envoyer un message'}
+                  {contacting ? 'Ouverture...' : 'Envoyer un message'}
                 </button>
               ) : (
                 <>
