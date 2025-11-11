@@ -1,5 +1,27 @@
 import { Link } from 'react-router-dom';
 
+// Fonction pour calculer l'expérience totale en années
+const calculateTotalExperience = (workExperiences) => {
+  if (!workExperiences || workExperiences.length === 0) return 0;
+  
+  let totalMonths = 0;
+  const now = new Date();
+  
+  workExperiences.forEach(exp => {
+    if (!exp.startDate) return;
+    
+    const startDate = new Date(exp.startDate + '-01');
+    const endDate = exp.endDate ? new Date(exp.endDate + '-01') : now;
+    
+    const months = (endDate.getFullYear() - startDate.getFullYear()) * 12 + 
+                   (endDate.getMonth() - startDate.getMonth());
+    
+    totalMonths += Math.max(0, months);
+  });
+  
+  return Math.round(totalMonths / 12 * 10) / 10;
+};
+
 export default function SearchResults({ results, query, onClose }) {
   if (!results) return null;
 
@@ -78,7 +100,12 @@ export default function SearchResults({ results, query, onClose }) {
                   </div>
                   <div className="flex-shrink-0">
                     <span className="inline-flex items-center px-2 py-1 text-xs lg:text-sm font-medium rounded-full bg-green-100 text-green-700">
-                      {driver.experience}
+                      {(() => {
+                        const totalYears = calculateTotalExperience(driver.workExperience);
+                        return totalYears > 0 
+                          ? `${totalYears} ${totalYears === 1 ? 'an' : 'ans'}`
+                          : 'Débutant';
+                      })()}
                     </span>
                   </div>
                 </div>

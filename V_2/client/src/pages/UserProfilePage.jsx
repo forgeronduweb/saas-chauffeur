@@ -547,88 +547,88 @@ export default function UserProfilePage() {
               <div>
                 <p className="text-xs font-semibold text-gray-700 mb-2">
                   {profileCompletion === 100 
-                    ? '✅ Tous les champs sont remplis' 
-                    : '📋 Champs manquants :'}
+                    ? 'Tous les champs sont remplis' 
+                    : 'Champs manquants :'}
                 </p>
                 <div className="flex flex-wrap gap-1.5 sm:gap-2 justify-center sm:justify-start">
                   {/* Champs de base */}
                   {!userInfo.firstName && (
                     <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
-                      👤 Prénom
+                      Prénom
                     </span>
                   )}
                   {!userInfo.lastName && (
                     <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
-                      👤 Nom
+                      Nom
                     </span>
                   )}
                   {!userInfo.phone && (
                     <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
-                      📞 Téléphone
+                      Téléphone
                     </span>
                   )}
                   
                   {/* Champs chauffeur */}
                   {isDriver && !driverInfo.licenseNumber && (
                     <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
-                      🪪 N° Permis
+                      N° Permis
                     </span>
                   )}
                   {isDriver && !driverInfo.licenseExpiryDate && (
                     <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
-                      📅 Date expiration
+                      Date expiration
                     </span>
                   )}
                   {isDriver && !driverInfo.workZone && (
                     <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
-                      📍 Zone de travail
+                      Zone de travail
                     </span>
                   )}
                   {isDriver && !driverInfo.profilePhotoUrl && (
                     <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
-                      📸 Photo
+                      Photo
                     </span>
                   )}
                   {isDriver && !workExperiences.some(exp => exp.company && exp.position && exp.startDate) && (
                     <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
-                      💼 Expérience pro
+                      Expérience pro
                     </span>
                   )}
                   
                   {/* Champs employeur */}
                   {user?.role === 'employer' && !employerInfo.companyName && (
                     <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
-                      🏢 Nom entreprise
+                      Nom entreprise
                     </span>
                   )}
                   {user?.role === 'employer' && !employerInfo.companyType && (
                     <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
-                      🏭 Type entreprise
+                      Type entreprise
                     </span>
                   )}
                   {user?.role === 'employer' && !employerInfo.sector && (
                     <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
-                      🏭 Secteur
+                      Secteur
                     </span>
                   )}
                   {user?.role === 'employer' && !employerInfo.address && (
                     <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
-                      📍 Adresse
+                      Adresse
                     </span>
                   )}
                   {user?.role === 'employer' && !employerInfo.description && (
                     <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
-                      📝 Description
+                      Description
                     </span>
                   )}
                   {user?.role === 'employer' && !employerInfo.companyPhone && (
                     <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
-                      📞 Tél. entreprise
+                      Tél. entreprise
                     </span>
                   )}
                   {user?.role === 'employer' && !employerInfo.companyEmail && (
                     <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
-                      📧 Email entreprise
+                      Email entreprise
                     </span>
                   )}
                 </div>

@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { driversService, messagesApi } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import SimpleHeader from '../component/common/SimpleHeader';
-import { MapPin, Phone, Mail, Star, Award, Calendar, Car, Shield, Briefcase, CheckCircle } from 'lucide-react';
+import { MapPin, Phone, Mail, Star, Award, Calendar, Car, Shield, Briefcase, CheckCircle, MessageCircle } from 'lucide-react';
 
 // Fonction pour formater les dates YYYY-MM en format lisible
 const formatMonthYear = (dateString) => {
@@ -11,6 +11,30 @@ const formatMonthYear = (dateString) => {
   const [year, month] = dateString.split('-');
   const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
   return `${months[parseInt(month) - 1]} ${year}`;
+};
+
+// Fonction pour calculer l'expérience totale en années
+const calculateTotalExperience = (workExperiences) => {
+  if (!workExperiences || workExperiences.length === 0) return 0;
+  
+  let totalMonths = 0;
+  const now = new Date();
+  
+  workExperiences.forEach(exp => {
+    if (!exp.startDate) return;
+    
+    const startDate = new Date(exp.startDate + '-01');
+    const endDate = exp.endDate ? new Date(exp.endDate + '-01') : now;
+    
+    // Calculer la différence en mois
+    const months = (endDate.getFullYear() - startDate.getFullYear()) * 12 + 
+                   (endDate.getMonth() - startDate.getMonth());
+    
+    totalMonths += Math.max(0, months);
+  });
+  
+  // Convertir en années (arrondi à 1 décimale)
+  return Math.round(totalMonths / 12 * 10) / 10;
 };
 
 export default function DriverProfilePage() {
@@ -159,9 +183,6 @@ export default function DriverProfilePage() {
                       </div>
                     );
                   })()}
-                  {driver.isAvailable && (
-                    <div className="absolute bottom-2 right-2 w-6 h-6 bg-green-500 border-4 border-white rounded-full"></div>
-                  )}
                 </div>
               </div>
 
@@ -169,25 +190,9 @@ export default function DriverProfilePage() {
               <div className="flex-1">
                 <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
                   <div>
-                    <h1 className="text-xl lg:text-3xl text-gray-900 mb-2">
+                    <h1 className="text-xl lg:text-3xl text-gray-900 mb-3">
                       {driver.firstName} {driver.lastName}
                     </h1>
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="flex items-center gap-1">
-                        {[...Array(5)].map((_, i) => (
-                          <Star 
-                            key={i} 
-                            className={`w-5 h-5 ${i < Math.floor(driver.rating || 5) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
-                          />
-                        ))}
-                      </div>
-                      <span className="text-lg text-gray-900">
-                        {driver.rating ? driver.rating.toFixed(1) : '5.0'}
-                      </span>
-                      <span className="text-gray-500">
-                        ({driver.totalRides || 0} courses)
-                      </span>
-                    </div>
                     <div className="flex flex-wrap gap-2">
                       {driver.isAvailable && (
                         <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">
@@ -199,12 +204,18 @@ export default function DriverProfilePage() {
                         <Shield className="w-4 h-4" />
                         Permis {driver.licenseType || 'B'}
                       </span>
-                      {driver.experience && (
-                        <span className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm">
-                          <Award className="w-4 h-4" />
-                          {driver.experience}
-                        </span>
-                      )}
+                      {(() => {
+                        const totalYears = calculateTotalExperience(driver.workExperience);
+                        if (totalYears > 0) {
+                          return (
+                            <span className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm">
+                              <Award className="w-4 h-4" />
+                              {totalYears} {totalYears === 1 ? 'an' : 'ans'}
+                            </span>
+                          );
+                        }
+                        return null;
+                      })()}
                     </div>
                   </div>
 
@@ -214,7 +225,7 @@ export default function DriverProfilePage() {
                     disabled={contacting}
                     className="w-full lg:w-auto px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                   >
-                    <Mail className="w-5 h-5" />
+                    <MessageCircle className="w-5 h-5" />
                     {contacting ? 'Connexion...' : 'Contacter'}
                   </button>
                 </div>
@@ -317,8 +328,10 @@ export default function DriverProfilePage() {
                   <span className="text-xl lg:text-2xl text-orange-500">{driver.totalRides || 0}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Note moyenne</span>
-                  <span className="text-xl lg:text-2xl text-orange-500">{driver.rating ? driver.rating.toFixed(1) : '5.0'}</span>
+                  <span className="text-gray-600">Années d'expérience</span>
+                  <span className="text-xl lg:text-2xl text-orange-500">
+                    {calculateTotalExperience(driver.workExperience) || 0}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">Taux d'acceptation</span>
