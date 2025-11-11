@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import SimpleHeader from '../component/common/SimpleHeader';
 import Footer from '../component/common/Footer';
 import ProductCard from '../component/common/ProductCard';
+import CustomDropdown from '../component/common/CustomDropdown';
 import api from '../services/api';
 
 export default function MarketingVentePage() {
@@ -27,6 +28,39 @@ export default function MarketingVentePage() {
     { value: 'pieces', label: 'Pièces & Accessoires', icon: '🔧', count: 0 },
     { value: 'services', label: 'Entretien & Réparation', icon: '⚙️', count: 0 },
     { value: 'equipements', label: 'Équipements Pro', icon: '👔', count: 0 }
+  ];
+
+  // Options pour les dropdowns
+  const categoryOptions = [
+    { value: '', label: 'Toutes les catégories' },
+    { value: 'vehicules', label: 'Véhicules Professionnels' },
+    { value: 'pieces', label: 'Pièces & Accessoires' },
+    { value: 'services', label: 'Entretien & Réparation' },
+    { value: 'equipements', label: 'Équipements Pro' }
+  ];
+
+  const conditionOptions = [
+    { value: '', label: 'Toutes conditions' },
+    { value: 'neuf', label: 'Neuf' },
+    { value: 'occasion', label: 'Occasion' },
+    { value: 'reconditionne', label: 'Reconditionné' }
+  ];
+
+  const cityOptions = [
+    { value: '', label: 'Toutes les villes' },
+    { value: 'abidjan', label: 'Abidjan' },
+    { value: 'yamoussoukro', label: 'Yamoussoukro' },
+    { value: 'bouake', label: 'Bouaké' },
+    { value: 'daloa', label: 'Daloa' },
+    { value: 'san-pedro', label: 'San Pedro' }
+  ];
+
+  const priceRangeOptions = [
+    { value: '', label: 'Tous les prix' },
+    { value: '0-500000', label: '0 - 500,000 FCFA' },
+    { value: '500000-2000000', label: '500,000 - 2,000,000 FCFA' },
+    { value: '2000000-5000000', label: '2,000,000 - 5,000,000 FCFA' },
+    { value: '5000000+', label: '5,000,000+ FCFA' }
   ];
 
   useEffect(() => {
@@ -155,17 +189,12 @@ export default function MarketingVentePage() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Catégorie
                 </label>
-                <select 
+                <CustomDropdown
                   value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                >
-                  <option value="">Toutes les catégories</option>
-                  <option value="vehicules">Véhicules Professionnels</option>
-                  <option value="pieces">Pièces & Accessoires</option>
-                  <option value="services">Entretien & Réparation</option>
-                  <option value="equipements">Équipements Pro</option>
-                </select>
+                  onChange={setSelectedCategory}
+                  options={categoryOptions}
+                  className="w-full"
+                />
               </div>
 
               {/* Condition */}
@@ -173,16 +202,12 @@ export default function MarketingVentePage() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Condition
                 </label>
-                <select 
+                <CustomDropdown
                   value={selectedCondition}
-                  onChange={(e) => setSelectedCondition(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                >
-                  <option value="">Toutes conditions</option>
-                  <option value="neuf">Neuf</option>
-                  <option value="occasion">Occasion</option>
-                  <option value="service">Service</option>
-                </select>
+                  onChange={setSelectedCondition}
+                  options={conditionOptions}
+                  className="w-full"
+                />
               </div>
 
               {/* Ville */}
@@ -190,43 +215,12 @@ export default function MarketingVentePage() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Ville
                 </label>
-                <select 
+                <CustomDropdown
                   value={selectedCity}
-                  onChange={(e) => setSelectedCity(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                >
-                  <option value="">Toutes les villes</option>
-                  <option value="abidjan">Abidjan</option>
-                  <option value="yamoussoukro">Yamoussoukro</option>
-                  <option value="bouake">Bouaké</option>
-                  <option value="daloa">Daloa</option>
-                  <option value="san-pedro">San Pedro</option>
-                  <option value="man">Man</option>
-                  <option value="gagnoa">Gagnoa</option>
-                  <option value="korhogo">Korhogo</option>
-                  <option value="divo">Divo</option>
-                  <option value="abengourou">Abengourou</option>
-                  <option value="bondoukou">Bondoukou</option>
-                  <option value="seguela">Séguéla</option>
-                  <option value="soubre">Soubré</option>
-                  <option value="ferkessedougou">Ferkessédougou</option>
-                  <option value="odienne">Odienné</option>
-                  <option value="touba">Touba</option>
-                  <option value="dabou">Dabou</option>
-                  <option value="tiassale">Tiassalé</option>
-                  <option value="grand-bassam">Grand-Bassam</option>
-                  <option value="guiglo">Guiglo</option>
-                  <option value="danane">Danané</option>
-                  <option value="biankouma">Biankouma</option>
-                  <option value="mbatto">M'Batto</option>
-                  <option value="bocanda">Bocanda</option>
-                  <option value="katiola">Katiola</option>
-                  <option value="bouafle">Bouaflé</option>
-                  <option value="sakassou">Sakassou</option>
-                  <option value="daoukro">Daoukro</option>
-                  <option value="tanda">Tanda</option>
-                  <option value="tabou">Tabou</option>
-                </select>
+                  onChange={setSelectedCity}
+                  options={cityOptions}
+                  className="w-full"
+                />
               </div>
 
               {/* Prix */}
@@ -234,18 +228,12 @@ export default function MarketingVentePage() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Fourchette de prix
                 </label>
-                <select 
+                <CustomDropdown
                   value={selectedPriceRange}
-                  onChange={(e) => setSelectedPriceRange(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                >
-                  <option value="">Tous les prix</option>
-                  <option value="0-100000">Moins de 100,000 FCFA</option>
-                  <option value="100000-500000">100,000 - 500,000 FCFA</option>
-                  <option value="500000-2000000">500,000 - 2,000,000 FCFA</option>
-                  <option value="2000000-5000000">2,000,000 - 5,000,000 FCFA</option>
-                  <option value="5000000+">Plus de 5,000,000 FCFA</option>
-                </select>
+                  onChange={setSelectedPriceRange}
+                  options={priceRangeOptions}
+                  className="w-full"
+                />
               </div>
 
               {/* Bouton Réinitialiser */}

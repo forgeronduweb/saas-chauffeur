@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import SimpleHeader from '../component/common/SimpleHeader';
 import Footer from '../component/common/Footer';
 import OfferCard from '../component/common/OfferCard';
+import CustomDropdown from '../component/common/CustomDropdown';
 import { offersApi } from '../services/api';
 
 export default function OffersPage() {
@@ -18,6 +19,62 @@ export default function OffersPage() {
   const [selectedCity, setSelectedCity] = useState('');
   const [selectedContractType, setSelectedContractType] = useState('');
   const [selectedWorkType, setSelectedWorkType] = useState('');
+
+  // Options pour les dropdowns
+  const cityOptions = [
+    { value: '', label: 'Toutes les villes' },
+    { value: 'abidjan', label: 'Abidjan' },
+    { value: 'yamoussoukro', label: 'Yamoussoukro' },
+    { value: 'bouake', label: 'Bouaké' },
+    { value: 'daloa', label: 'Daloa' },
+    { value: 'san-pedro', label: 'San Pedro' },
+    { value: 'man', label: 'Man' },
+    { value: 'gagnoa', label: 'Gagnoa' },
+    { value: 'korhogo', label: 'Korhogo' },
+    { value: 'divo', label: 'Divo' },
+    { value: 'abengourou', label: 'Abengourou' },
+    { value: 'bondoukou', label: 'Bondoukou' },
+    { value: 'seguela', label: 'Séguéla' },
+    { value: 'soubre', label: 'Soubré' },
+    { value: 'ferkessedougou', label: 'Ferkessédougou' },
+    { value: 'odienne', label: 'Odienné' },
+    { value: 'touba', label: 'Touba' },
+    { value: 'dabou', label: 'Dabou' },
+    { value: 'tiassale', label: 'Tiassalé' },
+    { value: 'grand-bassam', label: 'Grand-Bassam' },
+    { value: 'guiglo', label: 'Guiglo' },
+    { value: 'danane', label: 'Danané' },
+    { value: 'biankouma', label: 'Biankouma' },
+    { value: 'mbatto', label: 'M\'Batto' },
+    { value: 'bocanda', label: 'Bocanda' },
+    { value: 'katiola', label: 'Katiola' },
+    { value: 'bouafle', label: 'Bouaflé' },
+    { value: 'sakassou', label: 'Sakassou' },
+    { value: 'daoukro', label: 'Daoukro' },
+    { value: 'tanda', label: 'Tanda' },
+    { value: 'tabou', label: 'Tabou' }
+  ];
+
+  const contractTypeOptions = [
+    { value: '', label: 'Tous les types' },
+    { value: 'cdi', label: 'CDI' },
+    { value: 'cdd', label: 'CDD' },
+    { value: 'independant', label: 'Indépendant' }
+  ];
+
+  const workTypeOptions = [
+    { value: '', label: 'Tous les horaires' },
+    { value: 'temps plein', label: 'Temps plein' },
+    { value: 'temps partiel', label: 'Temps partiel' },
+    { value: 'flexible', label: 'Flexible' }
+  ];
+
+  const experienceOptions = [
+    { value: '', label: 'Toute expérience' },
+    { value: '1-3', label: '1-3 ans' },
+    { value: '3-5', label: '3-5 ans' },
+    { value: '5-10', label: '5-10 ans' }
+  ];
 
   // Bannières publicitaires
   const banners = [
@@ -143,43 +200,12 @@ export default function OffersPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Ville
                 </label>
-                <select 
+                <CustomDropdown
                   value={selectedCity}
-                  onChange={(e) => setSelectedCity(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                >
-                  <option value="">Toutes les villes</option>
-                  <option value="abidjan">Abidjan</option>
-                  <option value="yamoussoukro">Yamoussoukro</option>
-                  <option value="bouake">Bouaké</option>
-                  <option value="daloa">Daloa</option>
-                  <option value="san-pedro">San Pedro</option>
-                  <option value="man">Man</option>
-                  <option value="gagnoa">Gagnoa</option>
-                  <option value="korhogo">Korhogo</option>
-                  <option value="divo">Divo</option>
-                  <option value="abengourou">Abengourou</option>
-                  <option value="bondoukou">Bondoukou</option>
-                  <option value="seguela">Séguéla</option>
-                  <option value="soubre">Soubré</option>
-                  <option value="ferkessedougou">Ferkessédougou</option>
-                  <option value="odienne">Odienné</option>
-                  <option value="touba">Touba</option>
-                  <option value="dabou">Dabou</option>
-                  <option value="tiassale">Tiassalé</option>
-                  <option value="grand-bassam">Grand-Bassam</option>
-                  <option value="guiglo">Guiglo</option>
-                  <option value="danane">Danané</option>
-                  <option value="biankouma">Biankouma</option>
-                  <option value="mbatto">M'Batto</option>
-                  <option value="bocanda">Bocanda</option>
-                  <option value="katiola">Katiola</option>
-                  <option value="bouafle">Bouaflé</option>
-                  <option value="sakassou">Sakassou</option>
-                  <option value="daoukro">Daoukro</option>
-                  <option value="tanda">Tanda</option>
-                  <option value="tabou">Tabou</option>
-                </select>
+                  onChange={setSelectedCity}
+                  options={cityOptions}
+                  className="w-full"
+                />
               </div>
 
               {/* Type de contrat */}
@@ -187,16 +213,12 @@ export default function OffersPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Type de contrat
                 </label>
-                <select 
+                <CustomDropdown
                   value={selectedContractType}
-                  onChange={(e) => setSelectedContractType(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                >
-                  <option value="">Tous les types</option>
-                  <option value="cdi">CDI</option>
-                  <option value="cdd">CDD</option>
-                  <option value="independant">Indépendant</option>
-                </select>
+                  onChange={setSelectedContractType}
+                  options={contractTypeOptions}
+                  className="w-full"
+                />
               </div>
 
               {/* Horaire */}
@@ -204,16 +226,12 @@ export default function OffersPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Horaire
                 </label>
-                <select 
+                <CustomDropdown
                   value={selectedWorkType}
-                  onChange={(e) => setSelectedWorkType(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                >
-                  <option value="">Tous les horaires</option>
-                  <option value="temps plein">Temps plein</option>
-                  <option value="temps partiel">Temps partiel</option>
-                  <option value="flexible">Flexible</option>
-                </select>
+                  onChange={setSelectedWorkType}
+                  options={workTypeOptions}
+                  className="w-full"
+                />
               </div>
 
               {/* Expérience */}
@@ -221,12 +239,12 @@ export default function OffersPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Expérience requise
                 </label>
-                <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
-                  <option value="">Toute expérience</option>
-                  <option value="1-3">1-3 ans</option>
-                  <option value="3-5">3-5 ans</option>
-                  <option value="5-10">5-10 ans</option>
-                </select>
+                <CustomDropdown
+                  value=""
+                  onChange={() => {}}
+                  options={experienceOptions}
+                  className="w-full"
+                />
               </div>
 
               {/* Bouton Réinitialiser */}

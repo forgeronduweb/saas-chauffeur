@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import SimpleHeader from '../../component/common/SimpleHeader';
+import CustomDropdown from '../../component/common/CustomDropdown';
 import { applicationsApi } from '../../services/api';
 
 export default function MyApplications() {
@@ -94,77 +95,20 @@ export default function MyApplications() {
               Filtres
             </button>
             
-            {/* Filtres avec radio buttons - Cachés sur mobile */}
-            <form className="hidden sm:inline-flex items-center bg-white border border-gray-200 rounded-lg p-1 shadow-sm">
-              <button 
-                type="button"
-                onClick={() => setFilter('all')}
-                className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 text-gray-500 hover:text-gray-700 rounded transition-all duration-200"
-                title="Réinitialiser"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-              
-              <div className="w-px h-6 bg-gray-200 mx-1"></div>
-              
-              <label className="relative cursor-pointer">
-                <input 
-                  type="radio" 
-                  name="filter" 
-                  value="all"
-                  checked={filter === 'all'}
-                  onChange={(e) => setFilter(e.target.value)}
-                  className="peer sr-only"
-                />
-                <span className="px-3 py-1.5 rounded text-xs font-medium transition-all duration-200 inline-block peer-checked:bg-orange-500 peer-checked:text-white peer-checked:shadow-sm hover:bg-gray-50">
-                  Toutes ({applications.length})
-                </span>
-              </label>
-              
-              <label className="relative cursor-pointer">
-                <input 
-                  type="radio" 
-                  name="filter" 
-                  value="pending"
-                  checked={filter === 'pending'}
-                  onChange={(e) => setFilter(e.target.value)}
-                  className="peer sr-only"
-                />
-                <span className="px-3 py-1.5 rounded text-xs font-medium transition-all duration-200 inline-block peer-checked:bg-orange-500 peer-checked:text-white peer-checked:shadow-sm hover:bg-gray-50">
-                  En attente ({applications.filter(a => a.status === 'pending').length})
-                </span>
-              </label>
-              
-              <label className="relative cursor-pointer">
-                <input 
-                  type="radio" 
-                  name="filter" 
-                  value="accepted"
-                  checked={filter === 'accepted'}
-                  onChange={(e) => setFilter(e.target.value)}
-                  className="peer sr-only"
-                />
-                <span className="px-3 py-1.5 rounded text-xs font-medium transition-all duration-200 inline-block peer-checked:bg-orange-500 peer-checked:text-white peer-checked:shadow-sm hover:bg-gray-50">
-                  Acceptées ({applications.filter(a => a.status === 'accepted').length})
-                </span>
-              </label>
-              
-              <label className="relative cursor-pointer">
-                <input 
-                  type="radio" 
-                  name="filter" 
-                  value="rejected"
-                  checked={filter === 'rejected'}
-                  onChange={(e) => setFilter(e.target.value)}
-                  className="peer sr-only"
-                />
-                <span className="px-3 py-1.5 rounded text-xs font-medium transition-all duration-200 inline-block peer-checked:bg-orange-500 peer-checked:text-white peer-checked:shadow-sm hover:bg-gray-50">
-                  Rejetées ({applications.filter(a => a.status === 'rejected').length})
-                </span>
-              </label>
-            </form>
+            {/* Dropdown personnalisé - Desktop uniquement */}
+            <div className="hidden sm:block">
+              <CustomDropdown
+                value={filter}
+                onChange={setFilter}
+                placeholder="Filtrer par statut"
+                options={[
+                  { value: 'all', label: `Toutes (${applications.length})` },
+                  { value: 'pending', label: `En attente (${applications.filter(a => a.status === 'pending').length})` },
+                  { value: 'accepted', label: `Acceptées (${applications.filter(a => a.status === 'accepted').length})` },
+                  { value: 'rejected', label: `Rejetées (${applications.filter(a => a.status === 'rejected').length})` }
+                ]}
+              />
+            </div>
           </div>
           <p className="text-gray-600 text-sm">Suivez l'état de vos candidatures aux offres d'emploi</p>
         </div>

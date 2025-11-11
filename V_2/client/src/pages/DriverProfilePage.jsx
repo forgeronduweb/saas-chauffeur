@@ -5,6 +5,14 @@ import { useAuth } from '../contexts/AuthContext';
 import SimpleHeader from '../component/common/SimpleHeader';
 import { MapPin, Phone, Mail, Star, Award, Calendar, Car, Shield, Briefcase, CheckCircle } from 'lucide-react';
 
+// Fonction pour formater les dates YYYY-MM en format lisible
+const formatMonthYear = (dateString) => {
+  if (!dateString) return '';
+  const [year, month] = dateString.split('-');
+  const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
+  return `${months[parseInt(month) - 1]} ${year}`;
+};
+
 export default function DriverProfilePage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -337,37 +345,79 @@ export default function DriverProfilePage() {
         </div>
 
         {/* Expériences professionnelles - En bas */}
-        <div className="bg-white border border-gray-200 p-6 lg:p-8 mt-8">
-          <h2 className="text-lg lg:text-xl text-gray-900 mb-6 flex items-center gap-2">
-            <Briefcase className="w-6 h-6 text-orange-500" />
-            Expériences professionnelles
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-4 sm:p-6 lg:p-8 mt-6 lg:mt-8">
+          <h2 className="text-base sm:text-lg lg:text-xl font-semibold text-gray-900 mb-4 sm:mb-6 flex items-center gap-2">
+            <div className="p-2 bg-orange-100 rounded-lg">
+              <Briefcase className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600" />
+            </div>
+            <span>Expériences professionnelles</span>
           </h2>
           {driver.workExperience && driver.workExperience.length > 0 ? (
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               {driver.workExperience.map((exp, index) => (
-                <div key={index} className="relative pl-8 pb-6 border-l-2 border-orange-200 last:pb-0">
-                  <div className="absolute -left-2 top-0 w-4 h-4 bg-orange-500 rounded-full"></div>
-                  <h3 className="text-lg text-gray-900 mb-1">{exp.position || exp.title}</h3>
-                  <p className="text-sm text-gray-600 mb-2 flex items-center gap-2">
-                    <span>{exp.company}</span>
-                    {exp.duration && (
-                      <>
-                        <span>•</span>
-                        <span className="flex items-center gap-1">
-                          <Calendar className="w-4 h-4" />
-                          {exp.duration}
-                        </span>
-                      </>
+                <div 
+                  key={index} 
+                  className="relative pl-6 sm:pl-8 pb-4 sm:pb-6 border-l-2 border-orange-200 last:pb-0 hover:border-orange-400 transition-colors"
+                >
+                  {/* Point de la timeline */}
+                  <div className="absolute -left-[9px] top-0 w-4 h-4 bg-orange-500 rounded-full ring-4 ring-white shadow-sm"></div>
+                  
+                  {/* Contenu de l'expérience */}
+                  <div className="bg-gray-50 rounded-lg p-3 sm:p-4 hover:bg-orange-50 transition-colors">
+                    {/* Poste */}
+                    <h3 className="text-sm sm:text-base lg:text-lg font-semibold text-gray-900 mb-1 sm:mb-2">
+                      {exp.position || exp.title}
+                    </h3>
+                    
+                    {/* Entreprise et dates */}
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-2 sm:mb-3">
+                      {/* Entreprise */}
+                      <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-700">
+                        <div className="p-1 bg-white rounded">
+                          <Briefcase className="w-3 h-3 sm:w-4 sm:h-4 text-orange-500" />
+                        </div>
+                        <span className="font-medium">{exp.company}</span>
+                      </div>
+                      
+                      {/* Dates */}
+                      {(exp.startDate || exp.endDate) && (
+                        <>
+                          <span className="hidden sm:inline text-gray-400">•</span>
+                          <div className="flex items-center gap-1.5 text-xs sm:text-sm text-gray-600">
+                            <Calendar className="w-3 h-3 sm:w-4 sm:h-4 text-orange-500" />
+                            <span>
+                              {exp.startDate && exp.endDate 
+                                ? `${formatMonthYear(exp.startDate)} - ${formatMonthYear(exp.endDate)}`
+                                : exp.startDate 
+                                ? (
+                                  <>
+                                    {formatMonthYear(exp.startDate)} - <span className="text-green-600 font-medium">Présent</span>
+                                  </>
+                                )
+                                : formatMonthYear(exp.endDate)}
+                            </span>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                    
+                    {/* Description */}
+                    {exp.description && (
+                      <p className="text-xs sm:text-sm text-gray-600 leading-relaxed mt-2 pl-0 sm:pl-6">
+                        {exp.description}
+                      </p>
                     )}
-                  </p>
-                  {exp.description && (
-                    <p className="text-gray-700">{exp.description}</p>
-                  )}
+                  </div>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-gray-500 text-center py-8">Aucune expérience professionnelle renseignée</p>
+            <div className="text-center py-8 sm:py-12">
+              <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-gray-100 rounded-full mb-3 sm:mb-4">
+                <Briefcase className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
+              </div>
+              <p className="text-sm sm:text-base text-gray-500">Aucune expérience professionnelle renseignée</p>
+            </div>
           )}
         </div>
       </main>

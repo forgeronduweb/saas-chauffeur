@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { offersApi } from '../../services/api';
 import SimpleHeader from '../../component/common/SimpleHeader';
+import CustomDropdown from '../../component/common/CustomDropdown';
 
 export default function MyProducts() {
   const navigate = useNavigate();
@@ -75,7 +76,23 @@ export default function MyProducts() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-xl sm:text-2xl lg:text-3xl text-gray-900 mb-2">Mes offres marketing</h1>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-2">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl text-gray-900">Mes offres marketing</h1>
+            
+            {/* Dropdown de filtre - Desktop uniquement */}
+            <div className="hidden sm:block">
+              <CustomDropdown
+                value={filter}
+                onChange={setFilter}
+                placeholder="Filtrer par statut"
+                options={[
+                  { value: 'all', label: `Toutes (${products.length})` },
+                  { value: 'active', label: `Actives (${products.filter(p => p.status === 'active').length})` },
+                  { value: 'inactive', label: `Inactives (${products.filter(p => p.status === 'inactive').length})` }
+                ]}
+              />
+            </div>
+          </div>
           <p className="text-gray-600 text-sm">Gérez vos produits et services publiés</p>
         </div>
 

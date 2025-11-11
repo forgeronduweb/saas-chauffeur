@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import SimpleHeader from '../component/common/SimpleHeader';
+import CustomDropdown from '../component/common/CustomDropdown';
 import api from '../services/api';
 
 // Fonction utilitaire pour convertir un fichier en base64
@@ -24,6 +25,7 @@ export default function UserProfilePage() {
   const [showDriverForm, setShowDriverForm] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [employerType, setEmployerType] = useState('particulier');
+  const [profileCompletion, setProfileCompletion] = useState(0);
 
   const [driverInfo, setDriverInfo] = useState({
     licenseNumber: '',
@@ -75,6 +77,62 @@ export default function UserProfilePage() {
     driverLicenseBack: null
   });
 
+  // Options pour les dropdowns
+  const workZoneOptions = [
+    { value: '', label: 'Sélectionner une ville' },
+    { value: 'Abidjan', label: 'Abidjan' },
+    { value: 'Yamoussoukro', label: 'Yamoussoukro' },
+    { value: 'Bouaké', label: 'Bouaké' },
+    { value: 'Daloa', label: 'Daloa' },
+    { value: 'San Pedro', label: 'San Pedro' },
+    { value: 'Korhogo', label: 'Korhogo' },
+    { value: 'Man', label: 'Man' }
+  ];
+
+  const licenseTypeOptions = [
+    { value: 'A', label: 'Permis A (Moto)' },
+    { value: 'B', label: 'Permis B (Voiture)' },
+    { value: 'C', label: 'Permis C (Poids lourd)' },
+    { value: 'D', label: 'Permis D (Transport en commun)' },
+    { value: 'E', label: 'Permis E (Remorque)' }
+  ];
+
+  const experienceOptions = [
+    { value: '0-1', label: 'Moins d\'1 an' },
+    { value: '1-3', label: '1-3 ans' },
+    { value: '3-5', label: '3-5 ans' },
+    { value: '5-10', label: '5-10 ans' },
+    { value: '10+', label: 'Plus de 10 ans' }
+  ];
+
+  const companyTypeOptions = [
+    { value: '', label: 'Sélectionner' },
+    { value: 'particulier', label: 'Particulier' },
+    { value: 'entreprise', label: 'Entreprise' },
+    { value: 'association', label: 'Association' },
+    { value: 'administration', label: 'Administration' }
+  ];
+
+  const sectorOptions = [
+    { value: '', label: 'Sélectionner' },
+    { value: 'transport', label: 'Transport' },
+    { value: 'logistique', label: 'Logistique' },
+    { value: 'tourisme', label: 'Tourisme' },
+    { value: 'commerce', label: 'Commerce' },
+    { value: 'industrie', label: 'Industrie' },
+    { value: 'services', label: 'Services' },
+    { value: 'autre', label: 'Autre' }
+  ];
+
+  const employeeCountOptions = [
+    { value: '', label: 'Sélectionner' },
+    { value: '1-10', label: '1-10 employés' },
+    { value: '11-50', label: '11-50 employés' },
+    { value: '51-200', label: '51-200 employés' },
+    { value: '201-500', label: '201-500 employés' },
+    { value: '500+', label: 'Plus de 500 employés' }
+  ];
+
   useEffect(() => {
     if (user) {
       setUserInfo({
@@ -116,8 +174,8 @@ export default function UserProfilePage() {
           setWorkExperiences(driver.workExperience.map(exp => ({
             company: exp.company || '',
             position: exp.position || '',
-            startDate: exp.startDate ? exp.startDate.split('T')[0] : '',
-            endDate: exp.endDate ? exp.endDate.split('T')[0] : '',
+            startDate: exp.startDate || '',
+            endDate: exp.endDate || '',
             description: exp.description || ''
           })));
         }
@@ -181,6 +239,67 @@ export default function UserProfilePage() {
     newExperiences[index][field] = value;
     setWorkExperiences(newExperiences);
   };
+
+  // Obtenir la couleur selon le pourcentage
+  const getCompletionColor = (percentage) => {
+    if (percentage === 100) return { primary: '#10b981', light: '#d1fae5', shadow: 'rgba(16, 185, 129, 0.3)' }; // Vert
+    if (percentage >= 75) return { primary: '#3b82f6', light: '#dbeafe', shadow: 'rgba(59, 130, 246, 0.3)' }; // Bleu
+    if (percentage >= 50) return { primary: '#f59e0b', light: '#fef3c7', shadow: 'rgba(245, 158, 11, 0.3)' }; // Jaune/Ambre
+    return { primary: '#ef4444', light: '#fee2e2', shadow: 'rgba(239, 68, 68, 0.3)' }; // Rouge
+  };
+
+  // Calculer le pourcentage de complétion du profil
+  const calculateProfileCompletion = () => {
+    let totalFields = 0;
+    let filledFields = 0;
+
+    // Champs utilisateur de base (toujours comptés)
+    totalFields += 4;
+    if (userInfo.firstName) filledFields++;
+    if (userInfo.lastName) filledFields++;
+    if (userInfo.email) filledFields++;
+    if (userInfo.phone) filledFields++;
+
+    if (isDriver) {
+      // Champs spécifiques chauffeur
+      totalFields += 5;
+      if (driverInfo.licenseNumber) filledFields++;
+      if (driverInfo.licenseType) filledFields++;
+      if (driverInfo.licenseExpiryDate) filledFields++;
+      if (driverInfo.experience) filledFields++;
+      if (driverInfo.workZone) filledFields++;
+
+      // Photo de profil
+      totalFields += 1;
+      if (driverInfo.profilePhotoUrl) filledFields++;
+
+      // Expériences professionnelles (au moins une complète)
+      totalFields += 1;
+      const hasCompleteExperience = workExperiences.some(
+        exp => exp.company && exp.position && exp.startDate
+      );
+      if (hasCompleteExperience) filledFields++;
+    } else if (user?.role === 'employer') {
+      // Champs spécifiques employeur
+      totalFields += 8;
+      if (employerInfo.companyName) filledFields++;
+      if (employerInfo.companyType) filledFields++;
+      if (employerInfo.address) filledFields++;
+      if (employerInfo.city) filledFields++;
+      if (employerInfo.sector) filledFields++;
+      if (employerInfo.description) filledFields++;
+      if (employerInfo.companyPhone) filledFields++;
+      if (employerInfo.companyEmail) filledFields++;
+    }
+
+    const percentage = Math.round((filledFields / totalFields) * 100);
+    setProfileCompletion(percentage);
+  };
+
+  // Recalculer à chaque changement
+  useEffect(() => {
+    calculateProfileCompletion();
+  }, [userInfo, driverInfo, employerInfo, workExperiences, isDriver, user]);
 
   const addWorkExperience = () => {
     setWorkExperiences([
@@ -328,6 +447,7 @@ export default function UserProfilePage() {
       <SimpleHeader />
 
       <main className="max-w-4xl mx-auto px-3 sm:px-4 py-4 sm:py-6 lg:py-8">
+        {/* Titre de la page */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 mb-4 sm:mb-6">
           <h1 className="text-lg sm:text-2xl lg:text-3xl text-gray-900">Mon Profil</h1>
           <div className="flex gap-2 w-full sm:w-auto">
@@ -369,6 +489,153 @@ export default function UserProfilePage() {
             <p className="text-sm sm:text-base text-green-700">{success}</p>
           </div>
         )}
+
+        {/* Indicateur de complétion du profil */}
+        <div 
+          className="border rounded-xl p-4 sm:p-6 mb-4 sm:mb-6 shadow-sm transition-all duration-500"
+          style={{
+            background: `linear-gradient(135deg, ${getCompletionColor(profileCompletion).light} 0%, white 100%)`,
+            borderColor: getCompletionColor(profileCompletion).primary
+          }}
+        >
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+            {/* Indicateur radial */}
+            <div className="flex-shrink-0">
+              <div 
+                className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full transition-all duration-700"
+                style={{
+                  background: `conic-gradient(${getCompletionColor(profileCompletion).primary} ${profileCompletion * 3.6}deg, #e5e7eb ${profileCompletion * 3.6}deg)`,
+                  boxShadow: `0 4px 16px ${getCompletionColor(profileCompletion).shadow}`
+                }}
+              >
+                <div className="absolute inset-2 bg-white rounded-full flex items-center justify-center shadow-inner">
+                  <div className="text-center">
+                    <div 
+                      className="text-3xl sm:text-4xl font-bold transition-all duration-500"
+                      style={{ color: getCompletionColor(profileCompletion).primary }}
+                    >
+                      {profileCompletion}%
+                    </div>
+                    <div className="text-xs text-gray-500 font-medium">Complété</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Message et conseils */}
+            <div className="flex-1 text-center sm:text-left">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-1">
+                {profileCompletion === 100 
+                  ? '🎉 Profil complet !' 
+                  : profileCompletion >= 75 
+                  ? '👍 Presque terminé !' 
+                  : profileCompletion >= 50 
+                  ? '💪 Bon début !' 
+                  : '📝 Complétez votre profil'}
+              </h3>
+              <p className="text-xs sm:text-sm text-gray-600 mb-3">
+                {profileCompletion === 100 
+                  ? 'Votre profil est complet. Vous maximisez vos chances d\'être contacté !' 
+                  : profileCompletion >= 75 
+                  ? 'Encore quelques informations et votre profil sera parfait !' 
+                  : profileCompletion >= 50 
+                  ? 'Continuez à remplir votre profil pour attirer plus d\'opportunités.' 
+                  : 'Un profil complet augmente vos chances d\'être contacté par les employeurs.'}
+              </p>
+              
+              {/* Toujours afficher les champs manquants */}
+              <div>
+                <p className="text-xs font-semibold text-gray-700 mb-2">
+                  {profileCompletion === 100 
+                    ? '✅ Tous les champs sont remplis' 
+                    : '📋 Champs manquants :'}
+                </p>
+                <div className="flex flex-wrap gap-1.5 sm:gap-2 justify-center sm:justify-start">
+                  {/* Champs de base */}
+                  {!userInfo.firstName && (
+                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
+                      👤 Prénom
+                    </span>
+                  )}
+                  {!userInfo.lastName && (
+                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
+                      👤 Nom
+                    </span>
+                  )}
+                  {!userInfo.phone && (
+                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
+                      📞 Téléphone
+                    </span>
+                  )}
+                  
+                  {/* Champs chauffeur */}
+                  {isDriver && !driverInfo.licenseNumber && (
+                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
+                      🪪 N° Permis
+                    </span>
+                  )}
+                  {isDriver && !driverInfo.licenseExpiryDate && (
+                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
+                      📅 Date expiration
+                    </span>
+                  )}
+                  {isDriver && !driverInfo.workZone && (
+                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
+                      📍 Zone de travail
+                    </span>
+                  )}
+                  {isDriver && !driverInfo.profilePhotoUrl && (
+                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
+                      📸 Photo
+                    </span>
+                  )}
+                  {isDriver && !workExperiences.some(exp => exp.company && exp.position && exp.startDate) && (
+                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
+                      💼 Expérience pro
+                    </span>
+                  )}
+                  
+                  {/* Champs employeur */}
+                  {user?.role === 'employer' && !employerInfo.companyName && (
+                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
+                      🏢 Nom entreprise
+                    </span>
+                  )}
+                  {user?.role === 'employer' && !employerInfo.companyType && (
+                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
+                      🏭 Type entreprise
+                    </span>
+                  )}
+                  {user?.role === 'employer' && !employerInfo.sector && (
+                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
+                      🏭 Secteur
+                    </span>
+                  )}
+                  {user?.role === 'employer' && !employerInfo.address && (
+                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
+                      📍 Adresse
+                    </span>
+                  )}
+                  {user?.role === 'employer' && !employerInfo.description && (
+                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
+                      📝 Description
+                    </span>
+                  )}
+                  {user?.role === 'employer' && !employerInfo.companyPhone && (
+                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
+                      📞 Tél. entreprise
+                    </span>
+                  )}
+                  {user?.role === 'employer' && !employerInfo.companyEmail && (
+                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
+                      📧 Email entreprise
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* Photo de profil */}
         <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6">
@@ -472,32 +739,14 @@ export default function UserProfilePage() {
               {isDriver && (
                 <div>
                   <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">Lieu d'habitation</label>
-                  <select
+                  <CustomDropdown
                     name="workZone"
                     value={driverInfo.workZone}
-                    onChange={handleDriverInfoChange}
+                    onChange={(value) => handleDriverInfoChange({ target: { name: 'workZone', value } })}
                     disabled={!isEditing}
-                    className={`w-full px-4 py-2 border border-gray-300 rounded-lg ${isEditing ? 'focus:ring-2 focus:ring-orange-500' : 'bg-gray-50 cursor-not-allowed'}`}
-                  >
-                    <option value="">Sélectionnez une ville</option>
-                    <option value="Abidjan">Abidjan</option>
-                    <option value="Cocody">Cocody</option>
-                    <option value="Plateau">Plateau</option>
-                    <option value="Yopougon">Yopougon</option>
-                    <option value="Abobo">Abobo</option>
-                    <option value="Marcory">Marcory</option>
-                    <option value="Koumassi">Koumassi</option>
-                    <option value="Treichville">Treichville</option>
-                    <option value="Bouaké">Bouaké</option>
-                    <option value="Yamoussoukro">Yamoussoukro</option>
-                    <option value="San-Pédro">San-Pédro</option>
-                    <option value="Daloa">Daloa</option>
-                    <option value="Korhogo">Korhogo</option>
-                    <option value="Man">Man</option>
-                    <option value="Gagnoa">Gagnoa</option>
-                    <option value="Divo">Divo</option>
-                    <option value="Abengourou">Abengourou</option>
-                  </select>
+                    options={workZoneOptions}
+                    className="w-full"
+                  />
                 </div>
               )}
             </div>
@@ -525,17 +774,14 @@ export default function UserProfilePage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Type de permis</label>
-                  <select
+                  <CustomDropdown
                     name="licenseType"
                     value={driverInfo.licenseType}
-                    onChange={handleDriverInfoChange}
+                    onChange={(value) => handleDriverInfoChange({ target: { name: 'licenseType', value } })}
                     disabled={!isEditing}
-                    className={`w-full px-4 py-2 border border-gray-300 rounded-lg ${isEditing ? 'focus:ring-2 focus:ring-orange-500' : 'bg-gray-50 cursor-not-allowed'}`}
-                  >
-                    <option value="B">B (Voiture)</option>
-                    <option value="C">C (Poids lourd)</option>
-                    <option value="D">D (Transport de personnes)</option>
-                  </select>
+                    options={licenseTypeOptions}
+                    className="w-full"
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Date d'expiration</label>
@@ -550,18 +796,14 @@ export default function UserProfilePage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Expérience</label>
-                  <select
+                  <CustomDropdown
                     name="experience"
                     value={driverInfo.experience}
-                    onChange={handleDriverInfoChange}
+                    onChange={(value) => handleDriverInfoChange({ target: { name: 'experience', value } })}
                     disabled={!isEditing}
-                    className={`w-full px-4 py-2 border border-gray-300 rounded-lg ${isEditing ? 'focus:ring-2 focus:ring-orange-500' : 'bg-gray-50 cursor-not-allowed'}`}
-                  >
-                    <option value="0-1">Moins d'1 an</option>
-                    <option value="1-3">1 à 3 ans</option>
-                    <option value="3-5">3 à 5 ans</option>
-                    <option value="5+">Plus de 5 ans</option>
-                  </select>
+                    options={experienceOptions}
+                    className="w-full"
+                  />
                 </div>
               </div>
 
@@ -660,20 +902,22 @@ export default function UserProfilePage() {
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Date de début</label>
                         <input
-                          type="date"
+                          type="month"
                           value={exp.startDate}
                           onChange={(e) => handleWorkExperienceChange(index, 'startDate', e.target.value)}
                           disabled={!isEditing}
+                          placeholder="YYYY-MM"
                           className={`w-full px-4 py-2 border border-gray-300 rounded-lg ${isEditing ? 'focus:ring-2 focus:ring-orange-500' : 'bg-gray-50 cursor-not-allowed'}`}
                         />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Date de fin</label>
                         <input
-                          type="date"
+                          type="month"
                           value={exp.endDate}
                           onChange={(e) => handleWorkExperienceChange(index, 'endDate', e.target.value)}
                           disabled={!isEditing}
+                          placeholder="YYYY-MM (vide si en cours)"
                           className={`w-full px-4 py-2 border border-gray-300 rounded-lg ${isEditing ? 'focus:ring-2 focus:ring-orange-500' : 'bg-gray-50 cursor-not-allowed'}`}
                         />
                       </div>
@@ -764,20 +1008,14 @@ export default function UserProfilePage() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Type d'entreprise</label>
-                      <select
+                      <CustomDropdown
                         name="companyType"
                         value={employerInfo.companyType}
-                        onChange={handleEmployerInfoChange}
+                        onChange={(value) => handleEmployerInfoChange({ target: { name: 'companyType', value } })}
                         disabled={!isEditing}
-                        className={`w-full px-4 py-2 border border-gray-300 rounded-lg ${isEditing ? 'focus:ring-2 focus:ring-orange-500' : 'bg-gray-50 cursor-not-allowed'}`}
-                      >
-                        <option value="">Sélectionner...</option>
-                        <option value="sarl">SARL</option>
-                        <option value="sa">SA</option>
-                        <option value="entreprise_individuelle">Entreprise individuelle</option>
-                        <option value="association">Association</option>
-                        <option value="autre">Autre</option>
-                      </select>
+                        options={companyTypeOptions}
+                        className="w-full"
+                      />
                     </div>
 
                     <div>
@@ -795,42 +1033,26 @@ export default function UserProfilePage() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Secteur d'activité</label>
-                      <select
+                      <CustomDropdown
                         name="sector"
                         value={employerInfo.sector}
-                        onChange={handleEmployerInfoChange}
+                        onChange={(value) => handleEmployerInfoChange({ target: { name: 'sector', value } })}
                         disabled={!isEditing}
-                        className={`w-full px-4 py-2 border border-gray-300 rounded-lg ${isEditing ? 'focus:ring-2 focus:ring-orange-500' : 'bg-gray-50 cursor-not-allowed'}`}
-                      >
-                        <option value="">Sélectionner...</option>
-                        <option value="transport">Transport</option>
-                        <option value="logistique">Logistique</option>
-                        <option value="commerce">Commerce</option>
-                        <option value="industrie">Industrie</option>
-                        <option value="services">Services</option>
-                        <option value="hotellerie">Hôtellerie/Restauration</option>
-                        <option value="evenementiel">Événementiel</option>
-                        <option value="tourisme">Tourisme</option>
-                        <option value="autre">Autre</option>
-                      </select>
+                        options={sectorOptions}
+                        className="w-full"
+                      />
                     </div>
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Effectif</label>
-                      <select
+                      <CustomDropdown
                         name="employeeCount"
                         value={employerInfo.employeeCount}
-                        onChange={handleEmployerInfoChange}
+                        onChange={(value) => handleEmployerInfoChange({ target: { name: 'employeeCount', value } })}
                         disabled={!isEditing}
-                        className={`w-full px-4 py-2 border border-gray-300 rounded-lg ${isEditing ? 'focus:ring-2 focus:ring-orange-500' : 'bg-gray-50 cursor-not-allowed'}`}
-                      >
-                        <option value="">Sélectionner...</option>
-                        <option value="1-10">1-10 employés</option>
-                        <option value="11-50">11-50 employés</option>
-                        <option value="51-200">51-200 employés</option>
-                        <option value="201-500">201-500 employés</option>
-                        <option value="500+">Plus de 500 employés</option>
-                      </select>
+                        options={employeeCountOptions}
+                        className="w-full"
+                      />
                     </div>
 
                     <div>
