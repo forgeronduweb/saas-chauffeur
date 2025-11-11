@@ -59,8 +59,8 @@ const ConversationsModal = ({ isOpen, onClose, onSelectConversation }) => {
         className="hidden lg:block fixed inset-0 bg-black/20 z-[60] pointer-events-none"
       />
 
-      {/* Modal */}
-      <div className="fixed inset-0 lg:bottom-0 lg:right-4 lg:top-auto lg:left-auto w-full h-full lg:w-[380px] lg:h-[600px] bg-white lg:rounded-t-2xl shadow-2xl z-[9999] flex flex-col border-0 lg:border lg:border-gray-200">
+      {/* Modal - À droite, au-dessus du chat */}
+      <div className="fixed inset-0 lg:bottom-0 lg:right-4 lg:top-auto lg:left-auto w-full h-full lg:w-[360px] lg:h-[500px] lg:max-h-[calc(100vh-1rem)] bg-white lg:rounded-t-2xl shadow-2xl z-[9999] flex flex-col border-0 lg:border lg:border-gray-200">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white rounded-t-2xl">
           <div className="flex items-center space-x-2">

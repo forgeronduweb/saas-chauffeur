@@ -115,9 +115,9 @@ const ChatModal = ({ isOpen, conversation, onClose, onBack }) => {
         className="hidden lg:block fixed inset-0 bg-black/20 z-[70] pointer-events-none"
       />
 
-      {/* Modal */}
-      <div className={`fixed inset-0 lg:right-[420px] lg:left-auto lg:top-auto w-full h-full bg-white lg:rounded-t-2xl shadow-2xl z-[9999] flex flex-col border-0 lg:border lg:border-gray-200 transition-all duration-300 ${
-        isMinimized ? 'lg:bottom-0 lg:w-[320px] lg:h-[60px]' : 'lg:bottom-0 lg:w-[420px] lg:h-[600px]'
+      {/* Modal - Mobile: plein écran | Desktop: à gauche de la modale des conversations */}
+      <div className={`fixed inset-0 lg:right-[380px] lg:left-auto lg:top-auto w-full h-full bg-white lg:rounded-t-2xl shadow-2xl z-[10000] lg:z-[9998] flex flex-col border-0 lg:border lg:border-gray-200 transition-all duration-300 ${
+        isMinimized ? 'lg:bottom-0 lg:w-[320px] lg:h-[60px]' : 'lg:bottom-0 lg:w-[400px] lg:h-[500px] lg:max-h-[calc(100vh-1rem)]'
       }`}>
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white rounded-t-2xl">
