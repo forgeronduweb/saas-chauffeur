@@ -1,6 +1,6 @@
 const express = require('express');
 const { requireAuth } = require('../middleware/auth');
-const { cacheMiddleware } = require('../middleware/cache');
+const { cacheMiddleware, autoClearCache } = require('../middleware/cache');
 const {
   getDriverProfile,
   getDriverProfileById,
@@ -18,10 +18,10 @@ const router = express.Router();
 
 // Routes pour les chauffeurs connectés
 router.get('/profile', requireAuth, getDriverProfile);
-router.put('/profile', requireAuth, updateDriverProfile);
-router.put('/profile/upload', requireAuth, updateDriverProfile); // Route pour upload avec fichiers
-router.put('/location', requireAuth, updateLocation);
-router.post('/become-driver', requireAuth, becomeDriver); // Devenir chauffeur
+router.put('/profile', requireAuth, autoClearCache('/api/drivers'), updateDriverProfile);
+router.put('/profile/upload', requireAuth, autoClearCache('/api/drivers'), updateDriverProfile); // Route pour upload avec fichiers
+router.put('/location', requireAuth, autoClearCache('/api/drivers'), updateLocation);
+router.post('/become-driver', requireAuth, autoClearCache('/api/drivers'), becomeDriver); // Devenir chauffeur
 
 // Routes publiques/client avec cache
 router.get('/public', cacheMiddleware(300), getPublicDrivers); // Cache 5 min
@@ -31,6 +31,6 @@ router.get('/:driverId', requireAuth, cacheMiddleware(300), getDriverProfileById
 
 // Routes admin (TODO: ajouter middleware admin)
 router.get('/', requireAuth, getAllDrivers);
-router.put('/:driverId/status', requireAuth, updateDriverStatus);
+router.put('/:driverId/status', requireAuth, autoClearCache('/api/drivers'), updateDriverStatus);
 
 module.exports = router;

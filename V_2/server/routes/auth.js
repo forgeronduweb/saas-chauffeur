@@ -2,6 +2,7 @@ const express = require('express');
 const passport = require('../config/passport');
 const jwt = require('jsonwebtoken');
 const { requireAuth } = require('../middleware/auth');
+const { autoClearCache } = require('../middleware/cache');
 const { 
   register, 
   login, 
@@ -22,7 +23,7 @@ const {
 const router = express.Router();
 
 // Routes publiques
-router.post('/register', register);
+router.post('/register', autoClearCache('/api/drivers'), register);
 router.post('/login', login);
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password', resetPassword);
@@ -86,8 +87,8 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
 
 // Routes protégées
 router.get('/me', requireAuth, getProfile);
-router.put('/me', requireAuth, updateProfile);
-router.put('/me/role', requireAuth, updateRole);
+router.put('/me', requireAuth, autoClearCache('/api/drivers'), updateProfile);
+router.put('/me/role', requireAuth, autoClearCache('/api/drivers'), updateRole);
 
 // Route de debug pour forcer la sélection de rôle (à supprimer en production)
 router.post('/debug/reset-role', requireAuth, async (req, res) => {

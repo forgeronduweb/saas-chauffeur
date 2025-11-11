@@ -1,12 +1,17 @@
 // Middleware de cache simple en mémoire pour réduire les requêtes MongoDB
 const NodeCache = require('node-cache');
 
-// Cache avec TTL de 5 minutes par défaut
+// Cache avec TTL adapté à l'environnement
+const isDevelopment = process.env.NODE_ENV !== 'production';
+const defaultTTL = isDevelopment ? 10 : 300; // 10s en dev, 5min en prod
+
 const cache = new NodeCache({ 
-  stdTTL: 300, // 5 minutes
-  checkperiod: 60, // Vérifier les expirations toutes les 60 secondes
+  stdTTL: defaultTTL,
+  checkperiod: isDevelopment ? 5 : 60, // Vérifier plus souvent en dev
   useClones: false // Performance: ne pas cloner les objets
 });
+
+console.log(`🔧 Cache configuré: TTL=${defaultTTL}s (${isDevelopment ? 'DEVELOPMENT' : 'PRODUCTION'})`);
 
 /**
  * Middleware de cache pour les routes GET
@@ -67,9 +72,35 @@ const getCacheStats = () => {
   return cache.getStats();
 };
 
+/**
+ * Middleware pour invalider le cache automatiquement après les modifications
+ * À utiliser après les routes POST, PUT, PATCH, DELETE
+ */
+const autoClearCache = (pattern) => {
+  return (req, res, next) => {
+    // Intercepter la méthode send/json pour invalider après la réponse
+    const originalJson = res.json.bind(res);
+    const originalSend = res.send.bind(res);
+    
+    const clearAndRespond = (fn, data) => {
+      // Invalider le cache uniquement si la requête a réussi (2xx)
+      if (res.statusCode >= 200 && res.statusCode < 300) {
+        invalidateCache(pattern);
+      }
+      return fn(data);
+    };
+    
+    res.json = (data) => clearAndRespond(originalJson, data);
+    res.send = (data) => clearAndRespond(originalSend, data);
+    
+    next();
+  };
+};
+
 module.exports = {
   cacheMiddleware,
   invalidateCache,
   getCacheStats,
+  autoClearCache,
   cache
 };

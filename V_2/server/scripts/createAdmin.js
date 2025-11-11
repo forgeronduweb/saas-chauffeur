@@ -21,15 +21,29 @@ const User = mongoose.model('User', userSchema);
 async function createOrUpdateAdmin() {
   try {
     // Connexion à MongoDB
-    const mongoUri = process.env.MONGO_URI || 'mongodb+srv://forgeronduweb:MS2J5nSAFune9BcZ@cluster0.drfeiye.mongodb.net/chauffeur_db';
+    if (!process.env.MONGO_URI) {
+      console.error('❌ MONGO_URI n\'est pas défini dans le fichier .env');
+      console.error('💡 Créez un fichier .env avec: MONGO_URI=votre_uri_mongodb');
+      process.exit(1);
+    }
     
     console.log('📡 Connexion à MongoDB...');
-    await mongoose.connect(mongoUri);
+    await mongoose.connect(process.env.MONGO_URI);
     console.log('✅ Connecté à MongoDB\n');
 
-    // Données admin
-    const adminEmail = 'bahophilomeevrard@gmail.com';
-    const adminPassword = 'Philome98@';
+    // Données admin depuis les variables d'environnement
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    const adminFirstName = process.env.ADMIN_FIRST_NAME || 'Admin';
+    const adminLastName = process.env.ADMIN_LAST_NAME || 'User';
+    
+    if (!adminEmail || !adminPassword) {
+      console.error('❌ ADMIN_EMAIL et ADMIN_PASSWORD doivent être définis dans le fichier .env');
+      console.error('💡 Ajoutez ces variables dans votre fichier .env:');
+      console.error('   ADMIN_EMAIL=votre_email@example.com');
+      console.error('   ADMIN_PASSWORD=votre_mot_de_passe_securise');
+      process.exit(1);
+    }
     
     // Vérifier si l'admin existe déjà
     let admin = await User.findOne({ email: adminEmail.toLowerCase() });
@@ -50,8 +64,8 @@ async function createOrUpdateAdmin() {
       admin.role = 'admin';
       admin.isEmailVerified = true;
       admin.isActive = true;
-      admin.firstName = admin.firstName || 'Philomé';
-      admin.lastName = admin.lastName || 'Baho';
+      admin.firstName = admin.firstName || adminFirstName;
+      admin.lastName = admin.lastName || adminLastName;
       
       await admin.save();
       console.log('✅ Compte admin mis à jour avec succès!\n');
@@ -66,8 +80,8 @@ async function createOrUpdateAdmin() {
         email: adminEmail.toLowerCase(),
         passwordHash,
         role: 'admin',
-        firstName: 'Philomé',
-        lastName: 'Baho',
+        firstName: adminFirstName,
+        lastName: adminLastName,
         phone: '',
         isEmailVerified: true,
         isActive: true
@@ -80,7 +94,7 @@ async function createOrUpdateAdmin() {
     console.log('📋 INFORMATIONS DU COMPTE ADMIN:');
     console.log('================================');
     console.log('📧 Email:', admin.email);
-    console.log('🔑 Mot de passe:', adminPassword);
+    console.log('🔑 Mot de passe: ******** (voir fichier .env)');
     console.log('🎭 Rôle:', admin.role);
     console.log('✉️ Email vérifié:', admin.isEmailVerified);
     console.log('🟢 Actif:', admin.isActive);
@@ -88,7 +102,7 @@ async function createOrUpdateAdmin() {
     console.log('🆔 ID:', admin._id);
     console.log('================================\n');
     
-    console.log('✅ Vous pouvez maintenant vous connecter à l\'admin avec ces identifiants!\n');
+    console.log('✅ Vous pouvez maintenant vous connecter à l\'admin avec les identifiants du fichier .env!\n');
     
   } catch (error) {
     console.error('❌ Erreur:', error.message);
