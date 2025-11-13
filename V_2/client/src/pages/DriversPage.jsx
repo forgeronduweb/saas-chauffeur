@@ -3,19 +3,41 @@ import { Link, useNavigate } from 'react-router-dom';
 import SimpleHeader from '../component/common/SimpleHeader';
 import Footer from '../component/common/Footer';
 import DriverCard from '../component/common/DriverCard';
-import { driversService } from '../services/api';
+import { driversService, driversApi } from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function DriversPage() {
+  const { user, isDriver } = useAuth();
   const [drivers, setDrivers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [currentDriverProfile, setCurrentDriverProfile] = useState(null);
   const navigate = useNavigate();
   
   // États des filtres
   const [selectedCity, setSelectedCity] = useState('');
   const [selectedExperience, setSelectedExperience] = useState('');
   const [selectedVehicleType, setSelectedVehicleType] = useState('');
+
+  // Récupérer le profil du chauffeur connecté si c'est un chauffeur
+  useEffect(() => {
+    const fetchCurrentDriverProfile = async () => {
+      if (user && isDriver()) {
+        try {
+          const response = await driversApi.getMyProfile();
+          // La réponse contient {driver: {...}}, on extrait directement le driver
+          if (response.data && response.data.driver) {
+            setCurrentDriverProfile(response.data.driver);
+          }
+        } catch (error) {
+          console.error('Erreur lors de la récupération du profil chauffeur:', error);
+        }
+      }
+    };
+
+    fetchCurrentDriverProfile();
+  }, [user, isDriver]);
 
   useEffect(() => {
     const fetchDrivers = async () => {
@@ -43,8 +65,22 @@ export default function DriversPage() {
     fetchDrivers();
   }, []);
 
-  // Filtrage combiné (recherche + filtres)
+  /**
+   * Filtrage combiné (recherche + filtres + exclusion du chauffeur connecté)
+   * 
+   * Logique d'affichage selon le type d'utilisateur:
+   * - Non connecté: Affiche tous les chauffeurs
+   * - Employeur: Affiche tous les chauffeurs
+   * - Chauffeur: Affiche tous les chauffeurs SAUF lui-même
+   */
+  
   const filteredDrivers = drivers.filter(driver => {
+    // Exclure le chauffeur connecté de la liste (il ne doit pas se voir lui-même)
+    if (user && isDriver() && currentDriverProfile && driver._id === currentDriverProfile._id) {
+      console.log('✅ Chauffeur exclu de la liste:', driver.firstName, driver.lastName);
+      return false;
+    }
+
     // Filtre de recherche
     const matchesSearch = searchQuery === '' ||
       `${driver.firstName} ${driver.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) ||

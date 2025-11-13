@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { driversService, offersApi } from '../services/api';
+import { driversService, driversApi, offersApi } from '../services/api';
 import SimpleHeader from '../component/common/SimpleHeader';
 import Footer from '../component/common/Footer';
 import DriverCard from '../component/common/DriverCard';
 import OfferCard from '../component/common/OfferCard';
 import ProductCard from '../component/common/ProductCard';
+import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 
 export default function HomePage() {
+  const { user, isDriver } = useAuth();
   const [drivers, setDrivers] = useState([]);
   const [offers, setOffers] = useState([]);
   const [products, setProducts] = useState([]);
@@ -17,6 +19,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [currentDriverProfile, setCurrentDriverProfile] = useState(null);
   const navigate = useNavigate();
 
   // Bannières publicitaires
@@ -44,6 +47,25 @@ export default function HomePage() {
     }
   ];
 
+
+  // Récupérer le profil du chauffeur connecté si c'est un chauffeur
+  useEffect(() => {
+    const fetchCurrentDriverProfile = async () => {
+      if (user && isDriver()) {
+        try {
+          const response = await driversApi.getMyProfile();
+          // La réponse contient {driver: {...}}, on extrait directement le driver
+          if (response.data && response.data.driver) {
+            setCurrentDriverProfile(response.data.driver);
+          }
+        } catch (error) {
+          console.error('Erreur lors de la récupération du profil chauffeur:', error);
+        }
+      }
+    };
+
+    fetchCurrentDriverProfile();
+  }, [user, isDriver]);
 
   // Charger les données
   useEffect(() => {
@@ -129,12 +151,27 @@ export default function HomePage() {
     return () => clearInterval(interval);
   }, [banners.length]);
 
-  // Filtrage simple par recherche
-  const filteredDrivers = drivers.filter(driver =>
-    searchQuery === '' ||
-    `${driver.firstName} ${driver.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    driver.workZone?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  /**
+   * Filtrage combiné (recherche + exclusion du chauffeur connecté)
+   * 
+   * Logique d'affichage selon le type d'utilisateur:
+   * - Non connecté: Affiche tous les chauffeurs
+   * - Employeur: Affiche tous les chauffeurs
+   * - Chauffeur: Affiche tous les chauffeurs SAUF lui-même
+   */
+  const filteredDrivers = drivers.filter(driver => {
+    // Exclure le chauffeur connecté de la liste (il ne doit pas se voir lui-même)
+    if (user && isDriver() && currentDriverProfile && driver._id === currentDriverProfile._id) {
+      return false;
+    }
+
+    // Filtre de recherche
+    const matchesSearch = searchQuery === '' ||
+      `${driver.firstName} ${driver.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      driver.workZone?.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    return matchesSearch;
+  });
 
   return (
     <div className="min-h-screen bg-gray-50">
