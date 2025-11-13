@@ -49,7 +49,7 @@ export default function ContactDriverForm({ driverId, driverName, onClose }) {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"/>
           </svg>
         </div>
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">Message envoyé !</h3>
+        <h3 className="text-xl text-gray-900 mb-2">Message envoyé !</h3>
         <p className="text-gray-600">Le chauffeur vous contactera bientôt.</p>
       </div>
     );
@@ -58,7 +58,7 @@ export default function ContactDriverForm({ driverId, driverName, onClose }) {
   return (
     <div className="bg-white">
       <div className="mb-6">
-        <h2 className="text-2xl font-semibold text-gray-900 mb-2">Contacter {driverName}</h2>
+        <h2 className="text-2xl text-gray-900 mb-2">Contacter {driverName}</h2>
         <p className="text-gray-600">Remplissez ce formulaire pour proposer une opportunité</p>
       </div>
 
@@ -71,7 +71,7 @@ export default function ContactDriverForm({ driverId, driverName, onClose }) {
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Nom de l'entreprise */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm text-gray-700 mb-2">
             Nom de l'entreprise <span className="text-red-500">*</span>
           </label>
           <input
@@ -87,7 +87,7 @@ export default function ContactDriverForm({ driverId, driverName, onClose }) {
 
         {/* Nom du contact */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm text-gray-700 mb-2">
             Votre nom <span className="text-red-500">*</span>
           </label>
           <input
@@ -104,7 +104,7 @@ export default function ContactDriverForm({ driverId, driverName, onClose }) {
         {/* Email et Téléphone */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm text-gray-700 mb-2">
               Email <span className="text-red-500">*</span>
             </label>
             <input
@@ -118,7 +118,7 @@ export default function ContactDriverForm({ driverId, driverName, onClose }) {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm text-gray-700 mb-2">
               Téléphone <span className="text-red-500">*</span>
             </label>
             <input
@@ -135,7 +135,7 @@ export default function ContactDriverForm({ driverId, driverName, onClose }) {
 
         {/* Type de poste */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm text-gray-700 mb-2">
             Type de poste proposé <span className="text-red-500">*</span>
           </label>
           <select
@@ -156,7 +156,7 @@ export default function ContactDriverForm({ driverId, driverName, onClose }) {
 
         {/* Message */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm text-gray-700 mb-2">
             Votre message <span className="text-red-500">*</span>
           </label>
           <textarea
@@ -176,7 +176,7 @@ export default function ContactDriverForm({ driverId, driverName, onClose }) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+              className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
             >
               Annuler
             </button>
@@ -184,7 +184,7 @@ export default function ContactDriverForm({ driverId, driverName, onClose }) {
           <button
             type="submit"
             disabled={loading}
-            className="flex-1 px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all font-medium shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="flex-1 px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {loading ? (
               <>

@@ -193,11 +193,11 @@ export default function OffersPage() {
           {/* Sidebar Filtres Desktop */}
           <aside className="hidden lg:block w-64 flex-shrink-0 sticky top-20 self-start max-h-[calc(100vh-6rem)] overflow-y-auto">
             <div className="bg-white border border-gray-200 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Filtres</h3>
+              <h3 className="text-lg text-gray-900 mb-4">Filtres</h3>
               
               {/* Ville */}
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm text-gray-700 mb-2">
                   Ville
                 </label>
                 <CustomDropdown
@@ -210,7 +210,7 @@ export default function OffersPage() {
 
               {/* Type de contrat */}
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm text-gray-700 mb-2">
                   Type de contrat
                 </label>
                 <CustomDropdown
@@ -223,7 +223,7 @@ export default function OffersPage() {
 
               {/* Horaire */}
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm text-gray-700 mb-2">
                   Horaire
                 </label>
                 <CustomDropdown
@@ -236,7 +236,7 @@ export default function OffersPage() {
 
               {/* Expérience */}
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm text-gray-700 mb-2">
                   Expérience requise
                 </label>
                 <CustomDropdown
@@ -254,7 +254,7 @@ export default function OffersPage() {
                   setSelectedContractType('');
                   setSelectedWorkType('');
                 }}
-                className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+                className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm"
               >
                 Réinitialiser les filtres
               </button>
@@ -287,7 +287,7 @@ export default function OffersPage() {
             <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Aucune offre disponible</h3>
+            <h3 className="text-lg text-gray-900 mb-2">Aucune offre disponible</h3>
             <p className="text-gray-600">Aucune offre d'emploi publiée pour le moment</p>
           </div>
         )}
@@ -320,7 +320,7 @@ export default function OffersPage() {
                     <path d="M15 6.954 8.978 9.86a2.25 2.25 0 0 1-1.956 0L1 6.954V11.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V6.954Z" />
                   </svg>
                 </div>
-                <span className="text-sm font-medium text-gray-900 whitespace-nowrap">Marketing/Vente</span>
+                <span className="text-sm text-gray-900 whitespace-nowrap">Marketing/Vente</span>
               </Link>
 
               {/* Option Offre d'emploi */}
@@ -335,7 +335,7 @@ export default function OffersPage() {
                     <path d="M3 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 .5.5v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1Z" />
                   </svg>
                 </div>
-                <span className="text-sm font-medium text-gray-900 whitespace-nowrap">Offre d'emploi</span>
+                <span className="text-sm text-gray-900 whitespace-nowrap">Offre d'emploi</span>
               </Link>
             </div>
           </>
@@ -372,7 +372,7 @@ export default function OffersPage() {
           <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl max-h-[70vh] overflow-y-auto">
             {/* Header */}
             <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
-              <h3 className="text-base font-semibold text-gray-900">Filtres</h3>
+              <h3 className="text-base text-gray-900">Filtres</h3>
               <button
                 onClick={() => setShowMobileFilters(false)}
                 className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
@@ -387,7 +387,7 @@ export default function OffersPage() {
             <div className="p-4 space-y-3">
               {/* Ville */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1.5">
+                <label className="block text-xs text-gray-700 mb-1.5">
                   Ville
                 </label>
                 <select 
@@ -431,7 +431,7 @@ export default function OffersPage() {
 
               {/* Type de contrat */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1.5">
+                <label className="block text-xs text-gray-700 mb-1.5">
                   Type de contrat
                 </label>
                 <select 
@@ -448,7 +448,7 @@ export default function OffersPage() {
 
               {/* Horaire */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1.5">
+                <label className="block text-xs text-gray-700 mb-1.5">
                   Horaire
                 </label>
                 <select 
@@ -465,7 +465,7 @@ export default function OffersPage() {
 
               {/* Expérience */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1.5">
+                <label className="block text-xs text-gray-700 mb-1.5">
                   Expérience requise
                 </label>
                 <select className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
@@ -484,13 +484,13 @@ export default function OffersPage() {
                     setSelectedContractType('');
                     setSelectedWorkType('');
                   }}
-                  className="flex-1 px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+                  className="flex-1 px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
                 >
                   Réinitialiser
                 </button>
                 <button 
                   onClick={() => setShowMobileFilters(false)}
-                  className="flex-1 px-3 py-2 text-sm bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium"
+                  className="flex-1 px-3 py-2 text-sm bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
                 >
                   Appliquer
                 </button>

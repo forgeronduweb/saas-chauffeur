@@ -136,7 +136,7 @@ export default function JobOfferForm({ onSubmit, loading, error, initialData }) 
         <div className="flex items-center justify-between">
           {[1, 2, 3].map((step) => (
             <div key={step} className="flex items-center flex-1">
-              <div className={`flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full font-semibold text-base sm:text-lg ${
+              <div className={`flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full text-base sm:text-lg ${
                 currentStep >= step 
                   ? 'bg-orange-500 text-white' 
                   : 'bg-gray-200 text-gray-500'
@@ -151,7 +151,7 @@ export default function JobOfferForm({ onSubmit, loading, error, initialData }) 
             </div>
           ))}
         </div>
-        <div className="flex justify-between mt-2 sm:mt-3 text-xs lg:text-sm font-medium text-gray-600">
+        <div className="flex justify-between mt-2 sm:mt-3 text-xs lg:text-sm text-gray-600">
           <span>Informations</span>
           <span>Exigences</span>
           <span>Conditions</span>
@@ -169,7 +169,7 @@ export default function JobOfferForm({ onSubmit, loading, error, initialData }) 
         {currentStep === 1 && (
           <>
             <div>
-              <label className="block text-sm lg:text-lg font-medium text-gray-700 mb-2">
+              <label className="block text-sm lg:text-lg text-gray-700 mb-2">
                 Titre du poste <span className="text-red-500">*</span>
               </label>
               <input
@@ -184,7 +184,7 @@ export default function JobOfferForm({ onSubmit, loading, error, initialData }) 
             </div>
 
             <div>
-              <label className="block text-sm lg:text-lg font-medium text-gray-700 mb-2">
+              <label className="block text-sm lg:text-lg text-gray-700 mb-2">
                 Description du poste <span className="text-red-500">*</span>
               </label>
               <textarea
@@ -200,7 +200,7 @@ export default function JobOfferForm({ onSubmit, loading, error, initialData }) 
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm lg:text-lg font-medium text-gray-700 mb-2">
+                <label className="block text-sm lg:text-lg text-gray-700 mb-2">
                   Type d'offre <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -221,7 +221,7 @@ export default function JobOfferForm({ onSubmit, loading, error, initialData }) 
               </div>
 
               <div>
-                <label className="block text-sm lg:text-lg font-medium text-gray-700 mb-2">
+                <label className="block text-sm lg:text-lg text-gray-700 mb-2">
                   Type de travail <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -241,7 +241,7 @@ export default function JobOfferForm({ onSubmit, loading, error, initialData }) 
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm lg:text-lg font-medium text-gray-700 mb-2">
+                <label className="block text-sm lg:text-lg text-gray-700 mb-2">
                   Adresse <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -256,7 +256,7 @@ export default function JobOfferForm({ onSubmit, loading, error, initialData }) 
               </div>
 
               <div>
-                <label className="block text-sm lg:text-lg font-medium text-gray-700 mb-2">
+                <label className="block text-sm lg:text-lg text-gray-700 mb-2">
                   Ville <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -307,7 +307,7 @@ export default function JobOfferForm({ onSubmit, loading, error, initialData }) 
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm lg:text-lg font-medium text-gray-700 mb-2">
+                <label className="block text-sm lg:text-lg text-gray-700 mb-2">
                   Permis requis <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -325,7 +325,7 @@ export default function JobOfferForm({ onSubmit, loading, error, initialData }) 
               </div>
 
               <div>
-                <label className="block text-sm lg:text-lg font-medium text-gray-700 mb-2">
+                <label className="block text-sm lg:text-lg text-gray-700 mb-2">
                   Expérience requise <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -345,7 +345,7 @@ export default function JobOfferForm({ onSubmit, loading, error, initialData }) 
             </div>
 
             <div>
-              <label className="block text-sm lg:text-lg font-medium text-gray-700 mb-2">
+              <label className="block text-sm lg:text-lg text-gray-700 mb-2">
                 Type de véhicule <span className="text-red-500">*</span>
               </label>
               <select
@@ -366,7 +366,7 @@ export default function JobOfferForm({ onSubmit, loading, error, initialData }) 
             </div>
 
             <div>
-              <label className="block text-sm lg:text-lg font-medium text-gray-700 mb-2">
+              <label className="block text-sm lg:text-lg text-gray-700 mb-2">
                 Zone de travail <span className="text-red-500">*</span>
               </label>
               <input
@@ -382,7 +382,7 @@ export default function JobOfferForm({ onSubmit, loading, error, initialData }) 
 
             {/* Profil recherché (Liste) */}
             <div>
-              <label className="block text-sm lg:text-lg font-medium text-gray-700 mb-2">
+              <label className="block text-sm lg:text-lg text-gray-700 mb-2">
                 Profil recherché (Exigences détaillées)
               </label>
               <p className="text-xs lg:text-sm text-gray-500 mb-2">
@@ -434,7 +434,7 @@ export default function JobOfferForm({ onSubmit, loading, error, initialData }) 
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm lg:text-lg font-medium text-gray-700 mb-2">
+                <label className="block text-sm lg:text-lg text-gray-700 mb-2">
                   Salaire (FCFA) <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -449,7 +449,7 @@ export default function JobOfferForm({ onSubmit, loading, error, initialData }) 
               </div>
 
               <div>
-                <label className="block text-sm lg:text-lg font-medium text-gray-700 mb-2">
+                <label className="block text-sm lg:text-lg text-gray-700 mb-2">
                   Type de salaire <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -470,7 +470,7 @@ export default function JobOfferForm({ onSubmit, loading, error, initialData }) 
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm lg:text-lg font-medium text-gray-700 mb-2">
+                <label className="block text-sm lg:text-lg text-gray-700 mb-2">
                   Date de début <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -484,7 +484,7 @@ export default function JobOfferForm({ onSubmit, loading, error, initialData }) 
               </div>
 
               <div>
-                <label className="block text-sm lg:text-lg font-medium text-gray-700 mb-2">
+                <label className="block text-sm lg:text-lg text-gray-700 mb-2">
                   Horaires
                 </label>
                 <input
@@ -500,7 +500,7 @@ export default function JobOfferForm({ onSubmit, loading, error, initialData }) 
 
             {/* Avantages (Liste) */}
             <div>
-              <label className="block text-sm lg:text-lg font-medium text-gray-700 mb-2">
+              <label className="block text-sm lg:text-lg text-gray-700 mb-2">
                 Avantages du poste
               </label>
               <p className="text-xs lg:text-sm text-gray-500 mb-2">
@@ -553,7 +553,7 @@ export default function JobOfferForm({ onSubmit, loading, error, initialData }) 
             <button
               type="button"
               onClick={prevStep}
-              className="flex-1 px-4 sm:px-6 py-3 sm:py-3.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium text-sm"
+              className="flex-1 px-4 sm:px-6 py-3 sm:py-3.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm"
             >
               <span className="hidden sm:inline">← Précédent</span>
               <span className="sm:hidden">←</span>
@@ -564,7 +564,7 @@ export default function JobOfferForm({ onSubmit, loading, error, initialData }) 
             <button
               type="button"
               onClick={nextStep}
-              className="flex-1 px-4 sm:px-6 py-3 sm:py-3.5 bg-orange-500 text-white rounded-lg hover:bg-orange-500 transition-all font-medium shadow-md hover:shadow-lg text-sm"
+              className="flex-1 px-4 sm:px-6 py-3 sm:py-3.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm"
             >
               <span className="hidden sm:inline">Suivant →</span>
               <span className="sm:hidden">→</span>
@@ -573,7 +573,7 @@ export default function JobOfferForm({ onSubmit, loading, error, initialData }) 
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 px-4 sm:px-6 py-3 sm:py-3.5 bg-orange-500 text-white rounded-lg hover:bg-orange-500 transition-all font-medium shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
+              className="flex-1 px-4 sm:px-6 py-3 sm:py-3.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
             >
               {loading ? (
                 <>

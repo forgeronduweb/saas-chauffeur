@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import SimpleHeader from '../../component/common/SimpleHeader';
+import CustomDropdown from '../../component/common/CustomDropdown';
 import { applicationsApi } from '../../services/api';
 
 export default function MyCandidates() {
@@ -118,77 +119,20 @@ export default function MyCandidates() {
               Filtres
             </button>
             
-            {/* Filtres avec radio buttons - Cachés sur mobile */}
-            <form className="hidden sm:inline-flex items-center bg-white border border-gray-200 rounded-lg p-1 shadow-sm">
-              <button 
-                type="button"
-                onClick={() => setFilter('all')}
-                className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 text-gray-500 hover:text-gray-700 rounded transition-all duration-200"
-                title="Réinitialiser"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-              
-              <div className="w-px h-6 bg-gray-200 mx-1"></div>
-              
-              <label className="relative cursor-pointer">
-                <input 
-                  type="radio" 
-                  name="filter" 
-                  value="all"
-                  checked={filter === 'all'}
-                  onChange={(e) => setFilter(e.target.value)}
-                  className="peer sr-only"
-                />
-                <span className="px-3 py-1.5 rounded text-xs font-medium transition-all duration-200 inline-block peer-checked:bg-orange-500 peer-checked:text-white peer-checked:shadow-sm hover:bg-gray-50">
-                  Toutes ({candidates.length})
-                </span>
-              </label>
-              
-              <label className="relative cursor-pointer">
-                <input 
-                  type="radio" 
-                  name="filter" 
-                  value="pending"
-                  checked={filter === 'pending'}
-                  onChange={(e) => setFilter(e.target.value)}
-                  className="peer sr-only"
-                />
-                <span className="px-3 py-1.5 rounded text-xs font-medium transition-all duration-200 inline-block peer-checked:bg-orange-500 peer-checked:text-white peer-checked:shadow-sm hover:bg-gray-50">
-                  En attente ({candidates.filter(c => c.status === 'pending').length})
-                </span>
-              </label>
-              
-              <label className="relative cursor-pointer">
-                <input 
-                  type="radio" 
-                  name="filter" 
-                  value="accepted"
-                  checked={filter === 'accepted'}
-                  onChange={(e) => setFilter(e.target.value)}
-                  className="peer sr-only"
-                />
-                <span className="px-3 py-1.5 rounded text-xs font-medium transition-all duration-200 inline-block peer-checked:bg-orange-500 peer-checked:text-white peer-checked:shadow-sm hover:bg-gray-50">
-                  Acceptées ({candidates.filter(c => c.status === 'accepted').length})
-                </span>
-              </label>
-              
-              <label className="relative cursor-pointer">
-                <input 
-                  type="radio" 
-                  name="filter" 
-                  value="rejected"
-                  checked={filter === 'rejected'}
-                  onChange={(e) => setFilter(e.target.value)}
-                  className="peer sr-only"
-                />
-                <span className="px-3 py-1.5 rounded text-xs font-medium transition-all duration-200 inline-block peer-checked:bg-orange-500 peer-checked:text-white peer-checked:shadow-sm hover:bg-gray-50">
-                  Rejetées ({candidates.filter(c => c.status === 'rejected').length})
-                </span>
-              </label>
-            </form>
+            {/* Dropdown personnalisé - Desktop uniquement */}
+            <div className="hidden sm:block">
+              <CustomDropdown
+                value={filter}
+                onChange={setFilter}
+                placeholder="Filtrer par statut"
+                options={[
+                  { value: 'all', label: `Toutes (${candidates.length})` },
+                  { value: 'pending', label: `En attente (${candidates.filter(c => c.status === 'pending').length})` },
+                  { value: 'accepted', label: `Acceptées (${candidates.filter(c => c.status === 'accepted').length})` },
+                  { value: 'rejected', label: `Rejetées (${candidates.filter(c => c.status === 'rejected').length})` }
+                ]}
+              />
+            </div>
           </div>
           <p className="text-gray-600 text-sm">Gérez les candidatures reçues pour vos offres d'emploi</p>
         </div>
@@ -199,12 +143,25 @@ export default function MyCandidates() {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
           </div>
         ) : filteredCandidates.length === 0 ? (
-          <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-            <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-            </svg>
-            <h3 className="text-lg text-gray-900 mb-2">Aucune candidature</h3>
-            <p className="text-gray-600">Vous n'avez pas encore reçu de candidatures pour vos offres.</p>
+          <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
+            <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg className="w-10 h-10 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+              </svg>
+            </div>
+            <h3 className="text-2xl text-gray-900 mb-3">Aucune candidature</h3>
+            <p className="text-gray-600 mb-8 max-w-md mx-auto">
+              Vous n'avez pas encore reçu de candidatures. Publiez des offres d'emploi attractives pour attirer les meilleurs chauffeurs.
+            </p>
+            <button
+              onClick={() => navigate('/publier-offre?type=job')}
+              className="px-8 py-4 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors inline-flex items-center gap-3"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Publier une offre d'emploi
+            </button>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4">
@@ -220,7 +177,7 @@ export default function MyCandidates() {
                       {/* Info candidat */}
                       <div className="flex items-start gap-4 flex-1">
                         <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white border-2 border-orange-500 rounded-full flex items-center justify-center flex-shrink-0">
-                          <span className="text-orange-500 text-base sm:text-lg font-semibold">
+                          <span className="text-orange-500 text-base sm:text-lg">
                             {candidate.driverName.charAt(0)}
                           </span>
                         </div>
@@ -229,7 +186,7 @@ export default function MyCandidates() {
                             {candidate.driverName}
                           </h3>
                           <p className="text-sm text-gray-600 mb-2">
-                            Candidature pour : <span className="font-medium text-gray-900">{candidate.offerTitle}</span>
+                            Candidature pour : <span className="text-gray-900">{candidate.offerTitle}</span>
                           </p>
                           <div className="flex flex-wrap gap-2 sm:gap-3 text-xs sm:text-sm text-gray-600">
                             <span className="flex items-center gap-1">
@@ -256,7 +213,7 @@ export default function MyCandidates() {
 
                       {/* Status et actions */}
                       <div className="flex flex-col lg:items-end gap-2 sm:gap-3">
-                        <span className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${badge.color} self-start lg:self-auto`}>
+                        <span className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm ${badge.color} self-start lg:self-auto`}>
                           {badge.text}
                         </span>
                         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
@@ -264,13 +221,13 @@ export default function MyCandidates() {
                             <>
                               <button 
                                 onClick={() => handleAccept(candidate.id)}
-                                className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-xs sm:text-sm font-medium"
+                                className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-xs sm:text-sm"
                               >
                                 Accepter
                               </button>
                               <button 
                                 onClick={() => handleReject(candidate.id)}
-                                className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-xs sm:text-sm font-medium"
+                                className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-xs sm:text-sm"
                               >
                                 Refuser
                               </button>
@@ -279,7 +236,7 @@ export default function MyCandidates() {
                           {candidate.driverId ? (
                             <button 
                               onClick={() => navigate(`/driver/${candidate.driverId}`)}
-                              className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-xs sm:text-sm font-medium"
+                              className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-xs sm:text-sm"
                             >
                               Voir profil
                             </button>
@@ -311,7 +268,7 @@ export default function MyCandidates() {
             <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl max-h-[70vh] overflow-y-auto">
               {/* Header */}
               <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
-                <h3 className="text-base font-semibold text-gray-900">Filtres</h3>
+                <h3 className="text-base text-gray-900">Filtres</h3>
                 <button
                   onClick={() => setShowMobileFilters(false)}
                   className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
@@ -325,7 +282,7 @@ export default function MyCandidates() {
               {/* Filtres */}
               <div className="p-4 space-y-3">
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1.5">
+                  <label className="block text-xs text-gray-700 mb-1.5">
                     Statut
                   </label>
                   <select 
@@ -344,13 +301,13 @@ export default function MyCandidates() {
                 <div className="flex gap-2 pt-3">
                   <button 
                     onClick={() => setFilter('all')}
-                    className="flex-1 px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+                    className="flex-1 px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
                   >
                     Réinitialiser
                   </button>
                   <button 
                     onClick={() => setShowMobileFilters(false)}
-                    className="flex-1 px-3 py-2 text-sm bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium"
+                    className="flex-1 px-3 py-2 text-sm bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
                   >
                     Appliquer
                   </button>

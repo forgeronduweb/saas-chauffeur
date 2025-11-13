@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import SimpleHeader from '../../component/common/SimpleHeader';
+import CustomDropdown from '../../component/common/CustomDropdown';
 import { offersApi } from '../../services/api';
 
 export default function MyOffers() {
@@ -106,63 +107,19 @@ export default function MyOffers() {
               Filtres
             </button>
             
-            {/* Filtres avec radio buttons - Cachés sur mobile */}
-            <form className="hidden sm:inline-flex items-center bg-white border border-gray-200 rounded-lg p-1 shadow-sm">
-              <button 
-                type="button"
-                onClick={() => setFilter('all')}
-                className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 text-gray-500 hover:text-gray-700 rounded transition-all duration-200"
-                title="Réinitialiser"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-              
-              <div className="w-px h-6 bg-gray-200 mx-1"></div>
-              
-              <label className="relative cursor-pointer">
-                <input 
-                  type="radio" 
-                  name="filter" 
-                  value="all"
-                  checked={filter === 'all'}
-                  onChange={(e) => setFilter(e.target.value)}
-                  className="peer sr-only"
-                />
-                <span className="px-3 py-1.5 rounded text-xs font-medium transition-all duration-200 inline-block peer-checked:bg-orange-500 peer-checked:text-white peer-checked:shadow-sm hover:bg-gray-50">
-                  Toutes ({offers.length})
-                </span>
-              </label>
-              
-              <label className="relative cursor-pointer">
-                <input 
-                  type="radio" 
-                  name="filter" 
-                  value="active"
-                  checked={filter === 'active'}
-                  onChange={(e) => setFilter(e.target.value)}
-                  className="peer sr-only"
-                />
-                <span className="px-3 py-1.5 rounded text-xs font-medium transition-all duration-200 inline-block peer-checked:bg-orange-500 peer-checked:text-white peer-checked:shadow-sm hover:bg-gray-50">
-                  Actives ({offers.filter(o => o.status === 'active').length})
-                </span>
-              </label>
-              
-              <label className="relative cursor-pointer">
-                <input 
-                  type="radio" 
-                  name="filter" 
-                  value="closed"
-                  checked={filter === 'closed'}
-                  onChange={(e) => setFilter(e.target.value)}
-                  className="peer sr-only"
-                />
-                <span className="px-3 py-1.5 rounded text-xs font-medium transition-all duration-200 inline-block peer-checked:bg-orange-500 peer-checked:text-white peer-checked:shadow-sm hover:bg-gray-50">
-                  Fermées ({offers.filter(o => o.status === 'closed').length})
-                </span>
-              </label>
-            </form>
+            {/* Dropdown personnalisé - Desktop uniquement */}
+            <div className="hidden sm:block">
+              <CustomDropdown
+                value={filter}
+                onChange={setFilter}
+                placeholder="Filtrer par statut"
+                options={[
+                  { value: 'all', label: `Toutes (${offers.length})` },
+                  { value: 'active', label: `Actives (${offers.filter(o => o.status === 'active').length})` },
+                  { value: 'closed', label: `Fermées (${offers.filter(o => o.status === 'closed').length})` }
+                ]}
+              />
+            </div>
           </div>
           <p className="text-gray-600 text-sm">Gérez vos offres d'emploi publiées</p>
         </div>
@@ -173,20 +130,24 @@ export default function MyOffers() {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
           </div>
         ) : filteredOffers.length === 0 ? (
-          <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-            <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            </svg>
-            <h3 className="text-lg text-gray-900 mb-2">Aucune offre</h3>
-            <p className="text-gray-600 mb-4">Vous n'avez pas encore publié d'offres d'emploi.</p>
+          <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
+            <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg className="w-10 h-10 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h3 className="text-2xl text-gray-900 mb-3">Aucune annonce</h3>
+            <p className="text-gray-600 mb-8 max-w-md mx-auto">
+              Commencez à recruter les meilleurs chauffeurs. Créez votre première offre d'emploi et trouvez le candidat idéal.
+            </p>
             <button
               onClick={() => navigate('/publier-offre?type=job')}
-              className="w-full sm:w-auto px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium inline-flex items-center justify-center gap-2"
+              className="px-8 py-4 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors inline-flex items-center gap-3"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              Créer ma première offre
+              Créer ma première annonce
             </button>
           </div>
         ) : (
@@ -201,12 +162,12 @@ export default function MyOffers() {
                     {/* Info offre */}
                     <div className="flex-1">
                       <div className="mb-3">
-                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">{offer.title}</h3>
+                        <h3 className="text-base sm:text-lg text-gray-900 mb-2">{offer.title}</h3>
                         <div className="flex flex-wrap gap-2 mb-3">
-                          <span className="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm font-medium">
+                          <span className="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm">
                             {offer.type}
                           </span>
-                          <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                          <span className={`px-3 py-1 rounded-full text-sm ${
                             offer.status === 'active' 
                               ? 'bg-green-100 text-green-800' 
                               : 'bg-gray-100 text-gray-800'
@@ -244,35 +205,35 @@ export default function MyOffers() {
                           <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                           </svg>
-                          <span className="font-medium">{offer.applicationsCount}</span> candidatures
+                          <span>{offer.applicationsCount}</span> candidatures
                         </div>
                         <div className="flex items-center gap-2 text-gray-600">
                           <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                           </svg>
-                          <span className="font-medium">{offer.viewsCount}</span> vues
+                          <span>{offer.viewsCount}</span> vues
                         </div>
                       </div>
                     </div>
 
                     {/* Actions */}
-                    <div className="flex flex-col sm:flex-row gap-2 pt-3 border-t border-gray-100">
+                    <div className="flex gap-2 pt-3 border-t border-gray-100">
                       <button 
                         onClick={() => navigate(`/offre/${offer.id}`)}
-                        className="flex-1 px-4 py-2.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm font-medium"
+                        className="px-3 py-1.5 bg-orange-500 text-white rounded text-sm hover:bg-orange-600 transition-colors"
                       >
                         Voir détails
                       </button>
                       <button 
                         onClick={() => handleEdit(offer.id)}
-                        className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+                        className="px-3 py-1.5 border border-gray-300 text-gray-700 rounded text-sm hover:bg-gray-50 transition-colors"
                       >
                         Modifier
                       </button>
                       <button 
                         onClick={() => openDeleteModal(offer)}
-                        className="flex-1 px-4 py-2.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors text-sm font-medium"
+                        className="px-3 py-1.5 border border-red-300 text-red-600 rounded text-sm hover:bg-red-50 transition-colors"
                       >
                         Supprimer
                       </button>
@@ -298,7 +259,7 @@ export default function MyOffers() {
           <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl max-h-[70vh] overflow-y-auto">
             {/* Header */}
             <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
-              <h3 className="text-base font-semibold text-gray-900">Filtres</h3>
+              <h3 className="text-base text-gray-900">Filtres</h3>
               <button
                 onClick={() => setShowMobileFilters(false)}
                 className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
@@ -312,7 +273,7 @@ export default function MyOffers() {
             {/* Filtres */}
             <div className="p-4 space-y-3">
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1.5">
+                <label className="block text-xs text-gray-700 mb-1.5">
                   Statut
                 </label>
                 <select 
@@ -330,13 +291,13 @@ export default function MyOffers() {
               <div className="flex gap-2 pt-3">
                 <button 
                   onClick={() => setFilter('all')}
-                  className="flex-1 px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+                  className="flex-1 px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
                 >
                   Réinitialiser
                 </button>
                 <button 
                   onClick={() => setShowMobileFilters(false)}
-                  className="flex-1 px-3 py-2 text-sm bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium"
+                  className="flex-1 px-3 py-2 text-sm bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
                 >
                   Appliquer
                 </button>
@@ -378,13 +339,13 @@ export default function MyOffers() {
             <div className="flex gap-3 mt-6 w-full">
               <button
                 onClick={closeDeleteModal}
-                className="w-full md:w-36 h-10 rounded-md border border-gray-300 bg-white text-gray-600 font-medium text-sm hover:bg-gray-100 active:scale-95 transition"
+                className="w-full md:w-36 h-10 rounded-md border border-gray-300 bg-white text-gray-600 text-sm hover:bg-gray-100 active:scale-95 transition"
               >
                 Annuler
               </button>
               <button
                 onClick={handleDelete}
-                className="w-full md:w-36 h-10 rounded-md text-white bg-red-600 font-medium text-sm hover:bg-red-700 active:scale-95 transition"
+                className="w-full md:w-36 h-10 rounded-md text-white bg-red-600 text-sm hover:bg-red-700 active:scale-95 transition"
               >
                 Supprimer
               </button>

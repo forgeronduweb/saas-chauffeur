@@ -118,7 +118,11 @@ export default function DriversPage() {
           <h2 className="text-xl lg:text-2xl font-normal text-gray-900">
             <span className="lg:hidden">Chauffeurs</span>
             <span className="hidden lg:inline">Chauffeurs disponibles</span>
-            {' '}<span className="text-gray-500">({filteredDrivers.length})</span>
+            {' '}<span className="text-gray-500">
+              ({user && isDriver() && currentDriverProfile 
+                ? `${filteredDrivers.length} plus moi` 
+                : `${filteredDrivers.length}`})
+            </span>
           </h2>
           
           {/* Bouton filtres mobile */}

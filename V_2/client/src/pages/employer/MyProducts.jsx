@@ -11,6 +11,7 @@ export default function MyProducts() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // all, active, sold
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -76,12 +77,23 @@ export default function MyProducts() {
       <SimpleHeader />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
+        {/* Header avec filtres */}
         <div className="mb-6">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-2">
+          <div className="flex items-center justify-between mb-2">
             <h1 className="text-xl sm:text-2xl lg:text-3xl text-gray-900">Mes offres marketing</h1>
             
-            {/* Dropdown de filtre - Desktop uniquement */}
+            {/* Bouton filtres mobile */}
+            <button
+              onClick={() => setShowMobileFilters(true)}
+              className="sm:hidden flex items-center gap-1.5 px-3 py-1.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+              </svg>
+              Filtres
+            </button>
+            
+            {/* Dropdown personnalisé - Desktop uniquement */}
             <div className="hidden sm:block">
               <CustomDropdown
                 value={filter}
@@ -104,17 +116,21 @@ export default function MyProducts() {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
           </div>
         ) : filteredProducts.length === 0 ? (
-          <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-            <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-            </svg>
-            <h3 className="text-lg text-gray-900 mb-2">Aucune offre marketing</h3>
-            <p className="text-gray-600 mb-4">Vous n'avez pas encore publié de produits ou services.</p>
+          <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
+            <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg className="w-10 h-10 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+              </svg>
+            </div>
+            <h3 className="text-2xl text-gray-900 mb-3">Aucune offre marketing</h3>
+            <p className="text-gray-600 mb-8 max-w-md mx-auto">
+              Développez votre activité commerciale. Créez vos premières offres marketing et touchez de nouveaux clients.
+            </p>
             <button
               onClick={() => navigate('/publier-offre?type=product')}
-              className="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium inline-flex items-center gap-2"
+              className="px-8 py-4 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors inline-flex items-center gap-3"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
               Créer ma première offre
@@ -215,6 +231,67 @@ export default function MyProducts() {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Modal Filtres Mobile */}
+        {showMobileFilters && (
+          <div className="fixed inset-0 z-50 sm:hidden">
+            {/* Overlay */}
+            <div 
+              className="absolute inset-0 bg-black/50"
+              onClick={() => setShowMobileFilters(false)}
+            ></div>
+            
+            {/* Modal Content */}
+            <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl max-h-[70vh] overflow-y-auto">
+              {/* Header */}
+              <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+                <h3 className="text-base text-gray-900">Filtres</h3>
+                <button
+                  onClick={() => setShowMobileFilters(false)}
+                  className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Filtres */}
+              <div className="p-4 space-y-3">
+                <div>
+                  <label className="block text-xs text-gray-700 mb-1.5">
+                    Statut
+                  </label>
+                  <select 
+                    value={filter}
+                    onChange={(e) => setFilter(e.target.value)}
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  >
+                    <option value="all">Toutes ({products.length})</option>
+                    <option value="active">Actives ({products.filter(p => p.status === 'active').length})</option>
+                    <option value="inactive">Inactives ({products.filter(p => p.status === 'inactive').length})</option>
+                  </select>
+                </div>
+
+                {/* Boutons */}
+                <div className="flex gap-2 pt-3">
+                  <button 
+                    onClick={() => setFilter('all')}
+                    className="flex-1 px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Réinitialiser
+                  </button>
+                  <button 
+                    onClick={() => setShowMobileFilters(false)}
+                    className="flex-1 px-3 py-2 text-sm bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+                  >
+                    Appliquer
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </main>

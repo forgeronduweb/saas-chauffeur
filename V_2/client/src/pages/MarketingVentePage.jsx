@@ -182,11 +182,11 @@ export default function MarketingVentePage() {
           {/* Sidebar Filtres Desktop */}
           <aside className="hidden lg:block w-64 flex-shrink-0 sticky top-20 self-start max-h-[calc(100vh-6rem)] overflow-y-auto">
             <div className="bg-white border border-gray-200 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Filtres</h3>
+              <h3 className="text-lg text-gray-900 mb-4">Filtres</h3>
               
               {/* Catégorie */}
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm text-gray-700 mb-2">
                   Catégorie
                 </label>
                 <CustomDropdown
@@ -199,7 +199,7 @@ export default function MarketingVentePage() {
 
               {/* Condition */}
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm text-gray-700 mb-2">
                   Condition
                 </label>
                 <CustomDropdown
@@ -212,7 +212,7 @@ export default function MarketingVentePage() {
 
               {/* Ville */}
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm text-gray-700 mb-2">
                   Ville
                 </label>
                 <CustomDropdown
@@ -225,7 +225,7 @@ export default function MarketingVentePage() {
 
               {/* Prix */}
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm text-gray-700 mb-2">
                   Fourchette de prix
                 </label>
                 <CustomDropdown
@@ -244,7 +244,7 @@ export default function MarketingVentePage() {
                   setSelectedPriceRange('');
                   setSelectedCondition('');
                 }}
-                className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+                className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm"
               >
                 Réinitialiser les filtres
               </button>
@@ -278,7 +278,7 @@ export default function MarketingVentePage() {
             <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
             </svg>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Aucun produit disponible</h3>
+            <h3 className="text-lg text-gray-900 mb-2">Aucun produit disponible</h3>
             <p className="text-gray-600">Aucun produit publié pour le moment</p>
           </div>
         )}
@@ -311,7 +311,7 @@ export default function MarketingVentePage() {
                     <path d="M15 6.954 8.978 9.86a2.25 2.25 0 0 1-1.956 0L1 6.954V11.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V6.954Z" />
                   </svg>
                 </div>
-                <span className="text-sm font-medium text-gray-900 whitespace-nowrap">Marketing/Vente</span>
+                <span className="text-sm text-gray-900 whitespace-nowrap">Marketing/Vente</span>
               </Link>
 
               {/* Option Offre d'emploi */}
@@ -326,7 +326,7 @@ export default function MarketingVentePage() {
                     <path d="M3 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 .5.5v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1Z" />
                   </svg>
                 </div>
-                <span className="text-sm font-medium text-gray-900 whitespace-nowrap">Offre d'emploi</span>
+                <span className="text-sm text-gray-900 whitespace-nowrap">Offre d'emploi</span>
               </Link>
             </div>
           </>
@@ -363,7 +363,7 @@ export default function MarketingVentePage() {
           <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl max-h-[70vh] overflow-y-auto">
             {/* Header */}
             <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
-              <h3 className="text-base font-semibold text-gray-900">Filtres</h3>
+              <h3 className="text-base text-gray-900">Filtres</h3>
               <button
                 onClick={() => setShowMobileFilters(false)}
                 className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
@@ -378,7 +378,7 @@ export default function MarketingVentePage() {
             <div className="p-4 space-y-3">
               {/* Catégorie */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1.5">
+                <label className="block text-xs text-gray-700 mb-1.5">
                   Catégorie
                 </label>
                 <select 
@@ -396,7 +396,7 @@ export default function MarketingVentePage() {
 
               {/* Condition */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1.5">
+                <label className="block text-xs text-gray-700 mb-1.5">
                   Condition
                 </label>
                 <select 
@@ -413,7 +413,7 @@ export default function MarketingVentePage() {
 
               {/* Ville */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1.5">
+                <label className="block text-xs text-gray-700 mb-1.5">
                   Ville
                 </label>
                 <select 
@@ -431,7 +431,7 @@ export default function MarketingVentePage() {
 
               {/* Prix */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1.5">
+                <label className="block text-xs text-gray-700 mb-1.5">
                   Fourchette de prix
                 </label>
                 <select 
@@ -457,13 +457,13 @@ export default function MarketingVentePage() {
                     setSelectedPriceRange('');
                     setSelectedCondition('');
                   }}
-                  className="flex-1 px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+                  className="flex-1 px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
                 >
                   Réinitialiser
                 </button>
                 <button 
                   onClick={() => setShowMobileFilters(false)}
-                  className="flex-1 px-3 py-2 text-sm bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium"
+                  className="flex-1 px-3 py-2 text-sm bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
                 >
                   Appliquer
                 </button>

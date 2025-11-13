@@ -73,7 +73,7 @@ export default function CreateOfferForm({ onClose, onSuccess }) {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"/>
           </svg>
         </div>
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">Offre publiée avec succès !</h3>
+        <h3 className="text-xl text-gray-900 mb-2">Offre publiée avec succès !</h3>
         <p className="text-gray-600">Votre offre est maintenant visible par les chauffeurs.</p>
       </div>
     );
@@ -83,7 +83,7 @@ export default function CreateOfferForm({ onClose, onSuccess }) {
     <div className="bg-white">
       {/* Header */}
       <div className="mb-6">
-        <h2 className="text-2xl font-semibold text-gray-900 mb-2">Publier une offre d'emploi</h2>
+        <h2 className="text-2xl text-gray-900 mb-2">Publier une offre d'emploi</h2>
         <p className="text-gray-600">Trouvez le chauffeur idéal pour votre entreprise</p>
       </div>
 
@@ -92,7 +92,7 @@ export default function CreateOfferForm({ onClose, onSuccess }) {
         <div className="flex items-center justify-between">
           {[1, 2, 3].map((step) => (
             <div key={step} className="flex items-center flex-1">
-              <div className={`flex items-center justify-center w-10 h-10 rounded-full font-semibold ${
+              <div className={`flex items-center justify-center w-10 h-10 rounded-full ${
                 currentStep >= step 
                   ? 'bg-orange-500 text-white' 
                   : 'bg-gray-200 text-gray-500'
@@ -125,7 +125,7 @@ export default function CreateOfferForm({ onClose, onSuccess }) {
         {currentStep === 1 && (
           <>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm text-gray-700 mb-2">
                 Titre du poste <span className="text-red-500">*</span>
               </label>
               <input
@@ -140,7 +140,7 @@ export default function CreateOfferForm({ onClose, onSuccess }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm text-gray-700 mb-2">
                 Nom de l'entreprise <span className="text-red-500">*</span>
               </label>
               <input
@@ -156,7 +156,7 @@ export default function CreateOfferForm({ onClose, onSuccess }) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm text-gray-700 mb-2">
                   Type d'offre <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -178,7 +178,7 @@ export default function CreateOfferForm({ onClose, onSuccess }) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm text-gray-700 mb-2">
                   Type de contrat <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -199,7 +199,7 @@ export default function CreateOfferForm({ onClose, onSuccess }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm text-gray-700 mb-2">
                 Description du poste <span className="text-red-500">*</span>
               </label>
               <textarea
@@ -215,7 +215,7 @@ export default function CreateOfferForm({ onClose, onSuccess }) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm text-gray-700 mb-2">
                   Zone / Quartier <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -230,7 +230,7 @@ export default function CreateOfferForm({ onClose, onSuccess }) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm text-gray-700 mb-2">
                   Ville <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -281,7 +281,7 @@ export default function CreateOfferForm({ onClose, onSuccess }) {
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm text-gray-700 mb-2">
                   Permis requis <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -299,7 +299,7 @@ export default function CreateOfferForm({ onClose, onSuccess }) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm text-gray-700 mb-2">
                   Expérience requise <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -319,7 +319,7 @@ export default function CreateOfferForm({ onClose, onSuccess }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm text-gray-700 mb-2">
                 Type de véhicule <span className="text-red-500">*</span>
               </label>
               <select
@@ -345,7 +345,7 @@ export default function CreateOfferForm({ onClose, onSuccess }) {
         {currentStep === 3 && (
           <>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm text-gray-700 mb-2">
                 Fourchette de salaire (FCFA) <span className="text-red-500">*</span>
               </label>
               <div className="grid grid-cols-2 gap-4">
@@ -371,7 +371,7 @@ export default function CreateOfferForm({ onClose, onSuccess }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm text-gray-700 mb-2">
                 Type de travail <span className="text-red-500">*</span>
               </label>
               <select
@@ -390,7 +390,7 @@ export default function CreateOfferForm({ onClose, onSuccess }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm text-gray-700 mb-2">
                 Date de début souhaitée <span className="text-red-500">*</span>
               </label>
               <input
@@ -405,7 +405,7 @@ export default function CreateOfferForm({ onClose, onSuccess }) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm text-gray-700 mb-2">
                   Email de contact <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -420,7 +420,7 @@ export default function CreateOfferForm({ onClose, onSuccess }) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm text-gray-700 mb-2">
                   Téléphone de contact <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -443,7 +443,7 @@ export default function CreateOfferForm({ onClose, onSuccess }) {
             <button
               type="button"
               onClick={prevStep}
-              className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+              className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
             >
               ← Précédent
             </button>
@@ -453,7 +453,7 @@ export default function CreateOfferForm({ onClose, onSuccess }) {
             <button
               type="button"
               onClick={nextStep}
-              className="flex-1 px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all font-medium shadow-md hover:shadow-lg"
+              className="flex-1 px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
             >
               Suivant →
             </button>
@@ -461,7 +461,7 @@ export default function CreateOfferForm({ onClose, onSuccess }) {
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all font-medium shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="flex-1 px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>

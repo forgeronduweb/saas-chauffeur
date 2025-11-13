@@ -53,7 +53,7 @@ export default function OrderProductForm({ productId, productName, productPrice,
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"/>
           </svg>
         </div>
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">Commande confirmée !</h3>
+        <h3 className="text-xl text-gray-900 mb-2">Commande confirmée !</h3>
         <p className="text-gray-600">Nous vous contacterons pour la livraison.</p>
       </div>
     );
@@ -62,7 +62,7 @@ export default function OrderProductForm({ productId, productName, productPrice,
   return (
     <div className="bg-white">
       <div className="mb-6">
-        <h2 className="text-2xl font-semibold text-gray-900 mb-2">Commander {productName}</h2>
+        <h2 className="text-2xl text-gray-900 mb-2">Commander {productName}</h2>
         <p className="text-gray-600">Remplissez vos informations de livraison</p>
       </div>
 
@@ -75,7 +75,7 @@ export default function OrderProductForm({ productId, productName, productPrice,
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Nom complet */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm text-gray-700 mb-2">
             Nom complet <span className="text-red-500">*</span>
           </label>
           <input
@@ -92,7 +92,7 @@ export default function OrderProductForm({ productId, productName, productPrice,
         {/* Email et Téléphone */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm text-gray-700 mb-2">
               Email <span className="text-red-500">*</span>
             </label>
             <input
@@ -106,7 +106,7 @@ export default function OrderProductForm({ productId, productName, productPrice,
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm text-gray-700 mb-2">
               Téléphone <span className="text-red-500">*</span>
             </label>
             <input
@@ -123,7 +123,7 @@ export default function OrderProductForm({ productId, productName, productPrice,
 
         {/* Adresse */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm text-gray-700 mb-2">
             Adresse de livraison <span className="text-red-500">*</span>
           </label>
           <input
@@ -139,7 +139,7 @@ export default function OrderProductForm({ productId, productName, productPrice,
 
         {/* Ville */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm text-gray-700 mb-2">
             Ville <span className="text-red-500">*</span>
           </label>
           <select
@@ -185,7 +185,7 @@ export default function OrderProductForm({ productId, productName, productPrice,
         {/* Quantité et Prix */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm text-gray-700 mb-2">
               Quantité <span className="text-red-500">*</span>
             </label>
             <input
@@ -199,10 +199,10 @@ export default function OrderProductForm({ productId, productName, productPrice,
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm text-gray-700 mb-2">
               Prix total
             </label>
-            <div className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-lg font-semibold text-gray-900">
+            <div className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-lg text-gray-900">
               {totalPrice.toLocaleString()} FCFA
             </div>
           </div>
@@ -210,7 +210,7 @@ export default function OrderProductForm({ productId, productName, productPrice,
 
         {/* Mode de paiement */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm text-gray-700 mb-2">
             Mode de paiement <span className="text-red-500">*</span>
           </label>
           <select
@@ -229,7 +229,7 @@ export default function OrderProductForm({ productId, productName, productPrice,
 
         {/* Notes */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm text-gray-700 mb-2">
             Notes supplémentaires <span className="text-gray-500 text-xs">(optionnel)</span>
           </label>
           <textarea
@@ -248,7 +248,7 @@ export default function OrderProductForm({ productId, productName, productPrice,
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+              className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
             >
               Annuler
             </button>
@@ -256,7 +256,7 @@ export default function OrderProductForm({ productId, productName, productPrice,
           <button
             type="submit"
             disabled={loading}
-            className="flex-1 px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all font-medium shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="flex-1 px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {loading ? (
               <>

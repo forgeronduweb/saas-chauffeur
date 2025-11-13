@@ -242,7 +242,11 @@ export default function HomePage() {
         {/* Titre section chauffeurs */}
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-lg lg:text-2xl font-normal text-gray-900">
-            Chauffeurs <span className="text-gray-500">({totalDrivers})</span>
+            Chauffeurs <span className="text-gray-500">
+              ({user && isDriver() && currentDriverProfile 
+                ? `${totalDrivers - 1} plus moi` 
+                : `${totalDrivers}`})
+            </span>
           </h2>
           <Link 
             to="/chauffeurs" 
