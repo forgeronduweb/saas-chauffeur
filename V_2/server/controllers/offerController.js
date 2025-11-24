@@ -137,10 +137,30 @@ const getMyOffers = async (req, res) => {
           applicationsCount: { $size: '$applications' }
         }
       },
+      // Récupérer les informations du chauffeur ciblé pour les offres directes
+      {
+        $lookup: {
+          from: 'drivers',
+          localField: 'targetDriverId',
+          foreignField: '_id',
+          as: 'targetDriver'
+        }
+      },
+      {
+        $unwind: {
+          path: '$targetDriver',
+          preserveNullAndEmptyArrays: true
+        }
+      },
       {
         $project: {
           applications: 0, // Exclure le tableau des applications
-          __v: 0
+          __v: 0,
+          // Ne garder que les infos nécessaires sur le chauffeur ciblé
+          'targetDriver.email': 0,
+          'targetDriver.phone': 0,
+          'targetDriver.documents': 0,
+          'targetDriver.currentLocation': 0
         }
       }
     ]);
@@ -309,6 +329,13 @@ const updateOffer = async (req, res) => {
     if (!offer) {
       return res.status(404).json({ 
         error: 'Offre non trouvée ou vous n\'êtes pas autorisé à la modifier' 
+      });
+    }
+
+    // Empêcher la modification des offres d'emploi directes
+    if (offer.isDirect) {
+      return res.status(400).json({
+        error: 'Les offres d\'emploi directes ne peuvent pas être modifiées'
       });
     }
 

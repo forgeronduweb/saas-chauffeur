@@ -22,14 +22,62 @@ const applicationSchema = new mongoose.Schema({
     required: true
   },
   
-  // Statut de la candidature
+  // Statut de la candidature avec workflow intelligent
   status: {
     type: String,
-    enum: ['pending', 'accepted', 'rejected', 'withdrawn'],
+    enum: [
+      'pending',                    // Candidature envoyée, en attente
+      'in_negotiation',            // Discussion en cours via messagerie
+      'awaiting_final_decision',   // Proposition finale envoyée, décision requise
+      'accepted',                  // Candidature acceptée par le chauffeur
+      'rejected',                  // Candidature refusée par le chauffeur
+      'withdrawn',                 // Candidature retirée par le chauffeur
+      'employer_rejected'          // Candidature refusée par l'employeur
+    ],
     default: 'pending'
   },
   
-  // Message de motivation du chauffeur
+  // Message initial du chauffeur
+  message: {
+    type: String,
+    trim: true,
+    maxlength: 1000
+  },
+  
+  // Analyse automatique du message
+  messageAnalysis: {
+    needsConversation: {
+      type: Boolean,
+      default: false
+    },
+    confidence: {
+      type: Number,
+      min: 0,
+      max: 1,
+      default: 0
+    },
+    detectedKeywords: [{
+      type: String
+    }],
+    reason: {
+      type: String
+    }
+  },
+  
+  // Référence à la conversation (si créée)
+  conversationId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Conversation',
+    default: null
+  },
+  
+  // Indique si une conversation a été créée
+  hasConversation: {
+    type: Boolean,
+    default: false
+  },
+  
+  // Message de motivation du chauffeur (legacy - à supprimer progressivement)
   coverLetter: {
     type: String,
     trim: true
@@ -47,6 +95,26 @@ const applicationSchema = new mongoose.Schema({
     trim: true
   },
   
+  // Historique des changements de statut
+  statusHistory: [{
+    status: {
+      type: String,
+      required: true
+    },
+    changedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
+    },
+    changedAt: {
+      type: Date,
+      default: Date.now
+    },
+    reason: {
+      type: String
+    }
+  }],
+  
   // Date de candidature
   appliedAt: {
     type: Date,
@@ -55,6 +123,11 @@ const applicationSchema = new mongoose.Schema({
   
   // Date de réponse de l'employeur
   respondedAt: {
+    type: Date
+  },
+  
+  // Date de la décision finale du chauffeur
+  finalDecisionAt: {
     type: Date
   },
   
@@ -68,6 +141,22 @@ const applicationSchema = new mongoose.Schema({
   employerNotes: {
     type: String,
     trim: true
+  },
+  
+  // Proposition finale de l'employeur
+  finalOffer: {
+    salary: {
+      type: Number
+    },
+    startDate: {
+      type: Date
+    },
+    conditions: {
+      type: String
+    },
+    sentAt: {
+      type: Date
+    }
   }
 }, {
   timestamps: true

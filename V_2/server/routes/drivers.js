@@ -27,7 +27,7 @@ router.post('/become-driver', requireAuth, autoClearCache('/api/drivers'), becom
 router.get('/public', cacheMiddleware(300), getPublicDrivers); // Cache 5 min
 router.get('/count', cacheMiddleware(600), getDriversCount); // Cache 10 min (change rarement)
 router.get('/nearby', cacheMiddleware(180), findNearbyDrivers); // Cache 3 min
-router.get('/:driverId', requireAuth, cacheMiddleware(300), getDriverProfileById); // Cache 5 min
+router.get('/:driverId', cacheMiddleware(300), getDriverProfileById); // Cache 5 min - profil chauffeur public
 
 // Routes admin (TODO: ajouter middleware admin)
 router.get('/', requireAuth, getAllDrivers);

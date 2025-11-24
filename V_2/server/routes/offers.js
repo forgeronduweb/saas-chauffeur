@@ -15,20 +15,19 @@ const {
 const router = express.Router();
 
 // Routes publiques avec cache
-router.get('/', cacheMiddleware(180), getAllOffers); // Cache 3 min
+router.get('/', cacheMiddleware(180), getAllOffers); // Cache 3 min - liste des offres
 
-// Routes authentifiées
-router.use(requireAuth);
+// Routes authentifiées pour les opérations sensibles
+router.get('/my', requireAuth, getMyOffers); // Mes offres
+router.post('/', requireAuth, autoClearCache('/api/offers'), createOffer); // Créer une offre
+router.put('/:offerId', requireAuth, autoClearCache('/api/offers'), updateOffer); // Mettre à jour une offre
+router.delete('/:offerId', requireAuth, autoClearCache('/api/offers'), deleteOffer); // Supprimer une offre
 
-// Gestion des offres
-router.get('/my', getMyOffers); // Mes offres
-router.post('/', autoClearCache('/api/offers'), createOffer); // Créer une offre
-router.get('/:offerId', cacheMiddleware(300), getOfferById); // Cache 5 min
-router.put('/:offerId', autoClearCache('/api/offers'), updateOffer); // Mettre à jour une offre
-router.delete('/:offerId', autoClearCache('/api/offers'), deleteOffer); // Supprimer une offre
+// Gestion des candidatures (authentifiées)
+router.post('/:offerId/apply', requireAuth, autoClearCache('/api/offers'), applyToOffer); // Postuler à une offre
+router.get('/:offerId/applications', requireAuth, getOfferApplications); // Candidatures pour une offre
 
-// Gestion des candidatures
-router.post('/:offerId/apply', autoClearCache('/api/offers'), applyToOffer); // Postuler à une offre
-router.get('/:offerId/applications', getOfferApplications); // Candidatures pour une offre
+// Route publique pour le détail d'une offre (lecture seule)
+router.get('/:offerId', cacheMiddleware(300), getOfferById); // Cache 5 min - détail d'offre public
 
 module.exports = router;
