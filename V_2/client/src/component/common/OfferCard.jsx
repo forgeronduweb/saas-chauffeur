@@ -9,6 +9,14 @@ export default function OfferCard({ offer }) {
     return null;
   }
 
+  const employerName = offer.employer
+    ? (offer.employer.companyName || `${(offer.employer.firstName || '').trim()} ${(offer.employer.lastName || '').trim()}`.trim())
+    : null;
+
+  const companyLabel = offer.isDirect && employerName
+    ? `Offre directe de ${employerName}`
+    : (offer.company || employerName || 'Entreprise');
+
   return (
     <div 
       className="bg-white border border-gray-200 rounded-lg hover:border-gray-300 hover:shadow-sm transition-all duration-200 overflow-hidden cursor-pointer"
@@ -19,7 +27,7 @@ export default function OfferCard({ offer }) {
           {offer.title}
         </h3>
         <p className="text-xs lg:text-sm text-gray-600 mb-3 truncate">
-          {offer.company || 'Entreprise'}
+          {companyLabel}
         </p>
         
         <div className="space-y-2 mb-3">
@@ -46,6 +54,11 @@ export default function OfferCard({ offer }) {
           {offer.type && (
             <span className="px-1.5 py-0.5 bg-gray-100 text-gray-700 text-xs rounded font-medium">
               {offer.type}
+            </span>
+          )}
+          {offer.isDirect && (
+            <span className="px-1.5 py-0.5 bg-indigo-50 text-indigo-700 text-xs rounded font-medium">
+              Offre directe
             </span>
           )}
         </div>

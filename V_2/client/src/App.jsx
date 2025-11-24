@@ -35,6 +35,8 @@ import MyProducts from './pages/employer/MyProducts.jsx'
 import DriverMyProducts from './pages/driver/MyProducts.jsx'
 import MyApplications from './pages/driver/MyApplications.jsx'
 import MessagesPage from './pages/MessagesPage.jsx'
+import TestNegotiation from './pages/TestNegotiation.jsx'
+import TestDirectOffers from './pages/TestDirectOffers.jsx'
 
 function App() {
   return (
@@ -233,6 +235,18 @@ function App() {
                   <MessagesPage />
                 </PrivateRoute>
               } 
+            />
+            
+            {/* Page de test pour la détection de négociation */}
+            <Route 
+              path="/test-negotiation" 
+              element={<TestNegotiation />} 
+            />
+            
+            {/* Page de test pour les offres directes */}
+            <Route 
+              path="/test-direct-offers" 
+              element={<TestDirectOffers />} 
             />
           </Routes>
         </div>

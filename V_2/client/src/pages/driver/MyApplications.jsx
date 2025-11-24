@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import SimpleHeader from '../../component/common/SimpleHeader';
-import CustomDropdown from '../../component/common/CustomDropdown';
-import { applicationsApi } from '../../services/api';
+import ApplicationCard from '../../components/applications/ApplicationCard';
+import { applicationsApi, messagesApi } from '../../services/api';
 
 export default function MyApplications() {
   const navigate = useNavigate();
@@ -25,50 +25,55 @@ export default function MyApplications() {
     setLoading(true);
     try {
       const response = await applicationsApi.myApplications();
-      console.log('Mes candidatures:', response.data);
+      console.log('📋 Mes candidatures:', response.data);
       
-      // Transformer les données de l'API pour correspondre au format attendu
-      const formattedApplications = response.data.map(application => {
-        // Formater la localisation
-        let location = 'Non spécifié';
-        if (application.offer?.location) {
-          if (typeof application.offer.location === 'string') {
-            location = application.offer.location;
-          } else if (application.offer.location.city) {
-            location = application.offer.location.city;
-          }
-        }
-        
-        return {
-          id: application._id,
-          offerId: application.offer?._id || application.offerId,
-          offerTitle: application.offer?.title || 'Offre',
-          company: application.offer?.employer?.companyName || application.offer?.employer?.firstName + ' ' + application.offer?.employer?.lastName || 'Employeur',
-          location: location,
-          salary: application.offer?.salary || '0',
-          appliedDate: application.createdAt || application.appliedDate,
-          status: application.status // pending, accepted, rejected
-        };
-      });
-      
-      setApplications(formattedApplications);
+      // Les données sont déjà dans le bon format grâce au nouveau contrôleur
+      setApplications(response.data || []);
     } catch (error) {
-      console.error('Erreur lors de la récupération des candidatures:', error);
-      // En cas d'erreur, afficher un tableau vide
+      console.error('❌ Erreur lors de la récupération des candidatures:', error);
       setApplications([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const getStatusBadge = (status) => {
-    const badges = {
-      pending: { text: 'En attente', color: 'bg-yellow-100 text-yellow-800' },
-      accepted: { text: 'Acceptée', color: 'bg-green-100 text-green-800' },
-      rejected: { text: 'Rejetée', color: 'bg-red-100 text-red-800' }
-    };
-    return badges[status] || badges.pending;
+  // Gestion des mises à jour de candidatures
+  const handleApplicationUpdate = (updatedApplication) => {
+    setApplications(prev => 
+      prev.map(app => 
+        app._id === updatedApplication._id ? updatedApplication : app
+      )
+    );
   };
+
+  // Ouvrir la messagerie
+  const handleOpenConversation = (conversationId) => {
+    navigate(`/messages?conversation=${conversationId}`);
+  };
+
+  // Filtres avec tous les nouveaux statuts
+  const getStatusCounts = () => {
+    const counts = {
+      all: applications.length,
+      pending: 0,
+      in_negotiation: 0,
+      awaiting_final_decision: 0,
+      accepted: 0,
+      rejected: 0,
+      withdrawn: 0,
+      employer_rejected: 0
+    };
+
+    applications.forEach(app => {
+      if (counts[app.status] !== undefined) {
+        counts[app.status]++;
+      }
+    });
+
+    return counts;
+  };
+
+  const statusCounts = getStatusCounts();
 
   const filteredApplications = filter === 'all' 
     ? applications 
@@ -97,17 +102,20 @@ export default function MyApplications() {
             
             {/* Dropdown personnalisé - Desktop uniquement */}
             <div className="hidden sm:block">
-              <CustomDropdown
+              <select
                 value={filter}
-                onChange={setFilter}
-                placeholder="Filtrer par statut"
-                options={[
-                  { value: 'all', label: `Toutes (${applications.length})` },
-                  { value: 'pending', label: `En attente (${applications.filter(a => a.status === 'pending').length})` },
-                  { value: 'accepted', label: `Acceptées (${applications.filter(a => a.status === 'accepted').length})` },
-                  { value: 'rejected', label: `Rejetées (${applications.filter(a => a.status === 'rejected').length})` }
-                ]}
-              />
+                onChange={(e) => setFilter(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              >
+                <option value="all">Toutes ({statusCounts.all})</option>
+                <option value="pending">⏳ En attente ({statusCounts.pending})</option>
+                <option value="in_negotiation">💬 En négociation ({statusCounts.in_negotiation})</option>
+                <option value="awaiting_final_decision">⚠️ Décision requise ({statusCounts.awaiting_final_decision})</option>
+                <option value="accepted">✅ Acceptées ({statusCounts.accepted})</option>
+                <option value="rejected">❌ Refusées ({statusCounts.rejected})</option>
+                <option value="withdrawn">↩️ Retirées ({statusCounts.withdrawn})</option>
+                <option value="employer_rejected">❌ Rejetées ({statusCounts.employer_rejected})</option>
+              </select>
             </div>
           </div>
           <p className="text-gray-600 text-sm">Suivez l'état de vos candidatures aux offres d'emploi</p>
@@ -139,63 +147,16 @@ export default function MyApplications() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4">
-            {filteredApplications.map((application) => {
-              const badge = getStatusBadge(application.status);
-              return (
-                <div
-                  key={application.id}
-                  className="bg-white rounded-lg border border-gray-200 transition-all overflow-hidden"
-                >
-                  <div className="p-4 sm:p-6">
-                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-start justify-between mb-3">
-                          <div>
-                            <h3 className="text-base sm:text-lg lg:text-xl text-gray-900 mb-1">{application.offerTitle}</h3>
-                            <p className="text-sm sm:text-base text-gray-600 font-medium">{application.company}</p>
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 text-xs sm:text-sm text-gray-600 mb-3">
-                          <div className="flex items-center gap-2">
-                            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            {application.location}
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            {parseInt(application.salary).toLocaleString()} FCFA / mois
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            Postulé le {new Date(application.appliedDate).toLocaleDateString('fr-FR')}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col lg:items-end gap-2 sm:gap-3">
-                        <span className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${badge.color} self-start lg:self-auto`}>
-                          {badge.text}
-                        </span>
-                        <button 
-                          onClick={() => navigate(`/offre/${application.offerId}`)}
-                          className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-xs sm:text-sm font-medium whitespace-nowrap"
-                        >
-                          Voir l'offre
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+          <div className="space-y-6">
+            {filteredApplications.map((application) => (
+              <ApplicationCard
+                key={application._id}
+                application={application}
+                userRole="driver"
+                onUpdate={handleApplicationUpdate}
+                onOpenConversation={handleOpenConversation}
+              />
+            ))}
           </div>
         )}
 
@@ -234,10 +195,14 @@ export default function MyApplications() {
                     onChange={(e) => setFilter(e.target.value)}
                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                   >
-                    <option value="all">Toutes ({applications.length})</option>
-                    <option value="pending">En attente ({applications.filter(a => a.status === 'pending').length})</option>
-                    <option value="accepted">Acceptées ({applications.filter(a => a.status === 'accepted').length})</option>
-                    <option value="rejected">Rejetées ({applications.filter(a => a.status === 'rejected').length})</option>
+                    <option value="all">Toutes ({statusCounts.all})</option>
+                    <option value="pending">⏳ En attente ({statusCounts.pending})</option>
+                    <option value="in_negotiation">💬 En négociation ({statusCounts.in_negotiation})</option>
+                    <option value="awaiting_final_decision">⚠️ Décision requise ({statusCounts.awaiting_final_decision})</option>
+                    <option value="accepted">✅ Acceptées ({statusCounts.accepted})</option>
+                    <option value="rejected">❌ Refusées ({statusCounts.rejected})</option>
+                    <option value="withdrawn">↩️ Retirées ({statusCounts.withdrawn})</option>
+                    <option value="employer_rejected">❌ Rejetées ({statusCounts.employer_rejected})</option>
                   </select>
                 </div>
 

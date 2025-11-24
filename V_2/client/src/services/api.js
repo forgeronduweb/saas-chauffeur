@@ -137,7 +137,7 @@ export const offersApi = {
   getById: (offerId) => api.get(`/offers/${offerId}`),
 }
 
-// API pour les candidatures
+// API pour les candidatures intelligentes
 export const applicationsApi = {
   // Récupérer les candidatures pour une offre
   getForOffer: (offerId) => api.get(`/offers/${offerId}/applications`),
@@ -145,12 +145,33 @@ export const applicationsApi = {
   myApplications: () => api.get('/applications/my'),
   // Récupérer les candidatures reçues par l'employeur
   receivedApplications: () => api.get('/applications/received'),
-  // Postuler à une offre
-  apply: (offerId, data) => api.post(`/offers/${offerId}/apply`, data),
-  // Accepter/refuser une candidature
-  updateStatus: (applicationId, status) => api.patch(`/applications/${applicationId}/status`, { status }),
-  // Annuler une candidature (chauffeur)
-  withdraw: (applicationId) => api.delete(`/applications/${applicationId}`),
+  
+  // Postuler à une offre avec analyse intelligente
+  apply: (offerId, data) => api.post(`/applications/${offerId}`, data),
+  
+  // Mettre à jour l'ID de conversation d'une candidature
+  updateConversation: (applicationId, conversationId) => 
+    api.patch(`/applications/${applicationId}/conversation`, { conversationId }),
+  
+  // Mettre à jour le statut d'une candidature avec workflow
+  updateStatus: (applicationId, status, reason) => 
+    api.patch(`/applications/${applicationId}/status`, { status, reason }),
+  
+  // Envoyer une proposition finale (employeur)
+  sendFinalOffer: (applicationId, offerData) => 
+    api.post(`/applications/${applicationId}/final-offer`, offerData),
+  
+  // Accepter une candidature (chauffeur)
+  accept: (applicationId, reason) => 
+    api.patch(`/applications/${applicationId}/status`, { status: 'accepted', reason }),
+  
+  // Refuser une candidature (chauffeur)
+  reject: (applicationId, reason) => 
+    api.patch(`/applications/${applicationId}/status`, { status: 'rejected', reason }),
+  
+  // Retirer une candidature (chauffeur)
+  withdraw: (applicationId, reason) => 
+    api.patch(`/applications/${applicationId}/status`, { status: 'withdrawn', reason }),
 }
 
 // API pour les missions

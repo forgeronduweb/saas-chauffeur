@@ -19,6 +19,14 @@ export default function EditJobOfferPage() {
         setLoading(true);
         const response = await offersApi.getById(id);
         console.log('Offre récupérée:', response.data);
+
+        // Empêcher l'édition des offres d'emploi directes
+        if (response.data.isDirect) {
+          alert("Les offres d'emploi directes ne peuvent pas être modifiées.");
+          navigate('/employer/offers');
+          return;
+        }
+
         setOffer(response.data);
       } catch (error) {
         console.error('Erreur:', error);
@@ -33,6 +41,12 @@ export default function EditJobOfferPage() {
   }, [id, navigate]);
 
   const handleSubmit = async (formData) => {
+    // Sécurité supplémentaire côté client : ne pas envoyer de mise à jour pour une offre directe
+    if (offer?.isDirect) {
+      alert("Les offres d'emploi directes ne peuvent pas être modifiées.");
+      return;
+    }
+
     setLoading(true);
     setError('');
 

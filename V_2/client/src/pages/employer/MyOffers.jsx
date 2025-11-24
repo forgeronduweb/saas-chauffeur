@@ -40,7 +40,11 @@ export default function MyOffers() {
         status: offer.isActive ? 'active' : 'closed',
         createdDate: offer.createdAt,
         applicationsCount: offer.applicationsCount || 0,
-        viewsCount: offer.viewsCount || 0
+        viewsCount: offer.viewsCount || 0,
+        isDirect: !!offer.isDirect,
+        targetDriverName: offer.targetDriver
+          ? `${offer.targetDriver.firstName} ${offer.targetDriver.lastName}`
+          : null
       }));
       
       setOffers(formattedOffers);
@@ -174,6 +178,17 @@ export default function MyOffers() {
                           }`}>
                             {offer.status === 'active' ? 'Active' : 'Fermée'}
                           </span>
+                          {offer.isDirect && (
+                            <span className="px-3 py-1 bg-blue-50 text-blue-800 rounded-full text-sm">
+                              Offre directe
+                              {offer.targetDriverName && (
+                                <>
+                                  {' · '}
+                                  {offer.targetDriverName}
+                                </>
+                              )}
+                            </span>
+                          )}
                         </div>
                       </div>
 
@@ -225,12 +240,14 @@ export default function MyOffers() {
                       >
                         Voir détails
                       </button>
-                      <button 
-                        onClick={() => handleEdit(offer.id)}
-                        className="px-3 py-1.5 border border-gray-300 text-gray-700 rounded text-sm hover:bg-gray-50 transition-colors"
-                      >
-                        Modifier
-                      </button>
+                      {!offer.isDirect && (
+                        <button 
+                          onClick={() => handleEdit(offer.id)}
+                          className="px-3 py-1.5 border border-gray-300 text-gray-700 rounded text-sm hover:bg-gray-50 transition-colors"
+                        >
+                          Modifier
+                        </button>
+                      )}
                       <button 
                         onClick={() => openDeleteModal(offer)}
                         className="px-3 py-1.5 border border-red-300 text-red-600 rounded text-sm hover:bg-red-50 transition-colors"

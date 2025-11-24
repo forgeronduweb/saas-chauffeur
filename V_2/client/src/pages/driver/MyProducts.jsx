@@ -159,13 +159,6 @@ export default function MyProducts() {
             <p className="text-gray-600 mb-8 max-w-md mx-auto">
               Commencez à vendre vos produits et services. Créez votre première offre et touchez des milliers de clients potentiels.
             </p>
-            <button
-              onClick={() => navigate('/publier-offre')}
-              className="px-8 py-4 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors inline-flex items-center gap-3"
-            >
-              <Plus className="w-5 h-5" />
-              Créer ma première offre
-            </button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
