@@ -25,4 +25,7 @@ router.patch('/:applicationId/status', applicationController.updateStatus);
 // Envoyer une proposition finale (employeur)
 router.post('/:applicationId/final-offer', applicationController.sendFinalOffer);
 
+// Répondre à une offre directe (accepter/refuser)
+router.post('/direct-offer/:offerId/respond', applicationController.respondToDirectOffer);
+
 module.exports = router;

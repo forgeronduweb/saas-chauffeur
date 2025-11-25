@@ -108,7 +108,7 @@ exports.createApplication = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Erreur création candidature:', error);
+    console.error(' Erreur création candidature:', error);
     res.status(500).json({
       error: 'Erreur lors de la création de la candidature',
       details: error.message
@@ -314,7 +314,7 @@ exports.sendFinalOffer = async (req, res) => {
 };
 
 /**
- * Récupérer les candidatures du chauffeur
+ * Récupérer les candidatures du chauffeur et les offres directes
  */
 exports.getMyApplications = async (req, res) => {
   try {
@@ -325,10 +325,11 @@ exports.getMyApplications = async (req, res) => {
       return res.json([]);
     }
 
+    // 1. Récupérer les candidatures existantes
     const applications = await Application.find({ driverId: driverProfile._id })
       .populate({
         path: 'offerId',
-        select: 'title company location salary type contractType workType',
+        select: 'title company location salary type contractType workType isDirect targetDriverId',
         populate: {
           path: 'employerId',
           select: 'firstName lastName companyName'
@@ -340,10 +341,23 @@ exports.getMyApplications = async (req, res) => {
       })
       .sort({ createdAt: -1 });
 
+    // 2. Récupérer les offres directes non encore converties en candidature
+    const directOffers = await Offer.find({
+      targetDriverId: driverProfile._id,
+      isDirect: true,
+      _id: { $nin: applications.map(app => app.offerId?._id).filter(Boolean) }
+    })
+    .populate('employerId', 'firstName lastName companyName')
+    .sort({ createdAt: -1 });
+
+    // 3. Formater les candidatures existantes
     const formattedApplications = applications.map(app => ({
       _id: app._id,
       offerId: app.offerId?._id,
-      offer: app.offerId,
+      offer: app.offerId ? {
+        ...app.offerId.toObject(),
+        isDirect: app.offerId.isDirect || false
+      } : null,
       status: app.status,
       message: app.message,
       hasConversation: app.hasConversation,
@@ -352,10 +366,32 @@ exports.getMyApplications = async (req, res) => {
       finalOffer: app.finalOffer,
       createdAt: app.createdAt,
       updatedAt: app.updatedAt,
-      finalDecisionAt: app.finalDecisionAt
+      finalDecisionAt: app.finalDecisionAt,
+      isDirectOffer: app.offerId?.isDirect || false
     }));
 
-    res.json(formattedApplications);
+    // 4. Ajouter les offres directes comme des candidatures spéciales
+    const directOfferApplications = directOffers.map(offer => ({
+      _id: `direct_${offer._id}`, // ID temporaire pour le frontend
+      offerId: offer._id,
+      offer: {
+        ...offer.toObject(),
+        isDirect: true
+      },
+      status: 'direct_offer', // Statut spécial pour les offres directes
+      message: 'Vous avez reçu une offre directe pour ce poste',
+      hasConversation: false,
+      isDirectOffer: true,
+      createdAt: offer.createdAt,
+      updatedAt: offer.updatedAt
+    }));
+
+    // 5. Combiner et trier par date (du plus récent)
+    const allApplications = [...formattedApplications, ...directOfferApplications].sort(
+      (a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt)
+    );
+
+    res.json(allApplications);
 
   } catch (error) {
     console.error('❌ Erreur récupération candidatures:', error);
@@ -482,5 +518,94 @@ function validateStatusTransition(currentStatus, newStatus, userRole, userId, ap
 
   return { valid: true };
 }
+
+/**
+ * Répondre à une offre directe (accepter/refuser)
+ */
+exports.respondToDirectOffer = async (req, res) => {
+  try {
+    const { offerId } = req.params;
+    const { response, message } = req.body; // response: 'accept' ou 'reject'
+    const driverId = req.user.sub;
+
+    console.log('📋 Réponse à offre directe:', { offerId, response, driverId });
+
+    // Vérifier que l'offre existe et est directe
+    const Offer = require('../models/Offer');
+    const offer = await Offer.findById(offerId);
+    if (!offer) {
+      return res.status(404).json({ error: 'Offre non trouvée' });
+    }
+
+    if (!offer.isDirect) {
+      return res.status(400).json({ error: 'Cette offre n\'est pas une offre directe' });
+    }
+
+    // Vérifier que l'offre est destinée à ce chauffeur
+    const Driver = require('../models/Driver');
+    const driverProfile = await Driver.findOne({ userId: driverId });
+    if (!driverProfile) {
+      return res.status(404).json({ error: 'Profil chauffeur non trouvé' });
+    }
+
+    if (offer.targetDriverId.toString() !== driverProfile._id.toString()) {
+      return res.status(403).json({ error: 'Cette offre ne vous est pas destinée' });
+    }
+
+    // Vérifier si une candidature existe déjà
+    const Application = require('../models/Application');
+    let application = await Application.findOne({
+      offerId: offerId,
+      driverId: driverProfile._id
+    });
+
+    const status = response === 'accept' ? 'accepted' : 'rejected';
+    const responseMessage = message || (response === 'accept' ? 'J\'accepte votre offre directe.' : 'Je décline votre offre directe.');
+
+    if (application) {
+      // Mettre à jour la candidature existante
+      application.status = status;
+      application.message = responseMessage;
+      application.updatedAt = new Date();
+      await application.save();
+    } else {
+      // Créer une nouvelle candidature
+      application = new Application({
+        offerId: offerId,
+        driverId: driverProfile._id,
+        status: status,
+        message: responseMessage
+      });
+      await application.save();
+    }
+
+    // Populer les données pour la réponse
+    await application.populate([
+      {
+        path: 'offerId',
+        select: 'title company location salary type contractType workType isDirect',
+        populate: {
+          path: 'employerId',
+          select: 'firstName lastName companyName'
+        }
+      }
+    ]);
+
+    console.log('✅ Réponse à offre directe enregistrée:', application._id);
+
+    res.json({
+      success: true,
+      application: application,
+      message: response === 'accept' ? 'Offre acceptée avec succès' : 'Offre refusée avec succès'
+    });
+
+  } catch (error) {
+    console.error('❌ Erreur réponse offre directe:', error);
+    res.status(500).json({ 
+      error: 'Erreur lors de la réponse à l\'offre directe',
+      details: error.message 
+    });
+  }
+};
 
 module.exports = exports;

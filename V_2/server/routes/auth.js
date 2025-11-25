@@ -47,25 +47,67 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
       session: false,
       failureRedirect: process.env.CLIENT_URL + '/auth?mode=login&error=google_auth_failed'
     }),
-    (req, res) => {
+    async (req, res) => {
+      const startTime = Date.now();
+      
       try {
+        console.log('🔄 Google OAuth callback started');
+        console.log('👤 User received:', {
+          id: req.user?._id,
+          email: req.user?.email,
+          role: req.user?.role,
+          needsRoleSelection: req.user?.needsRoleSelection
+        });
+
+        if (!req.user) {
+          console.error('❌ No user in callback');
+          return res.redirect(`${process.env.CLIENT_URL}/auth?mode=login&error=no_user`);
+        }
+
+        if (!process.env.JWT_SECRET) {
+          console.error('❌ JWT_SECRET not configured');
+          return res.redirect(`${process.env.CLIENT_URL}/auth?mode=login&error=server_config`);
+        }
+
         // Générer un JWT pour l'utilisateur
+        const tokenPayload = { 
+          sub: req.user._id,
+          email: req.user.email,
+          role: req.user.role 
+        };
+
+        console.log('🔐 Generating JWT with payload:', tokenPayload);
+        
         const token = jwt.sign(
-          { 
-            sub: req.user._id,
-            email: req.user.email,
-            role: req.user.role 
-          },
+          tokenPayload,
           process.env.JWT_SECRET,
           { expiresIn: '7d' }
         );
 
+        console.log('✅ JWT generated successfully');
+
         // Rediriger vers le client avec le token
-        const redirectUrl = `${process.env.CLIENT_URL}/auth/callback?token=${token}`;
+        const clientUrl = process.env.CLIENT_URL || 'http://localhost:3000';
+        const redirectUrl = `${clientUrl}/auth/callback?token=${token}`;
+        
+        console.log('🔄 Redirecting to:', redirectUrl);
+        
+        const duration = Date.now() - startTime;
+        console.log(`⏱️ Google OAuth callback completed in ${duration}ms`);
+        
         res.redirect(redirectUrl);
+        
       } catch (error) {
-        console.error('❌ Erreur lors de la génération du token:', error);
-        res.redirect(`${process.env.CLIENT_URL}/auth?mode=login&error=token_generation_failed`);
+        const duration = Date.now() - startTime;
+        console.error('❌ Erreur dans Google OAuth callback:', {
+          error: error.message,
+          stack: error.stack,
+          duration: `${duration}ms`,
+          user: req.user ? { id: req.user._id, email: req.user.email } : null
+        });
+        
+        const clientUrl = process.env.CLIENT_URL || 'http://localhost:3000';
+        res.redirect(`${clientUrl}/auth?mode=login&error=callback_error`);
       }
     }
   );

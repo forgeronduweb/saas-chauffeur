@@ -31,36 +31,28 @@ const getAllOffers = async (req, res) => {
     
     // Filtrage des offres directes (optimisé)
     if (req.user && req.user.sub) {
-      // Pour les chauffeurs, récupérer l'ID du profil Driver
       const user = await User.findById(req.user.sub).select('role').lean();
       
+      // Pour tout le monde, on exclut les offres directes
+      filters.isDirect = { $ne: true };
+      
+      // Pour les chauffeurs, on peut ajouter des filtres spécifiques si nécessaire
       if (user && user.role === 'driver') {
-        const Driver = require('../models/Driver');
-        const driver = await Driver.findOne({ userId: req.user.sub }).select('_id').lean();
-        
-        if (driver) {
-          // Chauffeur connecté : afficher les offres générales + ses offres directes
-          filters.$or = [
-            { targetDriverId: { $exists: false } },
-            { targetDriverId: null },
-            { targetDriverId: driver._id }
-          ];
-        } else {
-          // Chauffeur sans profil : seulement les offres générales
-          filters.$or = [
-            { targetDriverId: { $exists: false } },
-            { targetDriverId: null }
-          ];
-        }
-      } else {
-        // Utilisateur non-chauffeur : seulement les offres générales
+        // On garde uniquement les offres générales (sans targetDriverId)
         filters.$or = [
           { targetDriverId: { $exists: false } },
           { targetDriverId: null }
         ];
+      } else if (user && user.role === 'employer') {
+        // Les employeurs voient leurs propres offres directes mais pas celles des autres
+        filters.$or = [
+          { employer: user._id },
+          { isDirect: { $ne: true } }
+        ];
       }
     } else {
-      // Utilisateur non connecté : seulement les offres générales
+      // Utilisateur non connecté : seulement les offres générales, pas d'offres directes
+      filters.isDirect = { $ne: true };
       filters.$or = [
         { targetDriverId: { $exists: false } },
         { targetDriverId: null }
@@ -212,6 +204,14 @@ const createOffer = async (req, res) => {
       ...req.body,
       employerId: userId
     };
+
+    // Log spécial pour les offres directes
+    if (offerData.isDirect) {
+      console.log('🎯 OFFRE DIRECTE détectée:');
+      console.log('   - targetDriverId:', offerData.targetDriverId);
+      console.log('   - isDirect:', offerData.isDirect);
+      console.log('   - title:', offerData.title);
+    }
 
     console.log('📸 Images à créer:', {
       mainImage: offerData.mainImage ? 'Oui' : 'Non',

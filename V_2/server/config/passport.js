@@ -27,59 +27,99 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
         proxy: true
       },
     async (accessToken, refreshToken, profile, done) => {
+      const startTime = Date.now();
+      
       try {
-        console.log('🔐 Google OAuth - Profile reçu:', {
+        console.log('🔐 Google OAuth Strategy - Profile reçu:', {
           id: profile.id,
           email: profile.emails?.[0]?.value,
-          name: profile.displayName
+          name: profile.displayName,
+          timestamp: new Date().toISOString()
         });
 
-        // Vérifier si l'utilisateur existe déjà
-        let user = await User.findOne({ googleId: profile.id });
-
-        if (user) {
-          console.log('✅ Utilisateur existant trouvé:', user.email);
-          return done(null, user);
+        const email = profile.emails?.[0]?.value;
+        if (!email) {
+          console.error('❌ Aucun email dans le profil Google');
+          return done(new Error('Email requis pour l\'authentification Google'), null);
         }
 
-        // Vérifier si un utilisateur avec cet email existe déjà
-        const email = profile.emails?.[0]?.value;
-        if (email) {
+        // Timeout pour éviter les blocages
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error('Timeout lors de l\'authentification Google')), 10000);
+        });
+
+        const authPromise = (async () => {
+          // Vérifier si l'utilisateur existe déjà avec Google ID
+          console.log('🔍 Recherche utilisateur avec Google ID:', profile.id);
+          let user = await User.findOne({ googleId: profile.id });
+
+          if (user) {
+            console.log('✅ Utilisateur existant trouvé avec Google ID:', user.email);
+            const duration = Date.now() - startTime;
+            console.log(`⏱️ Auth completed in ${duration}ms`);
+            return done(null, user);
+          }
+
+          // Vérifier si un utilisateur avec cet email existe déjà
+          console.log('🔍 Recherche utilisateur avec email:', email);
           user = await User.findOne({ email });
           
           if (user) {
             // Lier le compte Google à l'utilisateur existant
+            console.log('🔗 Liaison du compte Google à l\'utilisateur existant');
             user.googleId = profile.id;
+            user.authProvider = 'google';
             if (profile.photos?.[0]?.value) {
               user.profilePhotoUrl = profile.photos[0].value;
             }
+            
             await user.save();
             console.log('✅ Compte Google lié à l\'utilisateur existant:', user.email);
+            const duration = Date.now() - startTime;
+            console.log(`⏱️ Auth completed in ${duration}ms`);
             return done(null, user);
           }
-        }
 
-        // Créer un nouvel utilisateur sans rôle (sera choisi après)
-        const names = profile.displayName?.split(' ') || ['', ''];
-        const newUser = new User({
-          googleId: profile.id,
-          email: email,
-          firstName: profile.name?.givenName || names[0] || 'Utilisateur',
-          lastName: profile.name?.familyName || names.slice(1).join(' ') || 'Google',
-          profilePhotoUrl: profile.photos?.[0]?.value,
-          isActive: true,
-          role: 'client', // Rôle temporaire, sera changé lors de la sélection
-          authProvider: 'google',
-          needsRoleSelection: true // Flag pour indiquer qu'il faut choisir un rôle
-        });
+          // Créer un nouvel utilisateur
+          console.log('👤 Création d\'un nouvel utilisateur');
+          const names = profile.displayName?.split(' ') || ['', ''];
+          const newUser = new User({
+            googleId: profile.id,
+            email: email,
+            firstName: profile.name?.givenName || names[0] || 'Utilisateur',
+            lastName: profile.name?.familyName || names.slice(1).join(' ') || 'Google',
+            profilePhotoUrl: profile.photos?.[0]?.value,
+            isActive: true,
+            role: 'client', // Rôle temporaire
+            authProvider: 'google',
+            needsRoleSelection: true,
+            emailVerified: true // Google emails sont pré-vérifiés
+          });
 
-        await newUser.save();
-        console.log('✅ Nouvel utilisateur créé via Google:', newUser.email);
-        console.log('🔍 needsRoleSelection:', newUser.needsRoleSelection);
-        console.log('🔍 role:', newUser.role);
-        done(null, newUser);
+          await newUser.save();
+          console.log('✅ Nouvel utilisateur créé via Google:', {
+            email: newUser.email,
+            id: newUser._id,
+            needsRoleSelection: newUser.needsRoleSelection
+          });
+          
+          const duration = Date.now() - startTime;
+          console.log(`⏱️ Auth completed in ${duration}ms`);
+          done(null, newUser);
+        })();
+
+        // Race entre l'authentification et le timeout
+        await Promise.race([authPromise, timeoutPromise]);
+        
       } catch (error) {
-        console.error('❌ Erreur lors de l\'authentification Google:', error);
+        const duration = Date.now() - startTime;
+        console.error('❌ Erreur dans Google OAuth Strategy:', {
+          error: error.message,
+          stack: error.stack,
+          duration: `${duration}ms`,
+          profileId: profile?.id,
+          email: profile?.emails?.[0]?.value
+        });
         done(error, null);
       }
     }
