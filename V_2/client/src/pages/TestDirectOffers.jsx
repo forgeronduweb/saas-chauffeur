@@ -35,6 +35,8 @@ export default function TestDirectOffers() {
   }, []);
 
   const handleCreateDirectOffer = (driver) => {
+    console.log('🚗 Chauffeur sélectionné:', driver);
+    console.log('🆔 ID du chauffeur:', driver._id || driver.id);
     setSelectedDriver(driver);
     setShowModal(true);
   };

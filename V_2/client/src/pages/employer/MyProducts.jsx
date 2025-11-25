@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { offersApi } from '../../services/api';
 import SimpleHeader from '../../component/common/SimpleHeader';
 import CustomDropdown from '../../component/common/CustomDropdown';
+import ConfirmDialog from '../../components/common/ConfirmDialog';
 
 export default function MyProducts() {
   const navigate = useNavigate();
@@ -12,6 +13,9 @@ export default function MyProducts() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // all, active, sold
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -56,19 +60,34 @@ export default function MyProducts() {
     ? products 
     : products.filter(p => p.status === filter);
 
-  const handleDelete = async (offerId) => {
-    if (!window.confirm('Êtes-vous sûr de vouloir supprimer cette offre ?')) {
-      return;
-    }
+  const openDeleteModal = (product) => {
+    setProductToDelete(product);
+    setShowDeleteModal(true);
+  };
 
+  const closeDeleteModal = () => {
+    if (deleteLoading) return;
+    setShowDeleteModal(false);
+    setProductToDelete(null);
+    setDeleteLoading(false);
+  };
+
+  const handleDelete = async () => {
+    if (!productToDelete || deleteLoading) return;
+
+    setDeleteLoading(true);
     try {
-      await offersApi.delete(offerId);
-      console.log('✅ Offre supprimée');
+      await offersApi.delete(productToDelete.id);
+      console.log('✅ Produit supprimé');
       // Rafraîchir la liste
-      fetchProducts();
+      await fetchProducts();
+      setShowDeleteModal(false);
+      setProductToDelete(null);
     } catch (error) {
       console.error('❌ Erreur lors de la suppression:', error);
-      alert('Erreur lors de la suppression de l\'offre');
+      alert('Erreur lors de la suppression du produit');
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -219,7 +238,7 @@ export default function MyProducts() {
                       </svg>
                     </button>
                     <button 
-                      onClick={() => handleDelete(product._id)}
+                      onClick={() => openDeleteModal(product)}
                       className="px-2 py-1 bg-red-50 text-red-600 rounded hover:bg-red-100 transition-colors text-xs font-medium"
                       title="Supprimer"
                     >
@@ -295,6 +314,20 @@ export default function MyProducts() {
           </div>
         )}
       </main>
+
+      {/* Modal de confirmation de suppression */}
+      <ConfirmDialog
+        isOpen={showDeleteModal}
+        onClose={closeDeleteModal}
+        onConfirm={handleDelete}
+        title="Supprimer le produit"
+        subtitle="Cette action est définitive"
+        message={`Êtes-vous certain de vouloir supprimer le produit "${productToDelete?.title}" ? Cette action supprimera définitivement le produit.`}
+        confirmText="Supprimer définitivement"
+        cancelText="Annuler"
+        type="danger"
+        loading={deleteLoading}
+      />
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { offersApi } from '../services/api';
 import SimpleHeader from '../component/common/SimpleHeader';
 import JobOfferForm from '../component/forms/JobOfferForm';
 import ProductOfferForm from '../component/forms/ProductOfferForm';
+import ConfirmDialog from '../components/common/ConfirmDialog';
 
 export default function CreateOfferPage() {
   const navigate = useNavigate();
@@ -15,6 +16,8 @@ export default function CreateOfferPage() {
   const [error, setError] = useState('');
   const [showMobileFab, setShowMobileFab] = useState(false);
   const [cameFromUrl, setCameFromUrl] = useState(false); // Pour savoir si on vient d'une URL avec paramètre
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [createdOffer, setCreatedOffer] = useState(null);
 
   // Vérifier si l'utilisateur est connecté
   useEffect(() => {
@@ -104,7 +107,9 @@ export default function CreateOfferPage() {
       const response = await offersApi.create(jobData);
       console.log('Offre d\'emploi créée avec succès:', response.data);
       
-      navigate('/offres');
+      // Afficher la modal de succès
+      setCreatedOffer({ ...response.data, type: 'job' });
+      setShowSuccessModal(true);
     } catch (err) {
       console.error('Erreur lors de la création de l\'offre:', err);
       setError(err.response?.data?.error || 'Une erreur est survenue. Veuillez réessayer.');
@@ -164,12 +169,23 @@ export default function CreateOfferPage() {
       const response = await offersApi.create(productData);
       console.log('Produit créé avec succès:', response.data);
       
-      navigate('/marketing-vente');
+      // Afficher la modal de succès
+      setCreatedOffer({ ...response.data, type: 'product' });
+      setShowSuccessModal(true);
     } catch (err) {
       console.error('Erreur lors de la création du produit:', err);
       setError(err.response?.data?.error || 'Une erreur est survenue. Veuillez réessayer.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSuccessConfirm = () => {
+    setShowSuccessModal(false);
+    if (createdOffer?.type === 'job') {
+      navigate('/offres');
+    } else {
+      navigate('/marketing-vente');
     }
   };
 
@@ -328,6 +344,20 @@ export default function CreateOfferPage() {
           )}
         </>
       )}
+
+      {/* Modal de succès */}
+      <ConfirmDialog
+        isOpen={showSuccessModal}
+        onClose={handleSuccessConfirm}
+        onConfirm={handleSuccessConfirm}
+        title={createdOffer?.type === 'job' ? "Offre d'emploi créée !" : "Produit publié !"}
+        subtitle="Votre annonce est maintenant en ligne"
+        message={`${createdOffer?.type === 'job' ? "Votre offre d'emploi" : "Votre produit"} "${createdOffer?.title}" a été ${createdOffer?.type === 'job' ? "créée" : "publié"} avec succès. ${createdOffer?.type === 'job' ? "Les chauffeurs peuvent maintenant postuler." : "Les acheteurs peuvent maintenant le voir."}`}
+        confirmText="Voir mes annonces"
+        cancelText=""
+        type="success"
+        loading={false}
+      />
     </div>
   );
 }

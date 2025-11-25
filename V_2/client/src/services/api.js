@@ -1,5 +1,7 @@
 import axios from 'axios'
 import { config } from '../config/env'
+import logger from '../utils/logger.js'
+import errorHandler from '../utils/errorHandler.js'
 
 const API_BASE_URL = config.api.baseUrl
 const API_URL = config.api.url
@@ -10,36 +12,98 @@ export const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 })
 
+// Intercepteur de requête avec logging amélioré
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token')
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
-    console.log('API Request:', config.method?.toUpperCase(), config.url)
+    
+    // Marquer le début de la requête pour mesurer la performance
+    config.metadata = { startTime: Date.now() }
+    
+    logger.debug('API Request started', {
+      method: config.method?.toUpperCase(),
+      url: config.url,
+      hasAuth: !!token
+    })
+    
     return config
   },
   (error) => {
-    console.error('API Request Error:', error)
+    logger.error('API Request failed to start', { error })
     return Promise.reject(error)
   }
 )
 
+// Intercepteur de réponse avec logging et gestion d'erreur améliorés
 api.interceptors.response.use(
   (response) => {
-    console.log('API Response:', response.status, response.config.url)
+    const duration = Date.now() - response.config.metadata.startTime
+    
+    logger.api(
+      response.config.method,
+      response.config.url,
+      response.status,
+      duration
+    )
+    
     return response
   },
   (error) => {
-    console.error('API Response Error:', {
-      message: error.message,
-      status: error.response?.status,
-      url: error.config?.url,
-      data: error.response?.data
-    })
+    const duration = error.config?.metadata?.startTime 
+      ? Date.now() - error.config.metadata.startTime 
+      : 0;
     
+    // Log l'erreur avec le nouveau système
+    logger.api(
+      error.config?.method || 'UNKNOWN',
+      error.config?.url || 'UNKNOWN',
+      error.response?.status || 0,
+      duration,
+      {
+        message: error.message,
+        data: error.response?.data
+      }
+    );
+    
+    // Gestion des erreurs 401 (non autorisé)
+    if (error.response?.status === 401) {
+      // Liste des routes publiques qui ne nécessitent pas de redirection
+      const publicRoutes = ['/', '/auth', '/forgot-password', '/reset-password', 
+                          '/offres', '/chauffeurs', '/marketing-vente', 
+                          '/a-propos', '/contact', '/conditions', '/confidentialite'];
+      const currentPath = window.location.pathname;
+      
+      // Ne pas rediriger si on est sur une route publique
+      const isPublicRoute = publicRoutes.some(route => 
+        route === currentPath || currentPath.startsWith(route + '/')
+      );
+      
+      if (!isPublicRoute && 
+          currentPath !== '/auth' && 
+          !currentPath.startsWith('/auth/')) {
+        // Sauvegarder l'URL actuelle pour rediriger après la connexion
+        const redirectUrl = currentPath + window.location.search;
+        localStorage.setItem('redirectAfterLogin', redirectUrl);
+        
+        logger.info('Redirecting to auth due to 401', { 
+          currentPath, 
+          redirectUrl 
+        });
+        
+        // Rediriger vers la page de connexion
+        window.location.href = `/auth?redirect=${encodeURIComponent(redirectUrl)}`;
+      }
+    }
+    
+    // Gestion spéciale des erreurs réseau
     if (error.message === 'Network Error' || error.code === 'ERR_NETWORK') {
-      console.error('Network connectivity issue. Check if server is running and CORS is configured.')
+      logger.error('Network connection error', {
+        message: 'Vérifiez votre connexion internet et que le serveur est démarré',
+        error
+      });
     }
     
     return Promise.reject(error)
@@ -172,6 +236,10 @@ export const applicationsApi = {
   // Retirer une candidature (chauffeur)
   withdraw: (applicationId, reason) => 
     api.patch(`/applications/${applicationId}/status`, { status: 'withdrawn', reason }),
+  
+  // Répondre à une offre directe (accepter/refuser)
+  respondToDirectOffer: (offerId, response, message) => 
+    api.post(`/applications/direct-offer/${offerId}/respond`, { response, message }),
 }
 
 // API pour les missions

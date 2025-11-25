@@ -55,9 +55,9 @@ export default function MyApplications() {
   const getStatusCounts = () => {
     const counts = {
       all: applications.length,
+      direct_offer: 0,
       pending: 0,
       in_negotiation: 0,
-      awaiting_final_decision: 0,
       accepted: 0,
       rejected: 0,
       withdrawn: 0,
@@ -65,7 +65,10 @@ export default function MyApplications() {
     };
 
     applications.forEach(app => {
-      if (counts[app.status] !== undefined) {
+      // Compter les offres directes
+      if (app.status === 'direct_offer' || app.isDirectOffer) {
+        counts.direct_offer++;
+      } else if (counts[app.status] !== undefined) {
         counts[app.status]++;
       }
     });
@@ -77,7 +80,11 @@ export default function MyApplications() {
 
   const filteredApplications = filter === 'all' 
     ? applications 
-    : applications.filter(a => a.status === filter);
+    : applications.filter(a => 
+        filter === 'direct_offer' 
+          ? a.status === 'direct_offer' || a.isDirectOffer 
+          : a.status === filter
+      );
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -108,13 +115,13 @@ export default function MyApplications() {
                 className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
               >
                 <option value="all">Toutes ({statusCounts.all})</option>
-                <option value="pending">⏳ En attente ({statusCounts.pending})</option>
-                <option value="in_negotiation">💬 En négociation ({statusCounts.in_negotiation})</option>
-                <option value="awaiting_final_decision">⚠️ Décision requise ({statusCounts.awaiting_final_decision})</option>
-                <option value="accepted">✅ Acceptées ({statusCounts.accepted})</option>
-                <option value="rejected">❌ Refusées ({statusCounts.rejected})</option>
-                <option value="withdrawn">↩️ Retirées ({statusCounts.withdrawn})</option>
-                <option value="employer_rejected">❌ Rejetées ({statusCounts.employer_rejected})</option>
+                <option value="direct_offer">Offres directes ({statusCounts.direct_offer})</option>
+                <option value="pending">En attente ({statusCounts.pending})</option>
+                <option value="in_negotiation">En négociation ({statusCounts.in_negotiation})</option>
+                <option value="accepted">Acceptées ({statusCounts.accepted})</option>
+                <option value="rejected">Refusées ({statusCounts.rejected})</option>
+                <option value="withdrawn">Retirées ({statusCounts.withdrawn})</option>
+                <option value="employer_rejected">Rejetées ({statusCounts.employer_rejected})</option>
               </select>
             </div>
           </div>
@@ -132,9 +139,15 @@ export default function MyApplications() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
-            <h3 className="text-2xl text-gray-900 mb-3">Aucune candidature</h3>
+            <h3 className="text-2xl text-gray-900 mb-3">
+              {filter === 'direct_offer' 
+                ? 'Aucune offre directe pour le moment' 
+                : 'Aucune candidature'}
+            </h3>
             <p className="text-gray-600 mb-8 max-w-md mx-auto">
-              Commencez votre recherche d'emploi. Explorez les offres disponibles et postulez aux postes qui vous intéressent.
+              {filter === 'direct_offer' 
+                ? 'Les employeurs peuvent vous envoyer des offres directes qui apparaîtront ici.'
+                : 'Commencez votre recherche d\'emploi. Explorez les offres disponibles et postulez aux postes qui vous intéressent.'}
             </p>
             <button
               onClick={() => navigate('/offres')}
@@ -196,13 +209,13 @@ export default function MyApplications() {
                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                   >
                     <option value="all">Toutes ({statusCounts.all})</option>
-                    <option value="pending">⏳ En attente ({statusCounts.pending})</option>
-                    <option value="in_negotiation">💬 En négociation ({statusCounts.in_negotiation})</option>
-                    <option value="awaiting_final_decision">⚠️ Décision requise ({statusCounts.awaiting_final_decision})</option>
-                    <option value="accepted">✅ Acceptées ({statusCounts.accepted})</option>
-                    <option value="rejected">❌ Refusées ({statusCounts.rejected})</option>
-                    <option value="withdrawn">↩️ Retirées ({statusCounts.withdrawn})</option>
-                    <option value="employer_rejected">❌ Rejetées ({statusCounts.employer_rejected})</option>
+                    <option value="direct_offer">Offres directes ({statusCounts.direct_offer})</option>
+                    <option value="pending">En attente ({statusCounts.pending})</option>
+                    <option value="in_negotiation">En négociation ({statusCounts.in_negotiation})</option>
+                    <option value="accepted">Acceptées ({statusCounts.accepted})</option>
+                    <option value="rejected">Refusées ({statusCounts.rejected})</option>
+                    <option value="withdrawn">Retirées ({statusCounts.withdrawn})</option>
+                    <option value="employer_rejected">Rejetées ({statusCounts.employer_rejected})</option>
                   </select>
                 </div>
 

@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import PublicRoute from './component/PublicRoute'
 import PrivateRoute from './component/PrivateRoute'
+import ToastContainer from './components/common/Toast'
 import HomePage from './pages/HomePage.jsx'
 import DriversPage from './pages/DriversPage.jsx'
 import DriverProfilePage from './pages/DriverProfilePage.jsx'
@@ -250,6 +251,9 @@ function App() {
             />
           </Routes>
         </div>
+        
+        {/* Composant Toast global pour les notifications */}
+        <ToastContainer />
       </Router>
     </AuthProvider>
   )

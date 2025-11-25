@@ -37,13 +37,17 @@ export default function DirectOfferModal({ isOpen, onClose, driver, onSuccess })
     setLoading(true);
 
     try {
+      console.log('🔍 Données du chauffeur:', driver);
+      console.log('🔍 ID utilisateur:', user.id);
+      console.log('🔍 ID chauffeur:', driver.id || driver._id);
+
       const offerData = {
         title: formData.title,
         description: formData.description,
         // Type d'offre d'emploi générique (doit être compatible avec l'énum du modèle)
         type: 'Transport',
         employerId: user.id,
-        targetDriverId: driver.id,
+        targetDriverId: driver._id || driver.id, // Essayer _id en premier
         status: 'active',
         isDirect: true,
         location: {

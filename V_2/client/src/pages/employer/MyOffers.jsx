@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import SimpleHeader from '../../component/common/SimpleHeader';
+import ConfirmDialog from '../../components/common/ConfirmDialog';
 import CustomDropdown from '../../component/common/CustomDropdown';
 import { offersApi } from '../../services/api';
 
@@ -13,6 +14,7 @@ export default function MyOffers() {
   const [filter, setFilter] = useState('all'); // all, active, closed
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [offerToDelete, setOfferToDelete] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   useEffect(() => {
@@ -71,13 +73,16 @@ export default function MyOffers() {
   };
 
   const closeDeleteModal = () => {
+    if (deleteLoading) return; // Empêcher la fermeture pendant le chargement
     setShowDeleteModal(false);
     setOfferToDelete(null);
+    setDeleteLoading(false);
   };
 
   const handleDelete = async () => {
-    if (!offerToDelete) return;
+    if (!offerToDelete || deleteLoading) return;
 
+    setDeleteLoading(true);
     try {
       await offersApi.delete(offerToDelete.id);
       // Rafraîchir la liste
@@ -87,6 +92,8 @@ export default function MyOffers() {
     } catch (error) {
       console.error('Erreur lors de la suppression:', error);
       alert('Impossible de supprimer l\'offre');
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -325,51 +332,18 @@ export default function MyOffers() {
       )}
 
       {/* Modal de confirmation de suppression */}
-      {showDeleteModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          {/* Overlay */}
-          <div 
-            className="absolute inset-0 bg-black/50"
-            onClick={closeDeleteModal}
-          ></div>
-          
-          {/* Modal Content */}
-          <div className="relative flex flex-col items-center bg-white shadow-md rounded-xl py-6 px-5 w-[90vw] max-w-[460px] border border-gray-200">
-            {/* Icône */}
-            <div className="flex items-center justify-center p-4 bg-red-100 rounded-full">
-              <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
-            </div>
-
-            {/* Titre */}
-            <h3 className="text-gray-900 mt-4 text-xl">
-              Supprimer cette offre ?
-            </h3>
-
-            {/* Description */}
-            <p className="text-sm text-gray-600 mt-2 text-center">
-              Êtes-vous sûr de vouloir supprimer l'offre "{offerToDelete?.title}" ? Cette action est irréversible.
-            </p>
-
-            {/* Boutons */}
-            <div className="flex gap-3 mt-6 w-full">
-              <button
-                onClick={closeDeleteModal}
-                className="w-full md:w-36 h-10 rounded-md border border-gray-300 bg-white text-gray-600 text-sm hover:bg-gray-100 active:scale-95 transition"
-              >
-                Annuler
-              </button>
-              <button
-                onClick={handleDelete}
-                className="w-full md:w-36 h-10 rounded-md text-white bg-red-600 text-sm hover:bg-red-700 active:scale-95 transition"
-              >
-                Supprimer
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmDialog
+        isOpen={showDeleteModal}
+        onClose={closeDeleteModal}
+        onConfirm={handleDelete}
+        title="Supprimer l'offre"
+        subtitle="Cette action est définitive"
+        message={`Êtes-vous certain de vouloir supprimer l'offre "${offerToDelete?.title}" ? Cette action supprimera définitivement l'offre et toutes les candidatures associées.`}
+        confirmText="Supprimer définitivement"
+        cancelText="Annuler"
+        type="danger"
+        loading={deleteLoading}
+      />
     </div>
   );
 }

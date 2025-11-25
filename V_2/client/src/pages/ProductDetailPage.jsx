@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { offersApi, messagesApi } from '../services/api';
 import SimpleHeader from '../component/common/SimpleHeader';
+import ConfirmDialog from '../components/common/ConfirmDialog';
 import ImageModal from '../component/common/ImageModal';
 import api from '../services/api';
 
@@ -13,6 +14,8 @@ export default function ProductDetailPage() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [contacting, setContacting] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
@@ -20,20 +23,30 @@ export default function ProductDetailPage() {
   // Vérifier si l'utilisateur est le propriétaire de l'offre
   const isOwner = user && product && product.employerId === user.sub;
 
-  // Fonction de suppression
-  const handleDelete = async () => {
-    if (!window.confirm('Êtes-vous sûr de vouloir supprimer cette offre ?')) {
-      return;
-    }
+  // Fonctions pour la modal de suppression
+  const openDeleteModal = () => {
+    setShowDeleteModal(true);
+  };
 
+  const closeDeleteModal = () => {
+    if (deleteLoading) return;
+    setShowDeleteModal(false);
+    setDeleteLoading(false);
+  };
+
+  const handleDelete = async () => {
+    if (deleteLoading) return;
+
+    setDeleteLoading(true);
     try {
       await offersApi.delete(id);
-      alert('Offre supprimée avec succès');
       // Rediriger vers la page des offres marketing
       navigate(user.role === 'driver' ? '/driver/my-products' : '/employer/my-products');
     } catch (error) {
       console.error('Erreur lors de la suppression:', error);
       alert('Erreur lors de la suppression de l\'offre');
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -174,7 +187,7 @@ export default function ProductDetailPage() {
                       Modifier
                     </button>
                     <button
-                      onClick={handleDelete}
+                      onClick={openDeleteModal}
                       className="px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors text-sm font-medium flex items-center gap-2"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -331,6 +344,20 @@ export default function ProductDetailPage() {
           onClose={() => setShowImageModal(false)}
         />
       )}
+
+      {/* Modal de confirmation de suppression */}
+      <ConfirmDialog
+        isOpen={showDeleteModal}
+        onClose={closeDeleteModal}
+        onConfirm={handleDelete}
+        title="Supprimer le produit"
+        subtitle="Cette action est définitive"
+        message={`Êtes-vous certain de vouloir supprimer le produit "${product?.title}" ? Cette action supprimera définitivement le produit.`}
+        confirmText="Supprimer définitivement"
+        cancelText="Annuler"
+        type="danger"
+        loading={deleteLoading}
+      />
     </div>
   );
 }

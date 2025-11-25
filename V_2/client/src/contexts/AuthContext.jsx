@@ -1,5 +1,8 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { config } from '../config/env';
+import { api } from '../services/api';
+import logger from '../utils/logger';
+import errorHandler from '../utils/errorHandler';
 
 // Configuration API
 const API_BASE_URL = config.api.baseUrl;
@@ -29,7 +32,7 @@ export const AuthProvider = ({ children }) => {
         setToken(storedToken);
         setUser(JSON.parse(storedUser));
       } catch (error) {
-        console.error('Erreur lors de la récupération des données utilisateur:', error);
+        logger.error('Erreur lors de la récupération des données utilisateur stockées', { error });
         localStorage.removeItem('token');
         localStorage.removeItem('user');
       }
@@ -40,29 +43,10 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      console.log('Login attempt with API_BASE_URL:', API_BASE_URL);
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        // Si l'email n'est pas vérifié (403), retourner les infos supplémentaires
-        if (response.status === 403 && data.requiresEmailVerification) {
-          return { 
-            success: false, 
-            error: data.error,
-            requiresEmailVerification: true,
-            email: data.email
-          };
-        }
-        throw new Error(data.error || 'Erreur de connexion');
-      }
+      logger.info('Login attempt started', { email });
+      
+      const response = await api.post('/auth/login', { email, password });
+      const data = response.data;
 
       // Stocker le token et les infos utilisateur
       localStorage.setItem('token', data.token);
@@ -71,10 +55,25 @@ export const AuthProvider = ({ children }) => {
       setToken(data.token);
       setUser(data.user);
 
+      logger.info('Login successful', { userId: data.user.id, role: data.user.role });
       return { success: true, user: data.user };
+      
     } catch (error) {
-      console.error('Erreur de connexion:', error);
-      return { success: false, error: error.message };
+      // Si l'email n'est pas vérifié (403), retourner les infos supplémentaires
+      if (error.response?.status === 403 && error.response?.data?.requiresEmailVerification) {
+        return { 
+          success: false, 
+          error: error.response.data.error,
+          requiresEmailVerification: true,
+          email: error.response.data.email
+        };
+      }
+      
+      logger.error('Login failed', { email, error: error.message });
+      return { 
+        success: false, 
+        error: error.response?.data?.error || error.message || 'Erreur de connexion'
+      };
     }
   };
 
