@@ -33,6 +33,8 @@ export default function ProductOfferForm({ onSubmit, loading, error, initialData
   });
   const [currentStep, setCurrentStep] = useState(1);
   const [imageFiles, setImageFiles] = useState([]); // Fichiers images temporaires
+  const [newCharacteristic, setNewCharacteristic] = useState('');
+  const [newBenefit, setNewBenefit] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -119,6 +121,40 @@ export default function ProductOfferForm({ onSubmit, loading, error, initialData
   const prevStep = () => {
     setCurrentStep(prev => Math.max(prev - 1, 1));
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const addCharacteristic = () => {
+    if (newCharacteristic.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        requirementsList: [...prev.requirementsList, newCharacteristic.trim()]
+      }));
+      setNewCharacteristic('');
+    }
+  };
+
+  const removeCharacteristic = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      requirementsList: prev.requirementsList.filter((_, i) => i !== index)
+    }));
+  };
+
+  const addBenefit = () => {
+    if (newBenefit.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        benefits: [...prev.benefits, newBenefit.trim()]
+      }));
+      setNewBenefit('');
+    }
+  };
+
+  const removeBenefit = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      benefits: prev.benefits.filter((_, i) => i !== index)
+    }));
   };
 
   return (
@@ -264,37 +300,93 @@ export default function ProductOfferForm({ onSubmit, loading, error, initialData
               <label className="block text-sm lg:text-lg text-gray-700 mb-2">
                 Caractéristiques du produit
               </label>
-              <textarea
-                name="characteristics"
-                value={formData.requirementsList.join('\n')}
-                onChange={(e) => {
-                  const lines = e.target.value.split('\n');
-                  setFormData(prev => ({ ...prev, requirementsList: lines }));
-                }}
-                rows="4"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all resize-none"
-                placeholder="Une caractéristique par ligne&#10;Ex:&#10;Garantie 2 ans&#10;Compatible tous véhicules&#10;Certifié ISO 9001"
-              />
-              <p className="mt-1 text-xs lg:text-sm text-gray-500">Une caractéristique par ligne</p>
+              <p className="text-xs lg:text-sm text-gray-500 mb-2">
+                Ajoutez les caractéristiques techniques et spécifications de votre produit
+              </p>
+              <div className="flex gap-2 mb-3">
+                <input
+                  type="text"
+                  value={newCharacteristic}
+                  onChange={(e) => setNewCharacteristic(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCharacteristic())}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                  placeholder="Ex: Garantie 2 ans, Compatible tous véhicules"
+                />
+                <button
+                  type="button"
+                  onClick={addCharacteristic}
+                  className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                  </svg>
+                </button>
+              </div>
+              {formData.requirementsList.length > 0 && (
+                <ul className="space-y-2">
+                  {formData.requirementsList.map((characteristic, index) => (
+                    <li key={index} className="flex items-center justify-between gap-2 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                      <span className="text-sm text-gray-700 flex-1">{characteristic}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeCharacteristic(index)}
+                        className="p-1 text-red-500 hover:bg-red-50 rounded transition-colors"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
 
-            {/* Avantages / Spécifications */}
+            {/* Avantages / Points forts */}
             <div>
               <label className="block text-sm lg:text-lg text-gray-700 mb-2">
                 Avantages / Points forts
               </label>
-              <textarea
-                name="benefits"
-                value={formData.benefits.join('\n')}
-                onChange={(e) => {
-                  const lines = e.target.value.split('\n');
-                  setFormData(prev => ({ ...prev, benefits: lines }));
-                }}
-                rows="4"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all resize-none"
-                placeholder="Un avantage par ligne&#10;Ex:&#10;Livraison rapide&#10;Prix compétitif&#10;Service après-vente"
-              />
-              <p className="mt-1 text-xs lg:text-sm text-gray-500">Un avantage par ligne</p>
+              <p className="text-xs lg:text-sm text-gray-500 mb-2">
+                Mettez en avant les points forts et avantages de votre produit
+              </p>
+              <div className="flex gap-2 mb-3">
+                <input
+                  type="text"
+                  value={newBenefit}
+                  onChange={(e) => setNewBenefit(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addBenefit())}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                  placeholder="Ex: Livraison rapide, Prix compétitif"
+                />
+                <button
+                  type="button"
+                  onClick={addBenefit}
+                  className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                  </svg>
+                </button>
+              </div>
+              {formData.benefits.length > 0 && (
+                <ul className="space-y-2">
+                  {formData.benefits.map((benefit, index) => (
+                    <li key={index} className="flex items-center justify-between gap-2 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                      <span className="text-sm text-gray-700 flex-1">{benefit}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeBenefit(index)}
+                        className="p-1 text-red-500 hover:bg-red-50 rounded transition-colors"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
 
             {/* Upload d'images */}

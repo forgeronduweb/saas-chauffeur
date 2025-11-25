@@ -197,7 +197,7 @@ export default function CreateOfferPage() {
       <main className="max-w-4xl mx-auto px-4 lg:px-6 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl text-gray-900 mb-2">
             {!offerType 
               ? (user?.role === 'driver' ? 'Publier une offre marketing' : 'Publier une offre')
               : offerType === 'job' 
@@ -233,7 +233,7 @@ export default function CreateOfferPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                     </svg>
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Offre d'emploi</h3>
+                  <h3 className="text-xl text-gray-900 mb-2">Offre d'emploi</h3>
                   <p className="text-gray-600">Recrutez un chauffeur professionnel pour votre entreprise</p>
                 </div>
               </button>
@@ -250,7 +250,7 @@ export default function CreateOfferPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Marketing & Vente</h3>
+                <h3 className="text-xl text-gray-900 mb-2">Marketing & Vente</h3>
                 <p className="text-gray-600">Vendez vos produits et services {user?.role === 'driver' ? 'à la communauté' : 'aux chauffeurs'}</p>
               </div>
             </button>
@@ -320,7 +320,7 @@ export default function CreateOfferPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                     </svg>
                   </div>
-                  <span className="font-medium text-gray-900 pr-2">Offre d'emploi</span>
+                  <span className="text-gray-900 pr-2">Offre d'emploi</span>
                 </button>
 
                 {/* Marketing & Vente - Affiché en bas */}
@@ -337,7 +337,7 @@ export default function CreateOfferPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                     </svg>
                   </div>
-                  <span className="font-medium text-gray-900 pr-2">Marketing/Vente</span>
+                  <span className="text-gray-900 pr-2">Marketing/Vente</span>
                 </button>
               </div>
             </>
