@@ -177,6 +177,8 @@ const createOffer = async (req, res) => {
     
     console.log('🆕 Création d\'offre - userId:', userId);
     console.log('🆕 Type d\'offre:', type);
+    console.log('📋 Caractéristiques reçues:', req.body.requirementsList?.length || 0);
+    console.log('⭐ Avantages reçus:', req.body.benefits?.length || 0);
     
     // Vérifier que l'utilisateur existe
     const user = await User.findById(userId);
@@ -320,6 +322,8 @@ const updateOffer = async (req, res) => {
     console.log('📝 Mise à jour offre:', offerId);
     console.log('👤 Utilisateur:', userId);
     console.log('💰 Prix reçu du client:', req.body.price, 'Type:', typeof req.body.price);
+    console.log('📋 Caractéristiques reçues:', req.body.requirementsList?.length || 0);
+    console.log('⭐ Avantages reçus:', req.body.benefits?.length || 0);
     
     const offer = await Offer.findOne({ 
       _id: offerId, 
