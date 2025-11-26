@@ -127,11 +127,11 @@ export default function OfferDetailPage() {
           <div className="lg:col-span-2">
             {/* En-tête */}
             <div className="bg-white border border-gray-200 rounded-lg p-6 lg:p-8 mb-6">
-              <h1 className="text-base sm:text-lg lg:text-2xl font-semibold text-gray-900 mb-3">
+              <h1 className="text-base sm:text-lg lg:text-2xl text-gray-900 mb-3">
                 {offer.title}
               </h1>
               <div className="mb-4">
-                <p className="text-sm sm:text-base text-gray-900 font-medium mb-1">
+                <p className="text-sm sm:text-base text-gray-900 mb-1">
                   {offer.company || 'Entreprise'}
                 </p>
                 {(employer || offer.employer) && (
@@ -141,21 +141,21 @@ export default function OfferDetailPage() {
                 )}
               </div>
               <div className="flex flex-wrap items-center gap-3">
-                <span className="px-3 py-1 bg-blue-50 text-blue-700 text-xs lg:text-lg font-medium rounded">
+                <span className="px-3 py-1 bg-blue-50 text-blue-700 text-xs lg:text-lg rounded">
                   {offer.contractType || offer.type || 'CDI'}
                 </span>
                 {offer.type && (
-                  <span className="px-3 py-1 bg-gray-100 text-gray-700 text-xs lg:text-lg font-medium rounded">
+                  <span className="px-3 py-1 bg-gray-100 text-gray-700 text-xs lg:text-lg rounded">
                     {offer.type}
                   </span>
                 )}
                 {(offer.conditions?.workType || offer.workType) && !isDirect && (
-                  <span className="px-3 py-1 bg-gray-100 text-gray-700 text-xs lg:text-lg font-medium rounded">
+                  <span className="px-3 py-1 bg-gray-100 text-gray-700 text-xs lg:text-lg rounded">
                     {offer.conditions?.workType?.replace('_', ' ') || offer.workType}
                   </span>
                 )}
                 {isDirect && (
-                  <span className="px-3 py-1 bg-indigo-50 text-indigo-700 text-xs lg:text-lg font-medium rounded">
+                  <span className="px-3 py-1 bg-indigo-50 text-indigo-700 text-xs lg:text-lg rounded">
                     Offre directe
                   </span>
                 )}
@@ -167,7 +167,7 @@ export default function OfferDetailPage() {
 
             {/* Description */}
             <div className="bg-white border border-gray-200 rounded-lg p-6 lg:p-8 mb-6">
-              <h2 className="text-base lg:text-lg font-semibold text-gray-900 mb-4">Description du poste</h2>
+              <h2 className="text-base lg:text-lg text-gray-900 mb-4">Description du poste</h2>
               <p className="text-sm sm:text-base text-gray-700 leading-relaxed">{offer.description}</p>
             </div>
 
@@ -176,7 +176,7 @@ export default function OfferDetailPage() {
               <>
                 {/* Exigences */}
                 <div className="bg-white border border-gray-200 rounded-lg p-6 lg:p-8 mb-6">
-                  <h2 className="text-base lg:text-lg font-semibold text-gray-900 mb-4">Profil recherché</h2>
+                  <h2 className="text-base lg:text-lg text-gray-900 mb-4">Profil recherché</h2>
                   <ul className="space-y-2">
                     {/* Afficher les exigences selon la structure */}
                     {(offer.requirementsList && Array.isArray(offer.requirementsList)) ? (
@@ -239,7 +239,7 @@ export default function OfferDetailPage() {
                 {/* Avantages */}
                 {offer.benefits && Array.isArray(offer.benefits) && offer.benefits.length > 0 && (
                   <div className="bg-white border border-gray-200 rounded-lg p-6 lg:p-8">
-                    <h2 className="text-base sm:text-xl font-semibold text-gray-900 mb-4">Avantages</h2>
+                    <h2 className="text-base sm:text-xl text-gray-900 mb-4">Avantages</h2>
                     <ul className="space-y-2">
                       {offer.benefits.map((benefit, index) => (
                         <li key={index} className="flex items-start gap-2 text-gray-700">
@@ -261,11 +261,11 @@ export default function OfferDetailPage() {
             <div className="bg-white border border-gray-200 rounded-lg p-6 sticky top-24">
               {/* Informations clés */}
               <div className="mb-6">
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Informations</h3>
+                <h3 className="text-base sm:text-lg text-gray-900 mb-4">Informations</h3>
                 <div className="space-y-3">
                   <div>
                     <p className="text-sm lg:text-lg text-gray-500 mb-1">Localisation</p>
-                    <p className="text-base lg:text-lg font-medium text-gray-900">
+                    <p className="text-base lg:text-lg text-gray-900">
                       {offer.location?.address && offer.location?.city 
                         ? `${offer.location.address}, ${offer.location.city}`
                         : offer.location?.city || offer.location || 'Non spécifié'}
@@ -273,7 +273,7 @@ export default function OfferDetailPage() {
                   </div>
                   <div>
                     <p className="text-sm lg:text-lg text-gray-500 mb-1">Salaire</p>
-                    <p className="text-base lg:text-lg font-medium text-gray-900">
+                    <p className="text-base lg:text-lg text-gray-900">
                       {offer.salaryRange || (offer.conditions?.salary ? `${offer.conditions.salary.toLocaleString()} FCFA` : offer.salary || 'À négocier')}
                     </p>
                   </div>
@@ -281,19 +281,19 @@ export default function OfferDetailPage() {
                     <>
                       <div>
                         <p className="text-sm lg:text-lg text-gray-500 mb-1">Type de véhicule</p>
-                        <p className="text-base lg:text-lg font-medium text-gray-900">
+                        <p className="text-base lg:text-lg text-gray-900">
                           {offer.requirements?.vehicleType || offer.vehicleType || 'Non spécifié'}
                         </p>
                       </div>
                       <div>
                         <p className="text-sm lg:text-lg text-gray-500 mb-1">Expérience requise</p>
-                        <p className="text-base lg:text-lg font-medium text-gray-900">
+                        <p className="text-base lg:text-lg text-gray-900">
                           {offer.requirements?.experience || offer.experience || 'Non spécifié'}
                         </p>
                       </div>
                       <div>
                         <p className="text-sm lg:text-lg text-gray-500 mb-1">Permis</p>
-                        <p className="text-base lg:text-lg font-medium text-gray-900">
+                        <p className="text-base lg:text-lg text-gray-900">
                           Permis {offer.requirements?.licenseType || offer.licenseType || 'B'}
                         </p>
                       </div>
@@ -308,7 +308,7 @@ export default function OfferDetailPage() {
                   <>
                     <Link
                       to="/auth"
-                      className="block w-full py-3 bg-orange-500 text-white text-center font-medium rounded-lg hover:bg-orange-600 transition-colors"
+                      className="block w-full py-3 bg-orange-500 text-white text-center rounded-lg hover:bg-orange-600 transition-colors"
                     >
                       Postuler à cette offre
                     </Link>
@@ -325,7 +325,7 @@ export default function OfferDetailPage() {
                 ) : hasApplied ? (
                   <button
                     disabled
-                    className="w-full py-3 bg-green-100 text-green-700 text-center font-medium rounded-lg cursor-not-allowed flex items-center justify-center gap-2"
+                    className="w-full py-3 bg-green-100 text-green-700 text-center rounded-lg cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
@@ -335,7 +335,7 @@ export default function OfferDetailPage() {
                 ) : (
                   <button
                     onClick={handleApply}
-                    className="w-full py-3 bg-orange-500 text-white text-center font-medium rounded-lg hover:bg-orange-600 transition-colors"
+                    className="w-full py-3 bg-orange-500 text-white text-center rounded-lg hover:bg-orange-600 transition-colors"
                   >
                     Postuler à cette offre
                   </button>

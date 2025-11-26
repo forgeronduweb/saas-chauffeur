@@ -164,7 +164,7 @@ export default function SimpleHeader({ activeTab = '', searchQuery = '', onSearc
         <div className="flex items-center justify-between gap-2">
           {/* Logo */}
           <Link to="/" className="flex items-center flex-shrink-0">
-            <span className="text-3xl lg:text-8xl font-bold">
+            <span className="text-3xl lg:text-8xl">
               <span className="text-orange-500">Go</span>
               <span className="text-gray-900">Driver</span>
             </span>
@@ -220,7 +220,7 @@ export default function SimpleHeader({ activeTab = '', searchQuery = '', onSearc
             )}
             <Link
               to="/publier-offre"
-              className="font-medium text-gray-700 hover:text-gray-900 transition-colors"
+              className="text-gray-700 hover:text-gray-900 transition-colors"
             >
               <span className="text-sm lg:hidden">Publier</span>
               <span className="hidden lg:inline text-sm">Publier une offre</span>
@@ -244,7 +244,7 @@ export default function SimpleHeader({ activeTab = '', searchQuery = '', onSearc
                     )}
                   </div>
                   {/* Bouton Mon espace sur desktop */}
-                  <span className="hidden lg:inline px-4 py-2 bg-orange-500 text-white text-base font-medium rounded hover:bg-orange-600 transition-colors">
+                  <span className="hidden lg:inline px-4 py-2 bg-orange-500 text-white text-base rounded hover:bg-orange-600 transition-colors">
                     Mon espace
                   </span>
                 </button>
@@ -395,7 +395,7 @@ export default function SimpleHeader({ activeTab = '', searchQuery = '', onSearc
             ) : (
               <Link
                 to="/auth?mode=login"
-                className="px-4 py-2 bg-orange-500 text-white text-sm lg:text-base font-medium rounded hover:bg-orange-600 transition-colors"
+                className="px-4 py-2 bg-orange-500 text-white text-sm lg:text-base rounded hover:bg-orange-600 transition-colors"
               >
                 Connexion
               </Link>

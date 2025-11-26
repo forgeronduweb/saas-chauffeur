@@ -36,9 +36,8 @@ export default function AProposPage() {
   }, []);
 
   return (
-    <PublicPageLayout activeTab="">
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4 lg:px-6 py-12">
+    <PublicPageLayout activeTab="a-propos">
+      <div className="max-w-4xl mx-auto px-4 lg:px-6 py-12">
           <h1 className="text-3xl lg:text-4xl text-gray-900 mb-8">
             À propos de GoDriver
           </h1>
@@ -155,7 +154,6 @@ export default function AProposPage() {
             </section>
           </div>
         </div>
-      </div>
     </PublicPageLayout>
   );
 }

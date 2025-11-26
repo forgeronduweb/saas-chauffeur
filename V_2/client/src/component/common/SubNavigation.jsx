@@ -7,7 +7,7 @@ export default function SubNavigation({ activeTab = '' }) {
         <nav className="flex items-center lg:justify-center gap-4 lg:gap-8 overflow-x-auto scrollbar-hide px-4 lg:px-6">
           <Link 
             to="/chauffeurs" 
-            className={`py-2.5 lg:py-4 text-sm lg:text-lg font-medium whitespace-nowrap flex-shrink-0 transition-colors border-b-2 ${
+            className={`py-2.5 lg:py-4 text-sm lg:text-lg whitespace-nowrap flex-shrink-0 transition-colors border-b-2 ${
               activeTab === 'chauffeurs'
                 ? 'text-orange-600 border-orange-500'
                 : 'text-gray-500 hover:text-gray-900 border-transparent'
@@ -17,7 +17,7 @@ export default function SubNavigation({ activeTab = '' }) {
           </Link>
           <Link 
             to="/offres" 
-            className={`py-2.5 lg:py-4 text-sm lg:text-lg font-medium whitespace-nowrap flex-shrink-0 transition-colors border-b-2 ${
+            className={`py-2.5 lg:py-4 text-sm lg:text-lg whitespace-nowrap flex-shrink-0 transition-colors border-b-2 ${
               activeTab === 'offres'
                 ? 'text-orange-600 border-orange-500'
                 : 'text-gray-500 hover:text-gray-900 border-transparent'
@@ -27,7 +27,7 @@ export default function SubNavigation({ activeTab = '' }) {
           </Link>
           <Link 
             to="/marketing-vente" 
-            className={`py-2.5 lg:py-4 text-sm lg:text-lg font-medium whitespace-nowrap flex-shrink-0 transition-colors border-b-2 ${
+            className={`py-2.5 lg:py-4 text-sm lg:text-lg whitespace-nowrap flex-shrink-0 transition-colors border-b-2 ${
               activeTab === 'marketing'
                 ? 'text-orange-600 border-orange-500'
                 : 'text-gray-500 hover:text-gray-900 border-transparent'
@@ -36,7 +36,7 @@ export default function SubNavigation({ activeTab = '' }) {
             Marketing & Vente
           </Link>
           <span 
-            className={`py-2.5 lg:py-4 text-sm lg:text-base font-medium whitespace-nowrap flex-shrink-0 border-b-2 cursor-not-allowed opacity-50 ${
+            className={`py-2.5 lg:py-4 text-sm lg:text-base whitespace-nowrap flex-shrink-0 border-b-2 cursor-not-allowed opacity-50 ${
               activeTab === 'partenaire'
                 ? 'text-orange-600 border-orange-500'
                 : 'text-gray-400 border-transparent'
@@ -45,7 +45,7 @@ export default function SubNavigation({ activeTab = '' }) {
             Devenir partenaire
           </span>
           <span 
-            className={`py-2.5 lg:py-4 text-sm lg:text-base font-medium whitespace-nowrap flex-shrink-0 border-b-2 cursor-not-allowed opacity-50 ${
+            className={`py-2.5 lg:py-4 text-sm lg:text-base whitespace-nowrap flex-shrink-0 border-b-2 cursor-not-allowed opacity-50 ${
               activeTab === 'formations'
                 ? 'text-orange-600 border-orange-500'
                 : 'text-gray-400 border-transparent'
@@ -54,7 +54,7 @@ export default function SubNavigation({ activeTab = '' }) {
             Formations
           </span>
           <span 
-            className={`py-2.5 lg:py-4 text-sm lg:text-base font-medium whitespace-nowrap flex-shrink-0 border-b-2 cursor-not-allowed opacity-50 ${
+            className={`py-2.5 lg:py-4 text-sm lg:text-base whitespace-nowrap flex-shrink-0 border-b-2 cursor-not-allowed opacity-50 ${
               activeTab === 'certifications'
                 ? 'text-orange-600 border-orange-500'
                 : 'text-gray-400 border-transparent'
@@ -63,7 +63,7 @@ export default function SubNavigation({ activeTab = '' }) {
             Certifications
           </span>
           <span 
-            className={`py-2.5 lg:py-4 text-sm lg:text-base font-medium whitespace-nowrap flex-shrink-0 border-b-2 cursor-not-allowed opacity-50 ${
+            className={`py-2.5 lg:py-4 text-sm lg:text-base whitespace-nowrap flex-shrink-0 border-b-2 cursor-not-allowed opacity-50 ${
               activeTab === 'aide'
                 ? 'text-orange-600 border-orange-500'
                 : 'text-gray-400 border-transparent'
@@ -72,7 +72,7 @@ export default function SubNavigation({ activeTab = '' }) {
             Centre d'aide
           </span>
           <span 
-            className={`py-2.5 lg:py-4 text-sm lg:text-base font-medium whitespace-nowrap flex-shrink-0 border-b-2 cursor-not-allowed opacity-50 ${
+            className={`py-2.5 lg:py-4 text-sm lg:text-base whitespace-nowrap flex-shrink-0 border-b-2 cursor-not-allowed opacity-50 ${
               activeTab === 'tarifs'
                 ? 'text-orange-600 border-orange-500'
                 : 'text-gray-400 border-transparent'

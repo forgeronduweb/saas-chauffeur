@@ -2,9 +2,8 @@ import PublicPageLayout from '../component/common/PublicPageLayout';
 
 export default function ConditionsPage() {
   return (
-    <PublicPageLayout activeTab="">
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4 lg:px-6 py-12">
+    <PublicPageLayout activeTab="conditions">
+      <div className="max-w-4xl mx-auto px-4 lg:px-6 py-12">
           <h1 className="text-3xl lg:text-4xl text-gray-900 mb-8">
             Conditions d'utilisation
           </h1>
@@ -132,7 +131,6 @@ export default function ConditionsPage() {
             </div>
           </div>
         </div>
-      </div>
     </PublicPageLayout>
   );
 }

@@ -56,7 +56,7 @@ export default function DriverCard({ driver }) {
 
   return (
     <div 
-      className="bg-white rounded-xl shadow-xl overflow-hidden transition-transform duration-200 ease-out cursor-pointer"
+      className="bg-white rounded-xl overflow-hidden transition-transform duration-200 ease-out cursor-pointer border border-gray-200"
       onClick={() => navigate(`/driver/${driver._id}`)}
       onMouseMove={handleMove}
       onMouseLeave={() => setTilt({ x: 0, y: 0 })}

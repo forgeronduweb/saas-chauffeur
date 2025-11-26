@@ -135,24 +135,22 @@ export default function CentreAidePage() {
 
   return (
     <PublicPageLayout activeTab="aide">
-      <div className="max-w-7xl mx-auto px-4 lg:px-6 py-8">
-        <div className="mb-8">
-          <h1 className="text-2xl lg:text-3xl text-gray-900 mb-3">
-            Centre d'aide
-          </h1>
-          <p className="text-gray-600 mb-6">
-            Trouvez rapidement des réponses à vos questions
-          </p>
+      <div className="max-w-4xl mx-auto px-4 lg:px-6 py-12">
+        <h1 className="text-3xl lg:text-4xl text-gray-900 mb-8">
+          Centre d'aide
+        </h1>
+        <p className="text-gray-600 mb-6">
+          Trouvez rapidement des réponses à vos questions
+        </p>
 
-          <div className="relative max-w-2xl">
-            <input
-              type="text"
-              placeholder="Rechercher une question..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-orange-500 transition-colors"
-            />
-          </div>
+        <div className="relative max-w-2xl mb-8">
+          <input
+            type="text"
+            placeholder="Rechercher une question..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-orange-500 transition-colors"
+          />
         </div>
 
         <div className="mb-8">
