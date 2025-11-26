@@ -86,6 +86,23 @@ h1 {
   font-size: 1.5rem; /* 25.5px sur mobile */
 }
 
+/* Titres de section personnalisés */
+.section-title {
+  font-size: 1rem !important; /* 17px sur mobile */
+}
+
+@media (min-width: 640px) {
+  .section-title {
+    font-size: 1.125rem !important; /* 18px sur tablette */
+  }
+}
+
+@media (min-width: 1024px) {
+  .section-title {
+    font-size: 1.25rem !important; /* 20px sur desktop */
+  }
+}
+
 /* Sous-titres (h2) */
 h2 {
   font-size: 1.25rem; /* 21.25px sur mobile */

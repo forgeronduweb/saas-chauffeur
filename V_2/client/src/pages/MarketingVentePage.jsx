@@ -24,19 +24,15 @@ export default function MarketingVentePage() {
 
   // Catégories spécialisées pour chauffeurs
   const categories = [
-    { value: 'vehicules', label: 'Véhicules Professionnels', icon: '🚗', count: 0 },
-    { value: 'pieces', label: 'Pièces & Accessoires', icon: '🔧', count: 0 },
-    { value: 'services', label: 'Entretien & Réparation', icon: '⚙️', count: 0 },
-    { value: 'equipements', label: 'Équipements Pro', icon: '👔', count: 0 }
+    { value: 'vehicules', label: 'Véhicules & Flottes', icon: '🚗', count: 0 },
+    { value: 'pieces', label: 'Pièces & Accessoires', icon: '🔧', count: 0 }
   ];
 
   // Options pour les dropdowns
   const categoryOptions = [
     { value: '', label: 'Toutes les catégories' },
-    { value: 'vehicules', label: 'Véhicules Professionnels' },
-    { value: 'pieces', label: 'Pièces & Accessoires' },
-    { value: 'services', label: 'Entretien & Réparation' },
-    { value: 'equipements', label: 'Équipements Pro' }
+    { value: 'vehicules', label: 'Véhicules & Flottes' },
+    { value: 'pieces', label: 'Pièces & Accessoires' }
   ];
 
   const conditionOptions = [

@@ -165,8 +165,8 @@ export default function SimpleHeader({ activeTab = '', searchQuery = '', onSearc
           {/* Logo */}
           <Link to="/" className="flex items-center flex-shrink-0">
             <span className="text-3xl lg:text-8xl">
-              <span className="text-orange-500">Go</span>
-              <span className="text-gray-900">Driver</span>
+              <span className="text-orange-500 font-bold">Go</span>
+              <span className="text-gray-900 font-bold">Driver</span>
             </span>
           </Link>
 

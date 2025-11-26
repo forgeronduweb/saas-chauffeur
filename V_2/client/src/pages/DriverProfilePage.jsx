@@ -244,9 +244,9 @@ export default function DriverProfilePage() {
             {/* Informations sur le véhicule */}
             {driver.vehicleType && (
               <div className="bg-white border border-gray-200 p-6 lg:p-8">
-                <h2 className="text-xl text-gray-900 mb-6 flex items-center gap-2">
-                  <Car className="w-6 h-6 text-orange-500" />
-                  Véhicule
+                <h2 className="text-gray-900 mb-6 flex items-center gap-2">
+                  <Car className="w-5 h-5 sm:w-6 sm:h-6 text-orange-500" />
+                  <span className="section-title">Véhicule</span>
                 </h2>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-4 bg-gray-50 rounded-lg">
@@ -335,11 +335,11 @@ export default function DriverProfilePage() {
 
         {/* Expériences professionnelles - En bas */}
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-4 sm:p-6 lg:p-8 mt-6 lg:mt-8">
-          <h2 className="text-base sm:text-lg lg:text-xl font-semibold text-gray-900 mb-4 sm:mb-6 flex items-center gap-2">
+          <h2 className="text-base sm:text-lg lg:text-xl !text-gray-900 mb-4 sm:mb-6 flex items-center gap-2">
             <div className="p-2 bg-orange-100 rounded-lg">
               <Briefcase className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600" />
             </div>
-            <span>Expériences professionnelles</span>
+            <span className="section-title">Expériences professionnelles</span>
           </h2>
           {driver.workExperience && driver.workExperience.length > 0 ? (
             <div className="space-y-4 sm:space-y-6">

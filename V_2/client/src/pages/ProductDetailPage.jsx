@@ -6,8 +6,7 @@ import SimpleHeader from '../component/common/SimpleHeader';
 import ConfirmDialog from '../components/common/ConfirmDialog';
 import ImageModal from '../component/common/ImageModal';
 import ProductCard from '../component/common/ProductCard';
-import api from '../services/api';
-import { FaArrowRight, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
 export default function ProductDetailPage() {
   const { id } = useParams();
@@ -20,18 +19,21 @@ export default function ProductDetailPage() {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [contacting, setContacting] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false);
   const similarProductsRef = useRef(null);
   const [similarProducts, setSimilarProducts] = useState([]);
   const [loadingSimilar, setLoadingSimilar] = useState(false);
-  const [showImageModal, setShowImageModal] = useState(false);
 
   // Vérifier si l'utilisateur est le propriétaire de l'offre
-  const isOwner = user && product && product.employerId === user.sub;
+  const ownerUserId = product && (product.employerId?._id || product.employerId);
+  const isOwner =
+    !!user &&
+    !!product &&
+    !!ownerUserId &&
+    (ownerUserId === user.sub || ownerUserId === user._id);
 
   // Fonctions pour la modal de suppression
-  const openDeleteModal = () => {
-    setShowDeleteModal(true);
-  };
+  const openDeleteModal = () => setShowDeleteModal(true);
 
   const closeDeleteModal = () => {
     if (deleteLoading) return;
@@ -41,11 +43,9 @@ export default function ProductDetailPage() {
 
   const handleDelete = async () => {
     if (deleteLoading) return;
-
     setDeleteLoading(true);
     try {
       await offersApi.delete(id);
-      // Rediriger vers la page des offres marketing
       navigate(user.role === 'driver' ? '/driver/my-products' : '/employer/my-products');
     } catch (error) {
       console.error('Erreur lors de la suppression:', error);
@@ -55,20 +55,14 @@ export default function ProductDetailPage() {
     }
   };
 
-  // Récupérer le produit depuis l'API
   // Charger le produit et les produits similaires
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        console.log('Chargement du produit avec ID:', id);
         const response = await offersApi.getById(id);
-        console.log('Réponse du produit:', response);
         setProduct(response.data);
-        
-        // Charger les produits similaires après avoir chargé le produit
         if (response.data) {
-          console.log('Données du produit chargées, catégorie:', response.data.category);
           fetchSimilarProducts(response.data.category, response.data._id);
         }
       } catch (error) {
@@ -86,28 +80,20 @@ export default function ProductDetailPage() {
   const fetchSimilarProducts = async (category, currentProductId) => {
     try {
       setLoadingSimilar(true);
-      console.log('Chargement des produits similaires pour la catégorie:', category);
-      
-      // D'abord, on récupère le type du produit actuel
       const productResponse = await offersApi.getById(currentProductId);
-      const productType = productResponse.data.type; // 'marketing', 'vehicules', etc.
+      const productType = productResponse.data.type;
       
-      // On charge jusqu'à 8 produits similaires du même type et de la même catégorie
       const response = await offersApi.list({
         type: productType,
         category,
-        limit: 8, // On charge jusqu'à 8 produits
+        limit: 8,
         excludeId: currentProductId,
         sort: '-createdAt',
-        status: 'active' // On ne montre que les produits actifs
+        status: 'active'
       });
       
-      console.log('Réponse des produits similaires:', response);
-      
-      // Extraire le tableau des offres de la réponse
       const products = response.data?.offers || response.data || [];
       setSimilarProducts(products);
-      console.log('Produits similaires chargés:', products);
     } catch (error) {
       console.error('Error fetching similar products:', error);
     } finally {
@@ -128,7 +114,7 @@ export default function ProductDetailPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-xl font-bold text-gray-900 mb-4">Produit non trouvé</h2>
-          <Link to="/marketing-vente" className="text-gray-600 hover:text-gray-900">
+          <Link to="/marketing-vente" className="text-orange-500 hover:text-orange-600">
             Retour à la marketplace
           </Link>
         </div>
@@ -138,15 +124,12 @@ export default function ProductDetailPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <SimpleHeader activeTab="marketing" />
 
-      {/* Contenu - Style fiche produit */}
       <main className="max-w-7xl mx-auto px-4 lg:px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Colonne gauche - Images */}
           <div>
-            {/* Image principale */}
             <div className="relative h-96 lg:h-[500px] bg-gray-100 rounded-lg overflow-hidden mb-4">
               <img 
                 src={product.images[currentImageIndex]} 
@@ -155,7 +138,6 @@ export default function ProductDetailPage() {
                 onClick={() => setShowImageModal(true)}
               />
               
-              {/* Badge catégorie */}
               {product.category && (
                 <div className="absolute top-4 left-4">
                   <span className="px-3 py-1.5 bg-white/90 backdrop-blur-sm text-gray-900 text-sm rounded shadow-sm">
@@ -164,20 +146,25 @@ export default function ProductDetailPage() {
                 </div>
               )}
 
-              {/* Navigation images si plusieurs */}
               {product.images.length > 1 && (
                 <>
                   <button
-                    onClick={() => setCurrentImageIndex((prev) => (prev - 1 + product.images.length) % product.images.length)}
-                    className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-gray-900 p-2 rounded-full shadow-md transition-colors"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCurrentImageIndex(prev => (prev - 1 + product.images.length) % product.images.length);
+                    }}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-900 p-2 rounded-full shadow-md transition-colors"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
                     </svg>
                   </button>
                   <button
-                    onClick={() => setCurrentImageIndex((prev) => (prev + 1) % product.images.length)}
-                    className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-gray-900 p-2 rounded-full shadow-md transition-colors"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCurrentImageIndex(prev => (prev + 1) % product.images.length);
+                    }}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-900 p-2 rounded-full shadow-md transition-colors"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
@@ -187,7 +174,6 @@ export default function ProductDetailPage() {
               )}
             </div>
 
-            {/* Miniatures */}
             {product.images.length > 1 && (
               <div className="grid grid-cols-3 gap-2">
                 {product.images.map((image, index) => (
@@ -195,7 +181,7 @@ export default function ProductDetailPage() {
                     key={index}
                     onClick={() => setCurrentImageIndex(index)}
                     className={`relative h-24 bg-gray-100 rounded-lg overflow-hidden ${
-                      index === currentImageIndex ? 'ring-2 ring-gray-900' : ''
+                      index === currentImageIndex ? 'ring-2 ring-orange-500' : ''
                     }`}
                   >
                     <img 
@@ -211,16 +197,18 @@ export default function ProductDetailPage() {
 
           {/* Colonne droite - Informations */}
           <div>
-            {/* En-tête */}
             <div className="mb-6">
               <div className="flex items-start justify-between mb-3">
-                <h1 className="text-base sm:text-2xl lg:text-3xl text-gray-900 flex-1">
-                  {product.title}
-                </h1>
-                
-                {/* Boutons d'action si propriétaire */}
+                <div className="pr-4">
+                  <h1 className="section-title text-xl sm:text-2xl text-gray-900 mb-3">{product.title}</h1>
+                  {product.category && (
+                    <span className="inline-block px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded">
+                      {product.category}
+                    </span>
+                  )}
+                </div>
                 {isOwner && (
-                  <div className="flex gap-2 ml-4">
+                  <div className="flex gap-2">
                     <button
                       onClick={() => navigate(`/edit-offer/${product._id}`)}
                       className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm flex items-center gap-2"
@@ -242,212 +230,207 @@ export default function ProductDetailPage() {
                   </div>
                 )}
               </div>
-              <p className="text-2xl sm:text-3xl lg:text-4xl text-orange-500 mb-4">
+
+              <p className="text-2xl font-medium text-orange-500 mb-4">
                 {product.price ? `${product.price.toLocaleString()} FCFA` : 'Prix sur demande'}
               </p>
-              <div className="flex items-center gap-3 text-sm text-gray-600">
-                <div className="flex items-center gap-1.5">
+
+              <div className="flex items-center gap-3 text-sm text-gray-600 mb-6">
+                <div className="flex items-center gap-2">
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd"/>
                   </svg>
                   <span>{product.location?.city || product.location || 'Non spécifié'}</span>
-                  <span className="mx-2">•</span>
-                  <span className="text-xs text-gray-500">
-                    Publié le {new Date(product.createdAt).toLocaleDateString('fr-FR')}
-                  </span>
                 </div>
-                {(product.condition || product.category || product.type) && (
+                <span>•</span>
+                <span className="text-gray-500">
+                  Publié le {new Date(product.createdAt).toLocaleDateString('fr-FR')}
+                </span>
+                {product.condition && (
                   <>
                     <span>•</span>
-                    <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
-                      {product.condition || product.category || product.type}
+                    <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs border border-black/10">
+                      {product.condition}
                     </span>
                   </>
                 )}
               </div>
-            </div>
 
-            {/* Description */}
-            <div className="mb-6 pb-6 border-b border-gray-200">
-              <h2 className="text-base lg:text-lg text-gray-900 mb-4">Description</h2>
-              <p className="text-sm sm:text-base text-gray-700 leading-relaxed">{product.description}</p>
-            </div>
-
-            {/* Contact */}
-            <div className="bg-gray-50 rounded-lg p-6 mb-6">
-              <h2 className="text-base lg:text-lg text-gray-900 mb-4">Contact</h2>
-              {(product.employer || product.employerId) && (
-                <p className="text-xs lg:text-lg text-gray-600 mb-4">
-                  <span className="font-medium">Vendeur:</span> {(product.employer?.firstName || product.employerId?.firstName)} {(product.employer?.lastName || product.employerId?.lastName)}
-                  {(product.employer?.companyName || product.employerId?.companyName) && ` (${product.employer?.companyName || product.employerId?.companyName})`}
-                </p>
-              )}
-              {user ? (
-                <div className="space-y-2">
-                  <button
-                    onClick={async () => {
-                      try {
-                        setContacting(true);
-                        const employerId = product.employerId?._id || product.employerId;
-                        console.log('📤 Création/récupération de la conversation pour le produit:', {
-                          productId: product._id,
-                          productTitle: product.title,
-                          employerId: employerId
-                        });
-                        
-                        const response = await messagesApi.createOrGetConversation(
-                          employerId,
-                          { type: 'product_inquiry', offerId: product._id }
-                        );
-                        
-                        console.log('📨 Réponse complète:', response.data);
-                        console.log('💬 Messages reçus:', response.data.messages);
-                        console.log('📊 Nombre de messages:', response.data.messages?.length || 0);
-                        
-                        const conversationId = response.data.conversation._id;
-                        console.log('✅ Conversation prête:', conversationId);
-                        
-                        // Attendre un peu pour s'assurer que tout est sauvegardé
-                        await new Promise(resolve => setTimeout(resolve, 500));
-                        
-                        // Ouvrir la messagerie avec cette conversation
-                        console.log('🚀 Dispatch événement openMessaging avec conversationId:', conversationId);
-                        window.dispatchEvent(new CustomEvent('openMessaging', {
-                          detail: { conversationId }
-                        }));
-                      } catch (error) {
-                        console.error('❌ Erreur complète:', error);
-                        console.error('📋 Détails:', error.response?.data || error.message);
-                        alert('Erreur lors de l\'ouverture de la conversation');
-                      } finally {
-                        setContacting(false);
-                      }
-                    }}
-                    disabled={contacting}
-                    className="block w-full py-3 bg-orange-500 text-white text-center rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50"
-                  >
-                    {contacting ? 'Ouverture...' : 'Envoyer un message'}
-                  </button>
-                  
-                  <button
-                    onClick={() => {
-                      // TODO: Implémenter la logique de signalement
-                      alert('Fonctionnalité de signalement à venir');
-                    }}
-                    className="block w-full py-2 border border-orange-500 text-orange-500 bg-white hover:bg-orange-50 rounded-lg transition-colors flex items-center justify-center gap-2"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              {/* Section Vendeur */}
+              <div className="bg-white rounded-lg p-6 mb-6 border border-black/10">
+                <h3 className="section-title text-gray-900 mb-4">Vendeur</h3>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
-                    Signaler cette annonce
-                  </button>
+                  </div>
+                  <div>
+                    <p className="text-gray-800">
+                      {product.employer?.firstName || product.employerId?.firstName} {product.employer?.lastName || product.employerId?.lastName}
+                    </p>
+                    {product.employer?.companyName || product.employerId?.companyName ? (
+                      <p className="text-sm text-gray-500">
+                        {product.employer?.companyName || product.employerId?.companyName}
+                      </p>
+                    ) : null}
+                  </div>
                 </div>
-              ) : (
-                <>
-                  <Link
-                    to="/auth"
-                    className="block w-full py-3 bg-orange-500 text-white text-center rounded-lg hover:bg-orange-600 transition-colors"
-                  >
-                    Contacter le vendeur
-                  </Link>
-                  <p className="text-xs lg:text-sm text-gray-500 text-center mt-2">
-                    Créez un compte gratuit pour contacter le vendeur
-                  </p>
-                </>
+
+                <div className="mt-4">
+                  {user && !isOwner ? (
+                    <div className="flex flex-col sm:flex-row gap-3 w-full">
+                      <button
+                        onClick={async () => {
+                          try {
+                            setContacting(true);
+                            const employerId = ownerUserId;
+                            const response = await messagesApi.createOrGetConversation(
+                              employerId,
+                              { type: 'product_inquiry', offerId: product._id }
+                            );
+                            const conversationId = response.data.conversation._id;
+                            window.dispatchEvent(new CustomEvent('openMessaging', {
+                              detail: { conversationId }
+                            }));
+                          } catch (error) {
+                            console.error('Erreur:', error);
+                            alert('Erreur lors de l\'ouverture de la conversation');
+                          } finally {
+                            setContacting(false);
+                          }
+                        }}
+                        disabled={contacting}
+                        className="w-full py-2.5 px-4 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50 text-sm sm:text-base flex items-center justify-center gap-2"
+                      >
+                        {contacting ? (
+                          <>
+                            <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Ouverture...
+                          </>
+                        ) : (
+                          <>
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                            </svg>
+                            <span>Contacter le vendeur</span>
+                          </>
+                        )}
+                      </button>
+
+                      {!isOwner && (
+                        <button
+                          onClick={() => setShowReportModal(true)}
+                          className="w-full py-2.5 px-4 bg-white border border-orange-500 text-orange-500 rounded-lg hover:bg-orange-50 transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                          </svg>
+                          <span>Signaler l'annonce</span>
+                        </button>
+                      )}
+                    </div>
+                  ) : (
+                    <>
+                      <Link
+                        to="/auth"
+                        className="block w-full py-2.5 bg-orange-500 text-white text-center rounded-lg hover:bg-orange-600 transition-colors mb-2"
+                      >
+                        Se connecter pour contacter
+                      </Link>
+                      <p className="text-xs text-gray-500 text-center">
+                        Créez un compte pour discuter avec le vendeur
+                      </p>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {product.description && (
+                <div className="mb-6">
+                  <h3 className="section-title text-gray-900 mb-4">Description</h3>
+                  <div className="prose max-w-none text-gray-700">
+                    {product.description}
+                  </div>
+                </div>
               )}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                {product.requirementsList?.length > 0 && (
+                  <div className="bg-white p-5 rounded-lg border border-black/10">
+                    <h3 className="section-title text-gray-900 mb-4">Caractéristiques</h3>
+                    <ul className="space-y-2">
+                      {product.requirementsList.map((item, index) => (
+                        <li key={index} className="flex items-start">
+                          <svg className="h-5 w-5 text-green-500 mt-0.5 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          <span className="text-gray-700 font-normal">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {product.benefits?.length > 0 && (
+                  <div className="bg-white p-5 rounded-lg border border-black/10">
+                    <h3 className="section-title text-gray-900 mb-4">Avantages</h3>
+                    <ul className="space-y-2">
+                      {product.benefits.map((item, index) => (
+                        <li key={index} className="flex items-start">
+                          <svg className="h-5 w-5 text-blue-500 mt-0.5 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                          </svg>
+                          <span className="text-gray-700 font-normal">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
             </div>
-
-            {/* Caractéristiques */}
-            {product.requirementsList && product.requirementsList.length > 0 && (
-              <div className="mb-6 pb-6 border-b border-gray-200">
-                <h2 className="text-base lg:text-lg text-gray-900 mb-4">Caractéristiques</h2>
-                <ul className="grid grid-cols-1 gap-2">
-                  {product.requirementsList.map((feature, index) => (
-                    <li key={index} className="flex items-start gap-2 text-sm sm:text-base text-gray-700">
-                      <svg className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
-                      </svg>
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* Avantages */}
-            {product.benefits && product.benefits.length > 0 && (
-              <div className="mb-6 pb-6 border-b border-gray-200">
-                <h2 className="text-base lg:text-lg text-gray-900 mb-4">Avantages</h2>
-                <ul className="grid grid-cols-1 gap-2">
-                  {product.benefits.map((benefit, index) => (
-                    <li key={index} className="flex items-start gap-2 text-sm sm:text-base text-gray-700">
-                      <svg className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
-                      </svg>
-                      <span>{benefit}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
           </div>
         </div>
-      </main>
 
-      {/* Section Articles similaires */}
-      {!loading && similarProducts && similarProducts.length > 0 && (
-        <section className="bg-white py-8 px-4 sm:px-6 lg:px-4">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="mb-6">
-              <h2 className="text-lg lg:text-2xl font-normal text-gray-900">
-                Articles similaires
-              </h2>
-            </div>
-            
+        {similarProducts.length > 0 && (
+          <div className="mt-12">
+            <h2 className="section-title text-gray-900 mb-4">Produits similaires</h2>
             <div className="relative">
+              <div 
+                ref={similarProductsRef}
+                className="flex overflow-x-auto gap-6 pb-6 scrollbar-hide"
+                style={{ scrollSnapType: 'x mandatory' }}
+              >
+                {similarProducts.map((item) => (
+                  <div key={item._id} className="flex-shrink-0" style={{ scrollSnapAlign: 'start' }}>
+                    <ProductCard product={item} noShadow noBorder />
+                  </div>
+                ))}
+              </div>
               <button 
                 onClick={() => {
                   similarProductsRef.current.scrollBy({ left: -300, behavior: 'smooth' });
                 }}
-                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white p-2 rounded-full shadow-md text-orange-500 hover:text-orange-600 transition-all duration-200"
-                aria-label="Précédent"
+                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white p-2 rounded-full shadow-lg text-orange-500 hover:text-orange-600 transition-colors"
               >
                 <FaChevronLeft className="w-5 h-5" />
               </button>
-              
-              <div 
-                ref={similarProductsRef}
-                className="grid grid-flow-col auto-cols-[calc(50%-0.375rem)] sm:auto-cols-[calc(33.333%-0.5rem)] lg:auto-cols-[calc(25%-0.75rem)] gap-3 lg:gap-4 overflow-x-auto pb-4 scrollbar-hide"
-                style={{
-                  scrollSnapType: 'x mandatory',
-                  scrollPadding: '0 1rem',
-                  msOverflowStyle: 'none',
-                  scrollbarWidth: 'none'
-                }}
-              >
-                {similarProducts.map((product) => (
-                  <div key={product._id} className="w-full" style={{ scrollSnapAlign: 'start' }}>
-                    <ProductCard product={product} />
-                  </div>
-                ))}
-              </div>
-              
               <button 
                 onClick={() => {
                   similarProductsRef.current.scrollBy({ left: 300, behavior: 'smooth' });
                 }}
-                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white p-2 rounded-full shadow-md text-orange-500 hover:text-orange-600 transition-all duration-200"
-                aria-label="Suivant"
+                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-white p-2 rounded-full shadow-lg text-orange-500 hover:text-orange-600 transition-colors"
               >
                 <FaChevronRight className="w-5 h-5" />
               </button>
             </div>
           </div>
-        </section>
-      )}
+        )}
+      </main>
 
-      {/* Modal d'agrandissement d'image */}
       {showImageModal && (
         <ImageModal
           imageUrl={product.images[currentImageIndex]}
@@ -456,18 +439,16 @@ export default function ProductDetailPage() {
         />
       )}
 
-      {/* Modal de confirmation de suppression */}
       <ConfirmDialog
         isOpen={showDeleteModal}
         onClose={closeDeleteModal}
         onConfirm={handleDelete}
         title="Supprimer le produit"
-        subtitle="Cette action est définitive"
-        message={`Êtes-vous certain de vouloir supprimer le produit "${product?.title}" ? Cette action supprimera définitivement le produit.`}
-        confirmText="Supprimer définitivement"
+        message={`Êtes-vous certain de vouloir supprimer le produit "${product.title}" ? Cette action est irréversible.`}
+        confirmText={deleteLoading ? 'Suppression...' : 'Supprimer définitivement'}
         cancelText="Annuler"
-        type="danger"
-        loading={deleteLoading}
+        confirmButtonVariant="danger"
+        isConfirmLoading={deleteLoading}
       />
     </div>
   );

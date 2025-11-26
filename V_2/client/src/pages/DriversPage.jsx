@@ -141,7 +141,7 @@ export default function DriversPage() {
           {/* Sidebar Filtres Desktop */}
           <aside className="hidden lg:block w-64 flex-shrink-0 sticky top-20 self-start max-h-[calc(100vh-6rem)] overflow-y-auto">
             <div className="bg-white border border-gray-200 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Filtres</h3>
+              <h3 className="text-lg text-gray-900 mb-4">Filtres</h3>
               
               {/* Ville */}
               <div className="mb-4">

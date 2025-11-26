@@ -223,10 +223,8 @@ export default function ProductOfferForm({ onSubmit, loading, error, initialData
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
                 >
                   <option value="">Sélectionnez une catégorie</option>
-                  <option value="vehicules">Véhicules Professionnels</option>
+                  <option value="vehicules">Véhicules & Flottes</option>
                   <option value="pieces">Pièces & Accessoires</option>
-                  <option value="services">Entretien & Réparation</option>
-                  <option value="equipements">Équipements Pro</option>
                 </select>
               </div>
 
