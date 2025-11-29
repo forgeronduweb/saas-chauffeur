@@ -6,7 +6,12 @@ import SimpleHeader from '../component/common/SimpleHeader';
 import ConfirmDialog from '../components/common/ConfirmDialog';
 import ImageModal from '../component/common/ImageModal';
 import ProductCard from '../component/common/ProductCard';
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { 
+  FaChevronLeft, FaChevronRight, FaCar, FaCalendarAlt, FaTachometerAlt, 
+  FaGasPump, FaCheckCircle, FaCogs, FaShieldAlt, FaWrench, FaFileAlt, 
+  FaPuzzlePiece, FaLink, FaBarcode, FaCertificate, FaCube, FaChartLine,
+  FaTools, FaUserTie, FaBullseye, FaClock, FaAward, FaHandshake, FaHourglass
+} from 'react-icons/fa';
 
 export default function ProductDetailPage() {
   const { id } = useParams();
@@ -23,6 +28,42 @@ export default function ProductDetailPage() {
   const similarProductsRef = useRef(null);
   const [similarProducts, setSimilarProducts] = useState([]);
   const [loadingSimilar, setLoadingSimilar] = useState(false);
+
+  // Fonction pour obtenir l'icône appropriée selon la caractéristique
+  const getCharacteristicIcon = (characteristic) => {
+    const text = characteristic.toLowerCase();
+    
+    // Véhicules
+    if (text.includes('type') && (text.includes('berline') || text.includes('suv') || text.includes('véhicule'))) return FaCar;
+    if (text.includes('année') || text.includes('annee')) return FaCalendarAlt;
+    if (text.includes('km') || text.includes('kilom')) return FaTachometerAlt;
+    if (text.includes('motorisation') || text.includes('essence') || text.includes('diesel')) return FaGasPump;
+    if (text.includes('état') || text.includes('etat') || text.includes('excellent') || text.includes('bon')) return FaCheckCircle;
+    if (text.includes('options') || text.includes('climatisation') || text.includes('gps')) return FaCogs;
+    if (text.includes('sécurité') || text.includes('securite') || text.includes('abs') || text.includes('airbag')) return FaShieldAlt;
+    if (text.includes('entretien') || text.includes('révision') || text.includes('revision')) return FaWrench;
+    if (text.includes('documents') || text.includes('carte grise') || text.includes('contrôle')) return FaFileAlt;
+    
+    // Pièces
+    if (text.includes('type') && (text.includes('pneus') || text.includes('batterie') || text.includes('filtre'))) return FaPuzzlePiece;
+    if (text.includes('compatibilité') || text.includes('compatibilite') || text.includes('toyota') || text.includes('compatible')) return FaLink;
+    if (text.includes('référence') || text.includes('reference')) return FaBarcode;
+    if (text.includes('garantie')) return FaCertificate;
+    if (text.includes('matériau') || text.includes('materiau') || text.includes('acier') || text.includes('plastique')) return FaCube;
+    if (text.includes('performance') || text.includes('haute performance')) return FaChartLine;
+    if (text.includes('installation')) return FaTools;
+    
+    // Services
+    if (text.includes('type') && (text.includes('réparation') || text.includes('reparation') || text.includes('maintenance'))) return FaTools;
+    if (text.includes('domaine') || text.includes('mécanique') || text.includes('mecanique')) return FaBullseye;
+    if (text.includes('expertise') || text.includes('expérience') || text.includes('experience')) return FaUserTie;
+    if (text.includes('disponibilité') || text.includes('disponibilite') || text.includes('24h')) return FaClock;
+    if (text.includes('qualité') || text.includes('qualite') || text.includes('certifié') || text.includes('certifie')) return FaAward;
+    if (text.includes('délais') || text.includes('delais') || text.includes('intervention')) return FaHourglass;
+    
+    // Par défaut, retourner l'icône de check
+    return FaCheckCircle;
+  };
 
   // Vérifier si l'utilisateur est le propriétaire de l'offre
   const ownerUserId = product && (product.employerId?._id || product.employerId);
@@ -358,42 +399,62 @@ export default function ProductDetailPage() {
                 </div>
               )}
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                {product.requirementsList?.length > 0 && (
-                  <div className="bg-white p-5 rounded-lg border border-black/10">
-                    <h3 className="section-title text-gray-900 mb-4">Caractéristiques</h3>
-                    <ul className="space-y-2">
-                      {product.requirementsList.map((item, index) => (
-                        <li key={index} className="flex items-start">
-                          <svg className="h-5 w-5 text-green-500 mt-0.5 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                          <span className="text-gray-700 font-normal">{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {product.benefits?.length > 0 && (
-                  <div className="bg-white p-5 rounded-lg border border-black/10">
-                    <h3 className="section-title text-gray-900 mb-4">Avantages</h3>
-                    <ul className="space-y-2">
-                      {product.benefits.map((item, index) => (
-                        <li key={index} className="flex items-start">
-                          <svg className="h-5 w-5 text-blue-500 mt-0.5 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                          </svg>
-                          <span className="text-gray-700 font-normal">{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
             </div>
           </div>
         </div>
+
+        {/* Blocs Caractéristiques et Avantages centrés */}
+        {(product.requirementsList?.length > 0 || product.benefits?.length > 0) && (
+          <div className="mt-12 mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+              {product.requirementsList?.length > 0 && (
+                <div className="p-5 rounded-lg border" style={{ backgroundColor: '#f97316', borderColor: '#ea580c' }}>
+                  <h3 className="section-title text-white mb-4">Caractéristiques</h3>
+                  <ul className="space-y-2">
+                    {product.requirementsList.map((item, index) => {
+                      const IconComponent = getCharacteristicIcon(item);
+                      // Extraire le titre (avant les deux points) et la valeur (après les deux points)
+                      const [title, ...valueParts] = item.split(':');
+                      const value = valueParts.join(':').trim();
+                      
+                      return (
+                        <li key={index} className="flex items-start">
+                          <div className="flex items-start w-full">
+                            <div className="flex items-center w-32 flex-shrink-0">
+                              <IconComponent className="h-5 w-5 text-white mr-2 flex-shrink-0" />
+                              <span className="text-white">{title.trim()}</span>
+                            </div>
+                            {value && (
+                              <div className="text-white font-normal ml-4">
+                                : {value}
+                              </div>
+                            )}
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              )}
+
+              {product.benefits?.length > 0 && (
+                <div className="bg-white p-5 rounded-lg border border-black/10">
+                  <h3 className="section-title text-gray-900 mb-4">Avantages</h3>
+                  <ul className="space-y-2">
+                    {product.benefits.map((item, index) => (
+                      <li key={index} className="flex items-start">
+                        <svg className="h-5 w-5 text-blue-500 mt-0.5 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        <span className="text-gray-700 font-normal">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {similarProducts.length > 0 && (
           <div className="mt-12">

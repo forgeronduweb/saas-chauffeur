@@ -1,4 +1,11 @@
 import { useState } from 'react';
+import { 
+  FaCar, FaCalendarAlt, FaTachometerAlt, FaGasPump, FaCheckCircle,
+  FaCogs, FaShieldAlt, FaWrench, FaFileAlt, FaPuzzlePiece,
+  FaLink, FaBarcode, FaCertificate, FaCube, FaChartLine,
+  FaTools, FaUserTie, FaBullseye, FaClock, FaAward,
+  FaHandshake, FaHourglass
+} from 'react-icons/fa';
 
 export default function ProductOfferForm({ onSubmit, loading, error, initialData }) {
   const [formData, setFormData] = useState(initialData || {
@@ -33,8 +40,43 @@ export default function ProductOfferForm({ onSubmit, loading, error, initialData
   });
   const [currentStep, setCurrentStep] = useState(1);
   const [imageFiles, setImageFiles] = useState([]); // Fichiers images temporaires
-  const [newCharacteristic, setNewCharacteristic] = useState('');
   const [newBenefit, setNewBenefit] = useState('');
+  const [characteristicValues, setCharacteristicValues] = useState({}); // Valeurs des champs de caractéristiques
+
+  // Templates de champs de caractéristiques par catégorie avec icônes
+  const characteristicFields = {
+    vehicules: [
+      { key: 'type', label: 'Type', placeholder: 'Ex: Berline, SUV, Utilitaire...', icon: FaCar },
+      { key: 'annee', label: 'Année', placeholder: 'Ex: 2020', icon: FaCalendarAlt },
+      { key: 'km', label: 'KM', placeholder: 'Ex: 50 000 km', icon: FaTachometerAlt },
+      { key: 'motorisation', label: 'Motorisation', placeholder: 'Ex: Essence, Diesel, Hybride...', icon: FaGasPump },
+      { key: 'etat', label: 'État', placeholder: 'Ex: Excellent, Bon, Correct...', icon: FaCheckCircle },
+      { key: 'options', label: 'Options', placeholder: 'Ex: Climatisation, GPS, Bluetooth...', icon: FaCogs },
+      { key: 'securite', label: 'Sécurité', placeholder: 'Ex: ABS, Airbags, Alarme...', icon: FaShieldAlt },
+      { key: 'entretien', label: 'Entretien', placeholder: 'Ex: Révision récente, Garantie...', icon: FaWrench },
+      { key: 'documents', label: 'Documents', placeholder: 'Ex: Carte grise, Contrôle technique...', icon: FaFileAlt }
+    ],
+    pieces: [
+      { key: 'type', label: 'Type', placeholder: 'Ex: Pneus, Batterie, Filtre...', icon: FaPuzzlePiece },
+      { key: 'compatibilite', label: 'Compatibilité', placeholder: 'Ex: Toyota Camry 2015-2020...', icon: FaLink },
+      { key: 'etat', label: 'État', placeholder: 'Ex: Neuf, Occasion, Reconditionné...', icon: FaCheckCircle },
+      { key: 'reference', label: 'Référence', placeholder: 'Ex: Référence fabricant...', icon: FaBarcode },
+      { key: 'garantie', label: 'Garantie', placeholder: 'Ex: 2 ans, 6 mois...', icon: FaCertificate },
+      { key: 'materiau', label: 'Matériau', placeholder: 'Ex: Acier, Plastique, Caoutchouc...', icon: FaCube },
+      { key: 'performance', label: 'Performance', placeholder: 'Ex: Haute performance, Standard...', icon: FaChartLine },
+      { key: 'installation', label: 'Installation', placeholder: 'Ex: Installation incluse, Facile...', icon: FaTools }
+    ],
+    service: [
+      { key: 'type', label: 'Type', placeholder: 'Ex: Réparation, Maintenance, Formation...', icon: FaTools },
+      { key: 'domaine', label: 'Domaine', placeholder: 'Ex: Mécanique, Électronique, Carrosserie...', icon: FaBullseye },
+      { key: 'expertise', label: 'Expertise', placeholder: 'Ex: 10 ans d\'expérience...', icon: FaUserTie },
+      { key: 'disponibilite', label: 'Disponibilité', placeholder: 'Ex: 7j/7, Sur RDV, Urgence 24h...', icon: FaClock },
+      { key: 'qualite', label: 'Qualité', placeholder: 'Ex: Certifié, Agréé constructeur...', icon: FaAward },
+      { key: 'garantie', label: 'Garantie', placeholder: 'Ex: Garantie 1 an sur travaux...', icon: FaHandshake },
+      { key: 'delais', label: 'Délais', placeholder: 'Ex: Intervention sous 24h...', icon: FaHourglass },
+      { key: 'documents', label: 'Documents', placeholder: 'Ex: Devis gratuit, Facture...', icon: FaFileAlt }
+    ]
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -50,8 +92,29 @@ export default function ProductOfferForm({ onSubmit, loading, error, initialData
         }
       }));
     } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
     }
+
+    // Si changement de catégorie, réinitialiser les champs de caractéristiques
+    if (name === 'category' && value !== formData.category) {
+      resetCharacteristicFields();
+    }
+  };
+
+  // Fonction pour gérer les changements des champs de caractéristiques
+  const handleCharacteristicChange = (key, value) => {
+    setCharacteristicValues(prev => ({
+      ...prev,
+      [key]: value
+    }));
+  };
+
+  // Réinitialiser les champs de caractéristiques quand la catégorie change
+  const resetCharacteristicFields = () => {
+    setCharacteristicValues({});
   };
 
   const handleImageChange = async (e) => {
@@ -101,10 +164,18 @@ export default function ProductOfferForm({ onSubmit, loading, error, initialData
     // Extraire les images en base64
     const imagesBase64 = imageFiles.map(img => img.base64);
     
+    // Convertir les champs de caractéristiques en liste
+    const characteristicsList = Object.entries(characteristicValues)
+      .filter(([key, value]) => value && value.trim())
+      .map(([key, value]) => {
+        const field = characteristicFields[formData.category]?.find(f => f.key === key);
+        return `${field?.label}: ${value.trim()}`;
+      });
+
     // Filtrer les lignes vides avant soumission
     const dataToSubmit = {
       ...formData,
-      requirementsList: formData.requirementsList.filter(line => line.trim()),
+      requirementsList: characteristicsList, // Uniquement les champs de caractéristiques
       benefits: formData.benefits.filter(line => line.trim()),
       images: imagesBase64, // Envoyer les images en base64
       mainImage: imagesBase64[0] || '' // Première image comme image principale
@@ -123,22 +194,6 @@ export default function ProductOfferForm({ onSubmit, loading, error, initialData
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const addCharacteristic = () => {
-    if (newCharacteristic.trim()) {
-      setFormData(prev => ({
-        ...prev,
-        requirementsList: [...prev.requirementsList, newCharacteristic.trim()]
-      }));
-      setNewCharacteristic('');
-    }
-  };
-
-  const removeCharacteristic = (index) => {
-    setFormData(prev => ({
-      ...prev,
-      requirementsList: prev.requirementsList.filter((_, i) => i !== index)
-    }));
-  };
 
   const addBenefit = () => {
     if (newBenefit.trim()) {
@@ -225,6 +280,7 @@ export default function ProductOfferForm({ onSubmit, loading, error, initialData
                   <option value="">Sélectionnez une catégorie</option>
                   <option value="vehicules">Véhicules & Flottes</option>
                   <option value="pieces">Pièces & Accessoires</option>
+                  <option value="service">Services</option>
                 </select>
               </div>
 
@@ -298,46 +354,39 @@ export default function ProductOfferForm({ onSubmit, loading, error, initialData
               <label className="block text-sm lg:text-lg text-gray-700 mb-2">
                 Caractéristiques du produit
               </label>
-              <p className="text-xs lg:text-sm text-gray-500 mb-2">
-                Ajoutez les caractéristiques techniques et spécifications de votre produit
-              </p>
-              <div className="flex gap-2 mb-3">
-                <input
-                  type="text"
-                  value={newCharacteristic}
-                  onChange={(e) => setNewCharacteristic(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCharacteristic())}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                  placeholder="Ex: Garantie 2 ans, Compatible tous véhicules"
-                />
-                <button
-                  type="button"
-                  onClick={addCharacteristic}
-                  className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-                  </svg>
-                </button>
-              </div>
-              {formData.requirementsList.length > 0 && (
-                <ul className="space-y-2">
-                  {formData.requirementsList.map((characteristic, index) => (
-                    <li key={index} className="flex items-center justify-between gap-2 p-3 bg-gray-50 border border-gray-200 rounded-lg">
-                      <span className="text-sm text-gray-700 flex-1">{characteristic}</span>
-                      <button
-                        type="button"
-                        onClick={() => removeCharacteristic(index)}
-                        className="p-1 text-red-500 hover:bg-red-50 rounded transition-colors"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
+              
+              {formData.category && characteristicFields[formData.category] && (
+                <div className="mb-4">
+                  <p className="text-xs lg:text-sm text-gray-500 mb-3">
+                    Remplissez les champs correspondant à votre {formData.category === 'vehicules' ? 'véhicule' : formData.category === 'pieces' ? 'pièce' : 'service'}
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {characteristicFields[formData.category].map((field) => {
+                      const IconComponent = field.icon;
+                      return (
+                        <div key={field.key}>
+                          <label className="block text-sm text-gray-700 mb-1">
+                            {field.label}
+                          </label>
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                              <IconComponent className="w-4 h-4 text-gray-400" />
+                            </div>
+                            <input
+                              type="text"
+                              value={characteristicValues[field.key] || ''}
+                              onChange={(e) => handleCharacteristicChange(field.key, e.target.value)}
+                              className="w-full pl-10 pr-3 py-2 border border-gray-300 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all text-sm"
+                              placeholder={field.placeholder}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               )}
+
             </div>
 
             {/* Avantages / Points forts */}
