@@ -3,6 +3,13 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { offersApi } from '../services/api';
 import SimpleHeader from '../component/common/SimpleHeader';
+import {
+  FaCar, FaCalendarAlt, FaTachometerAlt, FaGasPump, FaCheckCircle,
+  FaCogs, FaShieldAlt, FaWrench, FaFileAlt, FaPuzzlePiece,
+  FaLink, FaBarcode, FaCertificate, FaCube, FaChartLine,
+  FaTools, FaUserTie, FaBullseye, FaClock, FaAward,
+  FaHandshake, FaHourglass
+} from 'react-icons/fa';
 
 export default function EditProductOfferPage() {
   const { id } = useParams();
@@ -14,6 +21,7 @@ export default function EditProductOfferPage() {
   const [images, setImages] = useState([]);
   const [newCharacteristic, setNewCharacteristic] = useState('');
   const [newBenefit, setNewBenefit] = useState('');
+  const [characteristicValues, setCharacteristicValues] = useState({});
   
   const [formData, setFormData] = useState({
     title: '',
@@ -32,6 +40,41 @@ export default function EditProductOfferPage() {
     mainImage: '',
     additionalImages: []
   });
+
+  // Templates de champs de caractéristiques par catégorie avec icônes
+  const characteristicFields = {
+    vehicules: [
+      { key: 'type', label: 'Type', placeholder: 'Ex: Berline, SUV, Utilitaire...', icon: FaCar },
+      { key: 'annee', label: 'Année', placeholder: 'Ex: 2020', icon: FaCalendarAlt },
+      { key: 'km', label: 'KM', placeholder: 'Ex: 50 000 km', icon: FaTachometerAlt },
+      { key: 'motorisation', label: 'Motorisation', placeholder: 'Ex: Essence, Diesel, Hybride...', icon: FaGasPump },
+      { key: 'etat', label: 'État', placeholder: 'Ex: Excellent, Bon, Correct...', icon: FaCheckCircle },
+      { key: 'options', label: 'Options', placeholder: 'Ex: Climatisation, GPS, Bluetooth...', icon: FaCogs },
+      { key: 'securite', label: 'Sécurité', placeholder: 'Ex: ABS, Airbags, Alarme...', icon: FaShieldAlt },
+      { key: 'entretien', label: 'Entretien', placeholder: 'Ex: Révision récente, Garantie...', icon: FaWrench },
+      { key: 'documents', label: 'Documents', placeholder: 'Ex: Carte grise, Contrôle technique...', icon: FaFileAlt }
+    ],
+    pieces: [
+      { key: 'type', label: 'Type', placeholder: 'Ex: Pneus, Batterie, Filtre...', icon: FaPuzzlePiece },
+      { key: 'compatibilite', label: 'Compatibilité', placeholder: 'Ex: Toyota Camry 2015-2020...', icon: FaLink },
+      { key: 'etat', label: 'État', placeholder: 'Ex: Neuf, Occasion, Reconditionné...', icon: FaCheckCircle },
+      { key: 'reference', label: 'Référence', placeholder: 'Ex: Référence fabricant...', icon: FaBarcode },
+      { key: 'garantie', label: 'Garantie', placeholder: 'Ex: 2 ans, 6 mois...', icon: FaCertificate },
+      { key: 'materiau', label: 'Matériau', placeholder: 'Ex: Acier, Plastique, Caoutchouc...', icon: FaCube },
+      { key: 'performance', label: 'Performance', placeholder: 'Ex: Haute performance, Standard...', icon: FaChartLine },
+      { key: 'installation', label: 'Installation', placeholder: 'Ex: Installation incluse, Facile...', icon: FaTools }
+    ],
+    service: [
+      { key: 'type', label: 'Type', placeholder: 'Ex: Réparation, Maintenance, Formation...', icon: FaTools },
+      { key: 'domaine', label: 'Domaine', placeholder: 'Ex: Mécanique, Électronique, Carrosserie...', icon: FaBullseye },
+      { key: 'expertise', label: 'Expertise', placeholder: 'Ex: 10 ans d\'expérience...', icon: FaUserTie },
+      { key: 'disponibilite', label: 'Disponibilité', placeholder: 'Ex: 7j/7, Sur RDV, Urgence 24h...', icon: FaClock },
+      { key: 'qualite', label: 'Qualité', placeholder: 'Ex: Certifié, Agréé constructeur...', icon: FaAward },
+      { key: 'garantie', label: 'Garantie', placeholder: 'Ex: Garantie 1 an sur travaux...', icon: FaHandshake },
+      { key: 'delais', label: 'Délais', placeholder: 'Ex: Intervention sous 24h...', icon: FaHourglass },
+      { key: 'documents', label: 'Documents', placeholder: 'Ex: Devis gratuit, Facture...', icon: FaFileAlt }
+    ]
+  };
 
   useEffect(() => {
     if (!user) {
@@ -103,6 +146,26 @@ export default function EditProductOfferPage() {
       });
       
       setImages(allImages);
+
+      // Pré-remplir les champs de caractéristiques dynamiques si possible
+      if (offer.category && characteristicFields[offer.category] && offer.requirementsList) {
+        const dynamicValues = {};
+        offer.requirementsList.forEach(item => {
+          // Essayer de parser "Label: Value"
+          const colonIndex = item.indexOf(':');
+          if (colonIndex > 0) {
+            const label = item.substring(0, colonIndex).trim();
+            const value = item.substring(colonIndex + 1).trim();
+            
+            // Trouver le champ correspondant
+            const field = characteristicFields[offer.category].find(f => f.label === label);
+            if (field) {
+              dynamicValues[field.key] = value;
+            }
+          }
+        });
+        setCharacteristicValues(dynamicValues);
+      }
     } catch (error) {
       console.error('Erreur lors du chargement de l\'offre:', error);
       setError('Impossible de charger l\'offre');
@@ -128,6 +191,24 @@ export default function EditProductOfferPage() {
         [name]: value
       }));
     }
+
+    // Si changement de catégorie, réinitialiser les champs de caractéristiques
+    if (name === 'category' && value !== formData.category) {
+      resetCharacteristicFields();
+    }
+  };
+
+  // Fonction pour gérer les changements des champs de caractéristiques
+  const handleCharacteristicChange = (key, value) => {
+    setCharacteristicValues(prev => ({
+      ...prev,
+      [key]: value
+    }));
+  };
+
+  // Réinitialiser les champs de caractéristiques quand la catégorie change
+  const resetCharacteristicFields = () => {
+    setCharacteristicValues({});
   };
 
   const addCharacteristic = () => {
@@ -231,6 +312,14 @@ export default function EditProductOfferPage() {
       const convertedPrice = formData.price ? Number(formData.price) : 0;
       console.log('💰 Prix après conversion:', convertedPrice, 'Type:', typeof convertedPrice);
       
+      // Convertir les caractéristiques dynamiques en format "Label: Value"
+      const characteristicsList = Object.entries(characteristicValues)
+        .filter(([key, value]) => value && value.trim())
+        .map(([key, value]) => {
+          const field = characteristicFields[formData.category]?.find(f => f.key === key);
+          return `${field?.label}: ${value.trim()}`;
+        });
+
       // Préparer les données avec tous les champs nécessaires
       const dataToSubmit = {
         title: formData.title,
@@ -245,7 +334,7 @@ export default function EditProductOfferPage() {
           city: formData.location?.city || '',
           address: formData.location?.address || ''
         },
-        requirementsList: formData.requirementsList.filter(item => item.trim() !== ''),
+        requirementsList: characteristicsList.length > 0 ? characteristicsList : formData.requirementsList.filter(item => item.trim() !== ''),
         benefits: formData.benefits.filter(item => item.trim() !== ''),
         mainImage: formData.mainImage || '',
         additionalImages: formData.additionalImages || [],
@@ -298,7 +387,7 @@ export default function EditProductOfferPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <SimpleHeader />
+      <SimpleHeader hideSubNav={true} />
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
@@ -440,10 +529,9 @@ export default function EditProductOfferPage() {
               className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-orange-500 transition-colors"
             >
               <option value="">Sélectionnez une catégorie</option>
-              <option value="vehicules">Véhicules Professionnels</option>
+              <option value="vehicules">Véhicules & Flottes</option>
               <option value="pieces">Pièces & Accessoires</option>
-              <option value="services">Entretien & Réparation</option>
-              <option value="equipements">Équipements Pro</option>
+              <option value="service">Services</option>
             </select>
           </div>
 
@@ -533,52 +621,90 @@ export default function EditProductOfferPage() {
             />
           </div>
 
-          {/* Caractéristiques */}
-          <div className="mb-6">
-            <label className="block text-sm lg:text-lg text-gray-700 mb-2">
-              Caractéristiques du produit
-            </label>
-            <p className="text-xs lg:text-sm text-gray-500 mb-2">
-              Ajoutez les caractéristiques techniques et spécifications de votre produit
-            </p>
-            <div className="flex gap-2 mb-3">
-              <input
-                type="text"
-                value={newCharacteristic}
-                onChange={(e) => setNewCharacteristic(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCharacteristic())}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                placeholder="Ex: Garantie 2 ans, Compatible tous véhicules"
-              />
-              <button
-                type="button"
-                onClick={addCharacteristic}
-                className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-                </svg>
-              </button>
+          {/* Caractéristiques dynamiques */}
+          {formData.category && characteristicFields[formData.category] && (
+            <div className="mb-6">
+              <label className="block text-sm lg:text-lg text-gray-700 mb-2">
+                Caractéristiques
+              </label>
+              <p className="text-xs lg:text-sm text-gray-500 mb-3">
+                Remplissez les champs correspondant à votre {formData.category === 'vehicules' ? 'véhicule' : formData.category === 'pieces' ? 'pièce' : 'service'}
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {characteristicFields[formData.category].map((field) => {
+                  const IconComponent = field.icon;
+                  return (
+                    <div key={field.key}>
+                      <label className="block text-sm text-gray-700 mb-1">
+                        {field.label}
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <IconComponent className="w-4 h-4 text-gray-400" />
+                        </div>
+                        <input
+                          type="text"
+                          value={characteristicValues[field.key] || ''}
+                          onChange={(e) => handleCharacteristicChange(field.key, e.target.value)}
+                          className="w-full pl-10 pr-3 py-2 border border-gray-300 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all text-sm"
+                          placeholder={field.placeholder}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-            {formData.requirementsList.length > 0 && (
-              <ul className="space-y-2">
-                {formData.requirementsList.map((characteristic, index) => (
-                  <li key={index} className="flex items-center justify-between gap-2 p-3 bg-gray-50 border border-gray-200 rounded-lg">
-                    <span className="text-sm text-gray-700 flex-1">{characteristic}</span>
-                    <button
-                      type="button"
-                      onClick={() => removeCharacteristic(index)}
-                      className="p-1 text-red-500 hover:bg-red-50 rounded transition-colors"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+          )}
+
+          {/* Caractéristiques manuelles (fallback pour les anciennes offres) */}
+          {(!formData.category || !characteristicFields[formData.category]) && (
+            <div className="mb-6">
+              <label className="block text-sm lg:text-lg text-gray-700 mb-2">
+                Caractéristiques du produit
+              </label>
+              <p className="text-xs lg:text-sm text-gray-500 mb-2">
+                Ajoutez les caractéristiques techniques et spécifications de votre produit
+              </p>
+              <div className="flex gap-2 mb-3">
+                <input
+                  type="text"
+                  value={newCharacteristic}
+                  onChange={(e) => setNewCharacteristic(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCharacteristic())}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                  placeholder="Ex: Garantie 2 ans, Compatible tous véhicules"
+                />
+                <button
+                  type="button"
+                  onClick={addCharacteristic}
+                  className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                  </svg>
+                </button>
+              </div>
+              {formData.requirementsList.length > 0 && (
+                <ul className="space-y-2">
+                  {formData.requirementsList.map((characteristic, index) => (
+                    <li key={index} className="flex items-center justify-between gap-2 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                      <span className="text-sm text-gray-700 flex-1">{characteristic}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeCharacteristic(index)}
+                        className="p-1 text-red-500 hover:bg-red-50 rounded transition-colors"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
 
           {/* Avantages */}
           <div className="mb-6">

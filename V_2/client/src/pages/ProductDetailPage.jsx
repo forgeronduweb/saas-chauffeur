@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { offersApi, messagesApi } from '../services/api';
+import { offersApi, messagesApi, reviewsApi } from '../services/api';
 import SimpleHeader from '../component/common/SimpleHeader';
 import ConfirmDialog from '../components/common/ConfirmDialog';
 import ImageModal from '../component/common/ImageModal';
@@ -10,7 +10,8 @@ import {
   FaChevronLeft, FaChevronRight, FaCar, FaCalendarAlt, FaTachometerAlt, 
   FaGasPump, FaCheckCircle, FaCogs, FaShieldAlt, FaWrench, FaFileAlt, 
   FaPuzzlePiece, FaLink, FaBarcode, FaCertificate, FaCube, FaChartLine,
-  FaTools, FaUserTie, FaBullseye, FaClock, FaAward, FaHandshake, FaHourglass
+  FaTools, FaUserTie, FaBullseye, FaClock, FaAward, FaHandshake, FaHourglass,
+  FaStar, FaRegStar, FaUser
 } from 'react-icons/fa';
 
 export default function ProductDetailPage() {
@@ -28,6 +29,14 @@ export default function ProductDetailPage() {
   const similarProductsRef = useRef(null);
   const [similarProducts, setSimilarProducts] = useState([]);
   const [loadingSimilar, setLoadingSimilar] = useState(false);
+  
+  // États pour les commentaires et notation
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState('');
+  const [userRating, setUserRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [submittingComment, setSubmittingComment] = useState(false);
+  const [loadingComments, setLoadingComments] = useState(false);
 
   // Fonction pour obtenir l'icône appropriée selon la caractéristique
   const getCharacteristicIcon = (characteristic) => {
@@ -96,6 +105,99 @@ export default function ProductDetailPage() {
     }
   };
 
+  // Fonctions pour les commentaires et notation
+  const handleSubmitComment = async () => {
+    if (!newComment.trim() || !userRating || submittingComment) return;
+    
+    setSubmittingComment(true);
+    try {
+      const reviewData = {
+        productId: id,
+        rating: userRating,
+        comment: newComment.trim()
+      };
+
+      const response = await reviewsApi.create(reviewData);
+      
+      if (response.data.success) {
+        // Recharger les commentaires pour avoir les données à jour
+        await loadComments();
+        setNewComment('');
+        setUserRating(0);
+        alert('Avis ajouté avec succès !');
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout de l\'avis:', error);
+      
+      // Gestion des erreurs spécifiques
+      if (error.response?.status === 400 && error.response?.data?.message?.includes('déjà laissé')) {
+        alert('Vous avez déjà laissé un avis pour ce produit');
+      } else if (error.response?.data?.message) {
+        alert(error.response.data.message);
+      } else {
+        alert('Erreur lors de l\'ajout de l\'avis');
+      }
+    } finally {
+      setSubmittingComment(false);
+    }
+  };
+
+  const renderStars = (rating, interactive = false, onStarClick = null, onStarHover = null) => {
+    return Array.from({ length: 5 }, (_, index) => {
+      const starValue = index + 1;
+      const isFilled = interactive ? 
+        (hoverRating >= starValue || (!hoverRating && rating >= starValue)) :
+        rating >= starValue;
+      
+      return (
+        <button
+          key={index}
+          type="button"
+          disabled={!interactive}
+          onClick={() => interactive && onStarClick && onStarClick(starValue)}
+          onMouseEnter={() => interactive && onStarHover && onStarHover(starValue)}
+          onMouseLeave={() => interactive && onStarHover && onStarHover(0)}
+          className={`${interactive ? 'cursor-pointer hover:scale-110' : 'cursor-default'} transition-all`}
+        >
+          {isFilled ? (
+            <FaStar className="w-5 h-5 text-yellow-400" />
+          ) : (
+            <FaRegStar className="w-5 h-5 text-gray-300" />
+          )}
+        </button>
+      );
+    });
+  };
+
+  // Fonction pour charger les commentaires
+  const loadComments = async () => {
+    if (!id) return;
+    
+    setLoadingComments(true);
+    try {
+      const response = await reviewsApi.getByProduct(id);
+      
+      if (response.data.success) {
+        // Transformer les données pour correspondre au format attendu par l'interface
+        const transformedComments = response.data.data.reviews.map(review => ({
+          id: review._id,
+          user: review.userId?.name || 'Utilisateur',
+          rating: review.rating,
+          comment: review.comment,
+          date: new Date(review.createdAt).toLocaleDateString('fr-FR')
+        }));
+        
+        setComments(transformedComments);
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement des avis:', error);
+      // Ne pas afficher d'erreur à l'utilisateur pour le chargement des commentaires
+      setComments([]);
+    } finally {
+      setLoadingComments(false);
+    }
+  };
+
   // Charger le produit et les produits similaires
   useEffect(() => {
     const fetchProduct = async () => {
@@ -115,6 +217,7 @@ export default function ProductDetailPage() {
     };
 
     fetchProduct();
+    loadComments();
   }, [id]);
 
   // Fonction pour charger les produits similaires
@@ -154,7 +257,7 @@ export default function ProductDetailPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Produit non trouvé</h2>
+          <h2 className="text-xl text-gray-900 mb-4">Produit non trouvé</h2>
           <Link to="/marketing-vente" className="text-orange-500 hover:text-orange-600">
             Retour à la marketplace
           </Link>
@@ -272,7 +375,7 @@ export default function ProductDetailPage() {
                 )}
               </div>
 
-              <p className="text-2xl font-medium text-orange-500 mb-4">
+              <p className="text-2xl text-orange-500 mb-4">
                 {product.price ? `${product.price.toLocaleString()} FCFA` : 'Prix sur demande'}
               </p>
 
@@ -408,8 +511,8 @@ export default function ProductDetailPage() {
           <div className="mt-12 mb-12">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
               {product.requirementsList?.length > 0 && (
-                <div className="p-5 rounded-lg border" style={{ backgroundColor: '#f97316', borderColor: '#ea580c' }}>
-                  <h3 className="section-title text-white mb-4">Caractéristiques</h3>
+                <div className="bg-white p-5 rounded-lg border-2 border-orange-500">
+                  <h3 className="section-title text-gray-900 mb-4">Caractéristiques</h3>
                   <ul className="space-y-2">
                     {product.requirementsList.map((item, index) => {
                       const IconComponent = getCharacteristicIcon(item);
@@ -421,11 +524,11 @@ export default function ProductDetailPage() {
                         <li key={index} className="flex items-start">
                           <div className="flex items-start w-full">
                             <div className="flex items-center w-32 flex-shrink-0">
-                              <IconComponent className="h-5 w-5 text-white mr-2 flex-shrink-0" />
-                              <span className="text-white">{title.trim()}</span>
+                              <IconComponent className="h-5 w-5 text-orange-500 mr-2 flex-shrink-0" />
+                              <span className="text-gray-800">{title.trim()}</span>
                             </div>
                             {value && (
-                              <div className="text-white font-normal ml-4">
+                              <div className="text-gray-700 font-normal ml-4">
                                 : {value}
                               </div>
                             )}
@@ -455,6 +558,99 @@ export default function ProductDetailPage() {
             </div>
           </div>
         )}
+
+        {/* Section Commentaires et Notation */}
+        <div className="mt-12 mb-12">
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <h2 className="section-title text-gray-900 mb-6">Avis et Commentaires</h2>
+            
+            {/* Formulaire d'ajout de commentaire */}
+            {user && (
+              <div className="mb-8 p-4 bg-gray-50 rounded-lg">
+                <h3 className="text-lg text-gray-900 mb-4">Laisser un avis</h3>
+                
+                {/* Notation par étoiles */}
+                <div className="mb-4">
+                  <label className="block text-sm text-gray-700 mb-2">
+                    Votre note
+                  </label>
+                  <div className="flex items-center gap-1">
+                    {renderStars(
+                      userRating, 
+                      true, 
+                      setUserRating, 
+                      setHoverRating
+                    )}
+                    <span className="ml-2 text-sm text-gray-600">
+                      {userRating > 0 ? `${userRating}/5` : 'Cliquez pour noter'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Zone de commentaire */}
+                <div className="mb-4">
+                  <label className="block text-sm text-gray-700 mb-2">
+                    Votre commentaire
+                  </label>
+                  <textarea
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    rows={4}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
+                    placeholder="Partagez votre expérience avec ce produit..."
+                  />
+                </div>
+
+                {/* Bouton de soumission */}
+                <button
+                  onClick={handleSubmitComment}
+                  disabled={!newComment.trim() || !userRating || submittingComment}
+                  className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                >
+                  {submittingComment ? 'Publication...' : 'Publier l\'avis'}
+                </button>
+              </div>
+            )}
+
+            {/* Liste des commentaires */}
+            <div className="space-y-4">
+              {loadingComments ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto mb-3"></div>
+                  <p className="text-gray-500">Chargement des avis...</p>
+                </div>
+              ) : comments.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  <FaUser className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                  <p>Aucun avis pour le moment</p>
+                  <p className="text-sm">Soyez le premier à laisser un commentaire !</p>
+                </div>
+              ) : (
+                comments.map((comment) => (
+                  <div key={comment.id} className="border-b border-gray-200 pb-4 last:border-b-0">
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
+                          <FaUser className="w-4 h-4 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-gray-900">{comment.user}</p>
+                          <div className="flex items-center gap-2">
+                            <div className="flex">
+                              {renderStars(comment.rating)}
+                            </div>
+                            <span className="text-sm text-gray-500">{comment.date}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-gray-700 ml-11">{comment.comment}</p>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
 
         {similarProducts.length > 0 && (
           <div className="mt-12">

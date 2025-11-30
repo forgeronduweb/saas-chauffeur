@@ -11,7 +11,7 @@ const FloatingMessagingButton = ({ isOpen, onClick, unreadCount = 0 }) => {
       {isOpen ? (
         <>
           <X className="w-5 h-5 text-gray-700" />
-          <span className="font-semibold text-base">Messagerie</span>
+          <span className="text-base">Messagerie</span>
         </>
       ) : (
         <>
@@ -23,7 +23,7 @@ const FloatingMessagingButton = ({ isOpen, onClick, unreadCount = 0 }) => {
               </span>
             )}
           </div>
-          <span className="font-semibold text-base">Messagerie</span>
+          <span className="text-base">Messagerie</span>
         </>
       )}
     </button>

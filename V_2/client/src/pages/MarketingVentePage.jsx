@@ -4,10 +4,12 @@ import SimpleHeader from '../component/common/SimpleHeader';
 import Footer from '../component/common/Footer';
 import ProductCard from '../component/common/ProductCard';
 import CustomDropdown from '../component/common/CustomDropdown';
-import api from '../services/api';
+import { offersApi, promotionsApi } from '../services/api';
+import { Zap, TrendingUp, Star } from 'lucide-react';
 
 export default function MarketingVentePage() {
   const [products, setProducts] = useState([]);
+  const [boostedOffers, setBoostedOffers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -60,28 +62,35 @@ export default function MarketingVentePage() {
   ];
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-        // Récupérer les offres de type "Autre" (produits)
-        const response = await api.get('/offers', {
-          params: {
-            type: 'Autre',
-            status: 'active'
-          }
+        
+        // Récupérer les offres boostées en priorité
+        const boostedResponse = await promotionsApi.getBoostedOffers({
+          limit: 6 // Limiter à 6 offres boostées pour la section premium
         });
-        setProducts(response.data.offers || response.data || []);
+        
+        // Récupérer toutes les offres normales
+        const productsResponse = await offersApi.list({
+          type: 'Autre',
+          status: 'active'
+        });
+        
+        setBoostedOffers(boostedResponse.data.success ? boostedResponse.data.data.offers : []);
+        setProducts(productsResponse.data.offers || productsResponse.data || []);
         setError(null);
       } catch (err) {
-        console.error('Erreur lors du chargement des produits:', err);
+        console.error('Erreur lors du chargement des données:', err);
         setError('Impossible de charger les produits');
         setProducts([]);
+        setBoostedOffers([]);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProducts();
+    fetchData();
   }, []);
 
   // Calculer le nombre de produits par catégorie
@@ -90,6 +99,37 @@ export default function MarketingVentePage() {
       cat.count = products.filter(p => p.category?.toLowerCase() === cat.value).length;
     });
   }, [products]);
+
+  // Fonctions utilitaires pour les boosts
+  const getBoostIcon = (type) => {
+    switch (type) {
+      case 'featured': return <TrendingUp className="w-4 h-4" />;
+      case 'premium': return <Star className="w-4 h-4" />;
+      case 'urgent': return <Zap className="w-4 h-4" />;
+      default: return <TrendingUp className="w-4 h-4" />;
+    }
+  };
+
+  const getBoostColor = (type) => {
+    switch (type) {
+      case 'featured': return 'blue';
+      case 'premium': return 'yellow';
+      case 'urgent': return 'red';
+      default: return 'blue';
+    }
+  };
+
+  const getBoostBadge = (boost) => {
+    if (!boost) return null;
+    
+    const colorClass = getBoostColor(boost.type);
+    return (
+      <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs text-white bg-${colorClass}-500 mb-2`}>
+        {getBoostIcon(boost.type)}
+        <span>{boost.config?.name || 'Boost'}</span>
+      </div>
+    );
+  };
 
   // Filtrage combiné (recherche + filtres)
   const filteredProducts = products.filter(product => {
@@ -249,7 +289,37 @@ export default function MarketingVentePage() {
 
           {/* Contenu principal */}
           <div className="flex-1">
-            {/* Liste des produits */}
+            {/* Section des offres boostées */}
+            {boostedOffers.length > 0 && (
+              <div className="mb-8">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl text-gray-900 flex items-center gap-2">
+                    <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                      <Zap className="w-4 h-4 text-white" />
+                    </div>
+                    Offres mises en avant
+                  </h2>
+                  <span className="text-sm text-gray-500">Sponsorisé</span>
+                </div>
+                
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border-2 border-dashed border-purple-200">
+                  {boostedOffers.map(product => (
+                    <div key={product._id} className="relative">
+                      {getBoostBadge(product.boost)}
+                      <ProductCard product={product} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Liste des produits normaux */}
+            <div className="mb-4">
+              <h2 className="text-xl text-gray-900 mb-4">
+                Toutes les offres {filteredProducts.length > 0 && `(${filteredProducts.length})`}
+              </h2>
+            </div>
+            
         {loading ? (
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
             {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (

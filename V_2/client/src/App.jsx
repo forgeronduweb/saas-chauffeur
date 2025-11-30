@@ -38,6 +38,8 @@ import MyApplications from './pages/driver/MyApplications.jsx'
 import MessagesPage from './pages/MessagesPage.jsx'
 import TestNegotiation from './pages/TestNegotiation.jsx'
 import TestDirectOffers from './pages/TestDirectOffers.jsx'
+import Statistics from './pages/dashboard/Statistics.jsx'
+import Earnings from './pages/dashboard/Earnings.jsx'
 
 function App() {
   return (
@@ -248,6 +250,25 @@ function App() {
             <Route 
               path="/test-direct-offers" 
               element={<TestDirectOffers />} 
+            />
+            
+            {/* Pages dashboard */}
+            <Route 
+              path="/dashboard/statistics" 
+              element={
+                <PrivateRoute>
+                  <Statistics />
+                </PrivateRoute>
+              } 
+            />
+            
+            <Route 
+              path="/dashboard/earnings" 
+              element={
+                <PrivateRoute>
+                  <Earnings />
+                </PrivateRoute>
+              } 
             />
           </Routes>
         </div>

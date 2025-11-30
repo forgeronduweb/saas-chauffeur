@@ -355,6 +355,35 @@ export const employerService = {
   uploadDocuments: (data) => api.post('/employer/documents', data),
 }
 
+// Service pour les avis et commentaires
+export const reviewsApi = {
+  // Créer un nouvel avis
+  create: (reviewData) => api.post('/reviews', reviewData),
+  // Récupérer les avis d'un produit
+  getByProduct: (productId, params = {}) => api.get(`/reviews/product/${productId}`, { params }),
+  // Mettre à jour un avis
+  update: (reviewId, reviewData) => api.put(`/reviews/${reviewId}`, reviewData),
+  // Supprimer un avis
+  delete: (reviewId) => api.delete(`/reviews/${reviewId}`)
+}
+
+// Service pour les promotions/boosts
+export const promotionsApi = {
+  // Obtenir les tarifs de boost
+  getPricing: () => api.get('/promotions/pricing'),
+  // Créer un nouveau boost
+  create: (boostData) => api.post('/promotions', boostData),
+  createBoost: (boostData) => api.post('/promotions', boostData), // Alias pour compatibilité
+  // Obtenir les boosts de l'utilisateur
+  getMyBoosts: (params = {}) => api.get('/promotions/my', { params }),
+  // Obtenir les offres boostées (public)
+  getBoostedOffers: (params = {}) => api.get('/promotions/boosted', { params }),
+  // Annuler un boost
+  cancel: (promotionId) => api.delete(`/promotions/${promotionId}`),
+  // Mettre à jour les statistiques
+  updateStats: (promotionId, type) => api.put(`/promotions/${promotionId}/stats`, { type })
+}
+
 // Service d'authentification (alias pour compatibilité)
 export const authService = {
   getProfile: () => api.get('/auth/me'),

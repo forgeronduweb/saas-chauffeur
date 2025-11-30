@@ -27,8 +27,10 @@ const useUnreadMessages = () => {
       setError(null);
       
       console.log('🔄 Chargement des conversations...');
-      const response = await chatService.getConversations();
-      const conversationsList = response.data || [];
+      // TODO: Réactiver quand l'API chat sera implémentée
+      // const response = await chatService.getConversations();
+      // const conversationsList = response.data || [];
+      const conversationsList = []; // Temporaire
       
       console.log('📨 Conversations reçues:', conversationsList);
       setConversations(conversationsList);

@@ -65,7 +65,7 @@ const ConversationsModal = ({ isOpen, onClose, onSelectConversation }) => {
         <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white rounded-t-2xl">
           <div className="flex items-center space-x-2">
             <MessageCircle className="w-5 h-5 text-gray-700" />
-            <h3 className="text-lg font-semibold text-gray-900">Messagerie</h3>
+            <h3 className="text-lg text-gray-900">Messagerie</h3>
           </div>
           <button
             onClick={onClose}
