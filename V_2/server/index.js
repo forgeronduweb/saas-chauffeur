@@ -14,6 +14,8 @@ const messageRoutes = require('./routes/messages');
 const employerRoutes = require('./routes/employer');
 const adminRoutes = require('./routes/admin');
 const platformContentRoutes = require('./routes/platformContent');
+const reviewRoutes = require('./routes/reviews');
+const promotionRoutes = require('./routes/promotions');
 
 const { connectToDatabase } = require('./db/connect');
 const { getCacheStats, invalidateCache } = require('./middleware/cache');
@@ -142,6 +144,8 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/employer', employerRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/platform-content', platformContentRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/promotions', promotionRoutes);
 
 // Not found handler
 app.use((req, res) => {
