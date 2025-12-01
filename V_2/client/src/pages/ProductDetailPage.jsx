@@ -181,7 +181,9 @@ export default function ProductDetailPage() {
         // Transformer les données pour correspondre au format attendu par l'interface
         const transformedComments = response.data.data.reviews.map(review => ({
           id: review._id,
-          user: review.userId?.name || 'Utilisateur',
+          user: review.userId ? 
+            `${review.userId.firstName || ''} ${review.userId.lastName || ''}`.trim() || 'Utilisateur' : 
+            'Utilisateur',
           rating: review.rating,
           comment: review.comment,
           date: new Date(review.createdAt).toLocaleDateString('fr-FR')

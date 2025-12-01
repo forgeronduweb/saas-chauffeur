@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import SimpleHeader from '../../component/common/SimpleHeader';
 import ApplicationCard from '../../components/applications/ApplicationCard';
+import CustomDropdown from '../../component/common/CustomDropdown';
 import { applicationsApi, messagesApi } from '../../services/api';
 
 export default function MyApplications() {
@@ -107,22 +108,24 @@ export default function MyApplications() {
               Filtres
             </button>
             
-            {/* Dropdown personnalisé - Desktop uniquement */}
-            <div className="hidden sm:block">
-              <select
+            {/* Dropdown filtres - Desktop uniquement */}
+            <div className="hidden lg:block">
+              <CustomDropdown
                 value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-              >
-                <option value="all">Toutes ({statusCounts.all})</option>
-                <option value="direct_offer">Offres directes ({statusCounts.direct_offer})</option>
-                <option value="pending">En attente ({statusCounts.pending})</option>
-                <option value="in_negotiation">En négociation ({statusCounts.in_negotiation})</option>
-                <option value="accepted">Acceptées ({statusCounts.accepted})</option>
-                <option value="rejected">Refusées ({statusCounts.rejected})</option>
-                <option value="withdrawn">Retirées ({statusCounts.withdrawn})</option>
-                <option value="employer_rejected">Rejetées ({statusCounts.employer_rejected})</option>
-              </select>
+                onChange={setFilter}
+                options={[
+                  { value: 'all', label: `Toutes (${statusCounts.all})` },
+                  { value: 'direct_offer', label: `Offres directes (${statusCounts.direct_offer})` },
+                  { value: 'pending', label: `En attente (${statusCounts.pending})` },
+                  { value: 'in_negotiation', label: `En négociation (${statusCounts.in_negotiation})` },
+                  { value: 'accepted', label: `Acceptées (${statusCounts.accepted})` },
+                  { value: 'rejected', label: `Refusées (${statusCounts.rejected})` },
+                  { value: 'withdrawn', label: `Retirées (${statusCounts.withdrawn})` },
+                  { value: 'employer_rejected', label: `Rejetées (${statusCounts.employer_rejected})` }
+                ]}
+                placeholder="Filtrer par statut"
+                className="w-64"
+              />
             </div>
           </div>
           <p className="text-gray-600 text-sm">Suivez l'état de vos candidatures aux offres d'emploi</p>
@@ -173,7 +176,7 @@ export default function MyApplications() {
           </div>
         )}
 
-        {/* Panneau filtres mobile */}
+        {/* Modal Filtres Mobile */}
         {showMobileFilters && (
           <div className="fixed inset-0 z-50 sm:hidden">
             {/* Overlay */}
@@ -203,20 +206,22 @@ export default function MyApplications() {
                   <label className="block text-xs font-medium text-gray-700 mb-1.5">
                     Statut
                   </label>
-                  <select 
+                  <CustomDropdown
                     value={filter}
-                    onChange={(e) => setFilter(e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  >
-                    <option value="all">Toutes ({statusCounts.all})</option>
-                    <option value="direct_offer">Offres directes ({statusCounts.direct_offer})</option>
-                    <option value="pending">En attente ({statusCounts.pending})</option>
-                    <option value="in_negotiation">En négociation ({statusCounts.in_negotiation})</option>
-                    <option value="accepted">Acceptées ({statusCounts.accepted})</option>
-                    <option value="rejected">Refusées ({statusCounts.rejected})</option>
-                    <option value="withdrawn">Retirées ({statusCounts.withdrawn})</option>
-                    <option value="employer_rejected">Rejetées ({statusCounts.employer_rejected})</option>
-                  </select>
+                    onChange={setFilter}
+                    options={[
+                      { value: 'all', label: `Toutes (${statusCounts.all})` },
+                      { value: 'direct_offer', label: `Offres directes (${statusCounts.direct_offer})` },
+                      { value: 'pending', label: `En attente (${statusCounts.pending})` },
+                      { value: 'in_negotiation', label: `En négociation (${statusCounts.in_negotiation})` },
+                      { value: 'accepted', label: `Acceptées (${statusCounts.accepted})` },
+                      { value: 'rejected', label: `Refusées (${statusCounts.rejected})` },
+                      { value: 'withdrawn', label: `Retirées (${statusCounts.withdrawn})` },
+                      { value: 'employer_rejected', label: `Rejetées (${statusCounts.employer_rejected})` }
+                    ]}
+                    placeholder="Filtrer par statut"
+                    className="w-full"
+                  />
                 </div>
 
                 {/* Boutons */}

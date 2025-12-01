@@ -5,6 +5,7 @@ import { offersApi, promotionsApi } from '../../services/api';
 import SimpleHeader from '../../component/common/SimpleHeader';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
 import BoostModal from '../../components/modals/BoostModal';
+import CustomDropdown from '../../component/common/CustomDropdown';
 import useUnreadMessages from '../../hooks/useUnreadMessages';
 import { Eye, MessageCircle, Copy, Power, Edit3, Trash2, Plus, TrendingUp, Zap, Star, Clock, BarChart3, Filter, AlertCircle, TrendingDown, DollarSign, PieChart, Activity, Target, Wallet, Calendar } from 'lucide-react';
 
@@ -29,7 +30,8 @@ export default function MyProducts() {
   const [boostImage, setBoostImage] = useState(null);
   const [boostImagePreview, setBoostImagePreview] = useState(null);
   const [boostText, setBoostText] = useState('');
-  const [boostStep, setBoostStep] = useState(1); // 1: Image/Texte, 2: Plans
+  const [boostStep, setBoostStep] = useState(1); // 1: Image/Texte, 2: Plans, 3: Paiement
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   const [userBoosts, setUserBoosts] = useState([]);
   const [loadingBoosts, setLoadingBoosts] = useState(false);
   const [creatingBoost, setCreatingBoost] = useState(false);
@@ -147,18 +149,22 @@ export default function MyProducts() {
   const handleNextStep = () => {
     if (boostStep === 1) {
       setBoostStep(2);
+    } else if (boostStep === 2 && selectedBoostDuration) {
+      setBoostStep(3);
     }
   };
 
   const handlePreviousStep = () => {
     if (boostStep === 2) {
       setBoostStep(1);
+    } else if (boostStep === 3) {
+      setBoostStep(2);
     }
   };
 
   const handleCreateBoost = async () => {
-    if (!selectedProduct || !selectedBoostDuration) {
-      alert('Veuillez sélectionner une durée de boost');
+    if (!selectedProduct || !selectedBoostDuration || !selectedPaymentMethod) {
+      alert('Veuillez sélectionner une méthode de paiement');
       return;
     }
 
@@ -170,6 +176,7 @@ export default function MyProducts() {
       formData.append('duration', selectedBoostDuration.days);
       formData.append('price', selectedBoostDuration.price);
       formData.append('boostText', boostText);
+      formData.append('paymentMethod', selectedPaymentMethod);
       
       if (boostImage) {
         formData.append('boostImage', boostImage);
@@ -178,10 +185,11 @@ export default function MyProducts() {
       const response = await promotionsApi.createBoost(formData);
       
       if (response.data.success) {
-        alert(`Boost créé avec succès pour ${selectedBoostDuration.days} jour${selectedBoostDuration.days > 1 ? 's' : ''} !`);
+        alert(`Paiement confirmé ! Boost créé avec succès pour ${selectedBoostDuration.days} jour${selectedBoostDuration.days > 1 ? 's' : ''} !`);
         setShowBoostMenu(false);
         setSelectedProduct(null);
         setSelectedBoostDuration(null);
+        setSelectedPaymentMethod(null);
         setBoostImage(null);
         setBoostImagePreview(null);
         setBoostText('');
@@ -189,11 +197,11 @@ export default function MyProducts() {
         fetchUserBoosts(); // Recharger les boosts
         fetchProducts(); // Recharger les produits pour mettre à jour l'affichage
       } else {
-        alert('Erreur lors de la création du boost');
+        alert('Erreur lors du traitement du paiement');
       }
     } catch (error) {
-      console.error('Erreur lors de la création du boost:', error);
-      alert('Erreur lors de la création du boost');
+      console.error('Erreur lors du traitement du paiement:', error);
+      alert('Erreur lors du traitement du paiement');
     } finally {
       setCreatingBoost(false);
     }
@@ -327,25 +335,31 @@ export default function MyProducts() {
             {/* Dropdown filtres/période - Desktop uniquement */}
             <div className="hidden lg:block">
               {currentView === 'list' ? (
-                <select 
+                <CustomDropdown
                   value={filter}
-                  onChange={(e) => setFilter(e.target.value)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                >
-                  <option value="all">Toutes ({products.length})</option>
-                  <option value="active">Actives ({products.filter(p => p.status === 'active').length})</option>
-                  <option value="inactive">Inactives ({products.filter(p => p.status === 'paused').length})</option>
-                </select>
+                  onChange={setFilter}
+                  options={[
+                    { value: 'all', label: `Tous les articles (${products.length})` },
+                    { value: 'active', label: `Articles actifs (${products.filter(p => p.status === 'active').length})` },
+                    { value: 'premium', label: `Articles premium (${products.filter(p => p.isPremium || p.isPromoted).length})` },
+                    { value: 'simple', label: `Articles simples (${products.filter(p => !p.isPremium && !p.isPromoted).length})` },
+                    { value: 'inactive', label: `Inactives (${products.filter(p => p.status === 'paused').length})` }
+                  ]}
+                  placeholder="Filtrer par statut"
+                  className="w-64"
+                />
               ) : (
-                <select
+                <CustomDropdown
                   value={timeRange}
-                  onChange={(e) => setTimeRange(e.target.value)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                >
-                  <option value="7">7 derniers jours</option>
-                  <option value="30">30 derniers jours</option>
-                  <option value="90">90 derniers jours</option>
-                </select>
+                  onChange={setTimeRange}
+                  options={[
+                    { value: '7', label: '7 derniers jours' },
+                    { value: '30', label: '30 derniers jours' },
+                    { value: '90', label: '90 derniers jours' }
+                  ]}
+                  placeholder="Sélectionner période"
+                  className="w-64"
+                />
               )}
             </div>
           </div>
@@ -381,71 +395,6 @@ export default function MyProducts() {
                   </div>
                 </button>
 
-                {/* Articles actifs */}
-                <button
-                  onClick={() => {setFilter('active'); setCurrentView('list');}}
-                  className={`w-full p-3 rounded-lg transition-colors text-left ${
-                    currentView === 'list' && filter === 'active'
-                      ? 'bg-green-50 border border-green-200' 
-                      : 'hover:bg-gray-50 border border-transparent'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                        <Eye className="w-4 h-4 text-green-600" />
-                      </div>
-                      <div>
-                        <p className="text-sm lg:text-xl text-gray-900">Articles actifs</p>
-                        <p className="text-xs text-gray-600">Offres en ligne</p>
-                      </div>
-                    </div>
-                  </div>
-                </button>
-
-                {/* Articles premium */}
-                <button
-                  onClick={() => {setFilter('premium'); setCurrentView('list');}}
-                  className={`w-full p-3 rounded-lg transition-colors text-left ${
-                    currentView === 'list' && filter === 'premium'
-                      ? 'bg-purple-50 border border-purple-200' 
-                      : 'hover:bg-gray-50 border border-transparent'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                        <Zap className="w-4 h-4 text-purple-600" />
-                      </div>
-                      <div>
-                        <p className="text-sm lg:text-xl text-gray-900">Articles premium</p>
-                        <p className="text-xs text-gray-600">Offres boostées</p>
-                      </div>
-                    </div>
-                  </div>
-                </button>
-
-                {/* Articles simples */}
-                <button
-                  onClick={() => {setFilter('simple'); setCurrentView('list');}}
-                  className={`w-full p-3 rounded-lg transition-colors text-left ${
-                    currentView === 'list' && filter === 'simple'
-                      ? 'bg-orange-50 border border-orange-200' 
-                      : 'hover:bg-gray-50 border border-transparent'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
-                        <Star className="w-4 h-4 text-orange-600" />
-                      </div>
-                      <div>
-                        <p className="text-sm lg:text-xl text-gray-900">Articles simples</p>
-                        <p className="text-xs text-gray-600">Offres standards</p>
-                      </div>
-                    </div>
-                  </div>
-                </button>
 
                 {/* Mes revenus */}
                 <button
@@ -898,71 +847,6 @@ export default function MyProducts() {
                 </div>
               </button>
 
-              {/* Articles actifs */}
-              <button
-                onClick={() => {setFilter('active'); setCurrentView('list'); setShowMobileSidebar(false);}}
-                className={`w-full p-3 rounded-lg transition-colors text-left ${
-                  currentView === 'list' && filter === 'active'
-                    ? 'bg-green-50 border border-green-200' 
-                    : 'hover:bg-gray-50 border border-transparent'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                      <Eye className="w-4 h-4 text-green-600" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-900">Articles actifs</p>
-                      <p className="text-xs text-gray-600">Offres en ligne</p>
-                    </div>
-                  </div>
-                </div>
-              </button>
-
-              {/* Articles premium */}
-              <button
-                onClick={() => {setFilter('premium'); setCurrentView('list'); setShowMobileSidebar(false);}}
-                className={`w-full p-3 rounded-lg transition-colors text-left ${
-                  currentView === 'list' && filter === 'premium'
-                    ? 'bg-purple-50 border border-purple-200' 
-                    : 'hover:bg-gray-50 border border-transparent'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                      <Zap className="w-4 h-4 text-purple-600" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-900">Articles premium</p>
-                      <p className="text-xs text-gray-600">Offres boostées</p>
-                    </div>
-                  </div>
-                </div>
-              </button>
-
-              {/* Articles simples */}
-              <button
-                onClick={() => {setFilter('simple'); setCurrentView('list'); setShowMobileSidebar(false);}}
-                className={`w-full p-3 rounded-lg transition-colors text-left ${
-                  currentView === 'list' && filter === 'simple'
-                    ? 'bg-orange-50 border border-orange-200' 
-                    : 'hover:bg-gray-50 border border-transparent'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
-                      <Star className="w-4 h-4 text-orange-600" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-900">Articles simples</p>
-                      <p className="text-xs text-gray-600">Offres standards</p>
-                    </div>
-                  </div>
-                </div>
-              </button>
 
               {/* Mes revenus */}
               <button
@@ -1061,7 +945,7 @@ export default function MyProducts() {
                     </button>
                   )}
                   <h3 className="text-lg text-gray-900">
-                    {boostStep === 1 ? 'Créer votre publicité' : 'Choisir votre plan'}
+                    {boostStep === 1 ? 'Créer votre publicité' : boostStep === 2 ? 'Choisir votre plan' : 'Paiement'}
                   </h3>
                 </div>
                 <button
@@ -1078,6 +962,7 @@ export default function MyProducts() {
               <div className="flex items-center justify-center mt-3 space-x-2">
                 <div className={`w-2 h-2 rounded-full ${boostStep === 1 ? 'bg-orange-500' : 'bg-gray-300'}`}></div>
                 <div className={`w-2 h-2 rounded-full ${boostStep === 2 ? 'bg-orange-500' : 'bg-gray-300'}`}></div>
+                <div className={`w-2 h-2 rounded-full ${boostStep === 3 ? 'bg-orange-500' : 'bg-gray-300'}`}></div>
               </div>
             </div>
 
@@ -1247,6 +1132,98 @@ export default function MyProducts() {
 
                     </>
                   )}
+
+                  {/* Étape 3: Paiement */}
+                  {boostStep === 3 && (
+                    <>
+                      <div className="space-y-4">
+                        <h5 className="text-sm text-gray-900">Choisissez votre méthode de paiement</h5>
+                        
+                        {/* Récapitulatif de la commande */}
+                        <div className="bg-gray-50 rounded-lg p-4 border">
+                          <h6 className="text-xs font-medium text-gray-700 mb-2">Récapitulatif</h6>
+                          <div className="flex justify-between items-center mb-1">
+                            <span className="text-sm text-gray-600">Formule {selectedBoostDuration?.label}</span>
+                            <span className="text-sm font-medium">{selectedBoostDuration?.price.toLocaleString()} F</span>
+                          </div>
+                          <div className="flex justify-between items-center text-xs text-gray-500">
+                            <span>Durée: {selectedBoostDuration?.weeks ? `${selectedBoostDuration.weeks} semaine${selectedBoostDuration.weeks > 1 ? 's' : ''}` : `${selectedBoostDuration?.days} jour${selectedBoostDuration?.days > 1 ? 's' : ''}`}</span>
+                          </div>
+                        </div>
+
+                        {/* Options de paiement */}
+                        <div className="space-y-3">
+                          {/* Paiement mobile */}
+                          <div>
+                            <h6 className="text-xs font-medium text-gray-700 mb-2">Paiement mobile</h6>
+                            <div className="grid grid-cols-2 gap-2">
+                              {[
+                                { id: 'wave', name: 'Wave', color: 'bg-blue-500'},
+                                { id: 'mtn', name: 'MTN Money', color: 'bg-yellow-500'},
+                                { id: 'orange', name: 'Orange Money', color: 'bg-orange-500'},
+                                { id: 'moov', name: 'Moov Money', color: 'bg-green-500'}
+                              ].map((method) => (
+                                <button
+                                  key={method.id}
+                                  onClick={() => setSelectedPaymentMethod(method.id)}
+                                  className={`p-3 border rounded-lg transition-colors text-left ${
+                                    selectedPaymentMethod === method.id
+                                      ? 'border-orange-500 bg-orange-50'
+                                      : 'border-gray-200 hover:border-orange-300 hover:bg-orange-50'
+                                  }`}
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-lg">{method.icon}</span>
+                                    <span className="text-xs font-medium">{method.name}</span>
+                                  </div>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Carte bancaire */}
+                          <div>
+                            <h6 className="text-xs font-medium text-gray-700 mb-2">Carte bancaire</h6>
+                            <button
+                              onClick={() => setSelectedPaymentMethod('visa')}
+                              className={`w-full p-3 border rounded-lg transition-colors text-left ${
+                                selectedPaymentMethod === 'visa'
+                                  ? 'border-orange-500 bg-orange-50'
+                                  : 'border-gray-200 hover:border-orange-300 hover:bg-orange-50'
+                              }`}
+                            >
+                              <div className="flex items-center gap-2">
+                                <span className="text-lg">💳</span>
+                                <span className="text-xs font-medium">Carte Visa/MasterCard</span>
+                              </div>
+                            </button>
+                          </div>
+
+                          {selectedPaymentMethod === 'visa' && (
+                            <div className="space-y-3">
+                              <input
+                                type="text"
+                                placeholder="Numéro de carte"
+                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-orange-500 text-sm"
+                              />
+                              <div className="grid grid-cols-2 gap-2">
+                                <input
+                                  type="text"
+                                  placeholder="MM/AA"
+                                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-orange-500 text-sm"
+                                />
+                                <input
+                                  type="text"
+                                  placeholder="CVV"
+                                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-orange-500 text-sm"
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </>
               )}
             </div>
@@ -1263,12 +1240,27 @@ export default function MyProducts() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                   </svg>
                 </button>
+              ) : boostStep === 2 ? (
+                <button 
+                  onClick={handleNextStep}
+                  disabled={!selectedBoostDuration}
+                  className={`w-full py-3 rounded-lg transition-all flex items-center justify-center gap-2 ${
+                    !selectedBoostDuration
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : 'bg-orange-500 hover:bg-orange-600 text-white'
+                  }`}
+                >
+                  Continuer vers le paiement
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
               ) : (
                 <button 
                   onClick={handleCreateBoost}
-                  disabled={!selectedBoostDuration || creatingBoost}
+                  disabled={!selectedPaymentMethod || creatingBoost}
                   className={`w-full py-3 rounded-lg transition-all flex items-center justify-center gap-2 ${
-                    !selectedBoostDuration || creatingBoost
+                    !selectedPaymentMethod || creatingBoost
                       ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                       : 'bg-orange-500 hover:bg-orange-600 text-white'
                   }`}
@@ -1276,12 +1268,12 @@ export default function MyProducts() {
                   {creatingBoost ? (
                     <>
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Création en cours...
+                      Traitement du paiement...
                     </>
                   ) : (
                     <>
                       <Zap className="w-4 h-4" />
-                      {selectedBoostDuration ? `Confirmer ${selectedBoostDuration.label} (${selectedBoostDuration.price.toLocaleString()} F)` : 'Sélectionnez une formule'}
+                      Confirmer le paiement ({selectedBoostDuration?.price.toLocaleString()} F)
                     </>
                   )}
                 </button>
@@ -1322,30 +1314,36 @@ export default function MyProducts() {
                   <label className="block text-xs font-medium text-gray-700 mb-1.5">
                     Statut
                   </label>
-                  <select 
+                  <CustomDropdown
                     value={filter}
-                    onChange={(e) => setFilter(e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  >
-                    <option value="all">Toutes ({products.length})</option>
-                    <option value="active">Actives ({products.filter(p => p.status === 'active').length})</option>
-                    <option value="inactive">Inactives ({products.filter(p => p.status === 'paused').length})</option>
-                  </select>
+                    onChange={setFilter}
+                    options={[
+                      { value: 'all', label: `Tous les articles (${products.length})` },
+                      { value: 'active', label: `Articles actifs (${products.filter(p => p.status === 'active').length})` },
+                      { value: 'premium', label: `Articles premium (${products.filter(p => p.isPremium || p.isPromoted).length})` },
+                      { value: 'simple', label: `Articles simples (${products.filter(p => !p.isPremium && !p.isPromoted).length})` },
+                      { value: 'inactive', label: `Inactives (${products.filter(p => p.status === 'paused').length})` }
+                    ]}
+                    placeholder="Filtrer par statut"
+                    className="w-full"
+                  />
                 </div>
               ) : (
                 <div>
                   <label className="block text-xs font-medium text-gray-700 mb-1.5">
                     Période
                   </label>
-                  <select
+                  <CustomDropdown
                     value={timeRange}
-                    onChange={(e) => setTimeRange(e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  >
-                    <option value="7">7 derniers jours</option>
-                    <option value="30">30 derniers jours</option>
-                    <option value="90">90 derniers jours</option>
-                  </select>
+                    onChange={setTimeRange}
+                    options={[
+                      { value: '7', label: '7 derniers jours' },
+                      { value: '30', label: '30 derniers jours' },
+                      { value: '90', label: '90 derniers jours' }
+                    ]}
+                    placeholder="Sélectionner période"
+                    className="w-full"
+                  />
                 </div>
               )}
 
