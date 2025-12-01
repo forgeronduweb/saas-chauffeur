@@ -60,7 +60,7 @@ const createReview = async (req, res) => {
     await review.save();
 
     // Populer les données utilisateur pour la réponse
-    await review.populate('userId', 'name email');
+    await review.populate('userId', 'firstName lastName email');
 
     res.status(201).json({
       success: true,
@@ -108,7 +108,7 @@ const getProductReviews = async (req, res) => {
       productId, 
       status: 'approved' 
     })
-    .populate('userId', 'name')
+    .populate('userId', 'firstName lastName')
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limit);
@@ -211,7 +211,7 @@ const updateReview = async (req, res) => {
     }
 
     await review.save();
-    await review.populate('userId', 'name email');
+    await review.populate('userId', 'firstName lastName email');
 
     res.json({
       success: true,
