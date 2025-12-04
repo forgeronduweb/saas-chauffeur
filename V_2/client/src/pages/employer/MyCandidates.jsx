@@ -162,24 +162,12 @@ export default function MyCandidates() {
           </div>
         ) : filteredCandidates.length === 0 ? (
           <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
-            <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg className="w-10 h-10 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-              </svg>
-            </div>
+            
             <h3 className="text-2xl text-gray-900 mb-3">Aucune candidature</h3>
             <p className="text-gray-600 mb-8 max-w-md mx-auto">
               Vous n'avez pas encore reçu de candidatures. Publiez des offres d'emploi attractives pour attirer les meilleurs chauffeurs.
             </p>
-            <button
-              onClick={() => navigate('/publier-offre?type=job')}
-              className="px-8 py-4 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors inline-flex items-center gap-3"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              Publier une offre d'emploi
-            </button>
+            
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4">
