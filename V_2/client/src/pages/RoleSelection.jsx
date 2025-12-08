@@ -60,7 +60,7 @@ const RoleSelection = () => {
       <div className="w-full max-w-2xl">
         {/* Titre simple */}
         <div className="text-center mb-6 md:mb-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+          <h2 className="text-2xl md:text-3xl text-gray-900 mb-2">
             Bienvenue sur GoDriver !
           </h2>
           <p className="text-sm md:text-base text-gray-600">
@@ -76,7 +76,7 @@ const RoleSelection = () => {
                   <svg className="w-5 h-5 text-red-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                   </svg>
-                  <p className="text-sm text-red-700 font-medium">{error}</p>
+                  <p className="text-sm text-red-700">{error}</p>
                 </div>
               </div>
             )}
@@ -101,7 +101,7 @@ const RoleSelection = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
                 </div>
-                <h3 className={`text-lg md:text-xl font-bold mb-1 md:mb-2 ${
+                <h3 className={`text-lg md:text-xl mb-1 md:mb-2 ${
                   selectedRole === 'driver' ? 'text-orange-500' : 'text-gray-900'
                 }`}>
                   Je suis Chauffeur
@@ -130,7 +130,7 @@ const RoleSelection = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <h3 className={`text-lg md:text-xl font-bold mb-1 md:mb-2 ${
+                <h3 className={`text-lg md:text-xl mb-1 md:mb-2 ${
                   selectedRole === 'employer' ? 'text-orange-500' : 'text-gray-900'
                 }`}>
                   Je suis Employeur
@@ -146,7 +146,7 @@ const RoleSelection = () => {
           <button
             onClick={handleRoleSelection}
             disabled={!selectedRole || loading}
-            className="w-full py-3 md:py-3.5 bg-orange-500 text-white text-sm md:text-base font-semibold rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full py-3 md:py-3.5 bg-orange-500 text-white text-sm md:text-base rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {loading ? (
               <>

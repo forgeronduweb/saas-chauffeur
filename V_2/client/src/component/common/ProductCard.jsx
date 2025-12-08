@@ -15,11 +15,11 @@ export default function ProductCard({ product }) {
 
   return (
     <div 
-      className="bg-white border border-gray-200 rounded-lg hover:border-gray-300 hover:shadow-md transition-all duration-200 overflow-hidden cursor-pointer group"
+      className="w-full h-full bg-white border border-gray-200 rounded-lg hover:border-gray-300 hover:shadow-md transition-all duration-200 overflow-hidden cursor-pointer group flex flex-col"
       onClick={handleClick}
     >
       {/* Image grande */}
-      <figure className="relative h-32 lg:h-48 bg-gray-100 overflow-hidden">
+      <figure className="relative h-40 lg:h-48 bg-gray-100 overflow-hidden flex-shrink-0">
         <img 
           src={product.mainImage || product.images?.[0] || product.image || 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400&h=300&fit=crop'} 
           alt={product.title || product.name}
@@ -36,7 +36,7 @@ export default function ProductCard({ product }) {
       </figure>
 
       {/* Contenu compact */}
-      <div className="p-2 lg:p-4">
+      <div className="p-2 lg:p-4 flex-1 flex flex-col">
         <h3 className="text-xs lg:text-base font-semibold text-gray-900 mb-1 line-clamp-2">
           {product.title || product.name}
         </h3>

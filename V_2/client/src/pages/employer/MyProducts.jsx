@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { offersApi, promotionsApi } from '../../services/api';
+import { offersApi, promotionsApi, productsApi } from '../../services/api';
 import SimpleHeader from '../../component/common/SimpleHeader';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
 import BoostModal from '../../components/modals/BoostModal';
@@ -42,6 +42,36 @@ export default function MyProducts() {
   // États pour les vues statistics et earnings
   const [timeRange, setTimeRange] = useState('30');
 
+  const fetchProducts = async () => {
+    setLoading(true);
+    try {
+      console.log('🔄 Récupération des produits...');
+      console.log('👤 Utilisateur:', user);
+      
+      // Récupérer les offres de type "product" pour l'utilisateur connecté
+      const response = await offersApi.myOffers();
+      console.log('✅ Réponse API produits:', response);
+      
+      // Filtrer uniquement les offres de type "product"
+      const products = Array.isArray(response.data) 
+        ? response.data.filter(offer => offer.type === 'product' || offer.type === 'Autre')
+        : [];
+      
+      // Mettre à jour l'état avec les produits récupérés
+      setProducts(products);
+    } catch (error) {
+      console.error('Erreur lors du chargement des produits:', error);
+      setProducts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchUserBoosts = async () => {
+    // Implémentation de la fonction fetchUserBoosts si nécessaire
+    setUserBoosts([]);
+  };
+
   useEffect(() => {
     if (!user) {
       navigate('/auth');
@@ -50,51 +80,6 @@ export default function MyProducts() {
     fetchProducts();
     fetchUserBoosts();
   }, [user, navigate]);
-
-  const fetchProducts = async () => {
-    setLoading(true);
-    try {
-      console.log('🔄 Récupération des offres chauffeur...');
-      console.log('👤 Utilisateur:', user);
-      
-      // Récupérer les offres de l'utilisateur connecté de type "Autre" (produits)
-      const response = await offersApi.myOffers();
-      console.log('✅ Réponse API:', response);
-      console.log('📊 Données reçues:', response.data);
-      
-      // Filtrer uniquement les offres de type "Autre" (produits marketing)
-      const allOffers = Array.isArray(response.data) ? response.data : [];
-      console.log('📋 Total offres:', allOffers.length);
-      
-      const marketingOffers = allOffers.filter(offer => offer.type === 'Autre');
-      console.log('🛒 Offres marketing filtrées:', marketingOffers.length);
-      console.log('🛒 Détails:', marketingOffers);
-      
-      setProducts(marketingOffers);
-    } catch (error) {
-      console.error('❌ Erreur:', error);
-      console.error('❌ Détails:', error.response?.data);
-      setProducts([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Fonctions pour les boosts
-  const fetchUserBoosts = async () => {
-    setLoadingBoosts(true);
-    try {
-      const response = await promotionsApi.getMyBoosts();
-      if (response.data.success) {
-        setUserBoosts(response.data.data.promotions);
-      }
-    } catch (error) {
-      console.error('Erreur lors du chargement des boosts:', error);
-      setUserBoosts([]);
-    } finally {
-      setLoadingBoosts(false);
-    }
-  };
 
   const handleBoostClick = (product) => {
     setSelectedProduct(product);
@@ -182,7 +167,7 @@ export default function MyProducts() {
         formData.append('boostImage', boostImage);
       }
 
-      const response = await promotionsApi.createBoost(formData);
+      const response = await productsApi.createBoost(formData);
       
       if (response.data.success) {
         alert(`Paiement confirmé ! Boost créé avec succès pour ${selectedBoostDuration.days} jour${selectedBoostDuration.days > 1 ? 's' : ''} !`);
@@ -194,7 +179,6 @@ export default function MyProducts() {
         setBoostImagePreview(null);
         setBoostText('');
         setBoostStep(1);
-        fetchUserBoosts(); // Recharger les boosts
         fetchProducts(); // Recharger les produits pour mettre à jour l'affichage
       } else {
         alert('Erreur lors du traitement du paiement');
@@ -254,21 +238,18 @@ export default function MyProducts() {
     setDeleteLoading(false);
   };
 
-  const handleDelete = async () => {
-    if (!productToDelete || deleteLoading) return;
-
-    setDeleteLoading(true);
-    try {
-      await offersApi.delete(productToDelete._id);
-      console.log('✅ Produit supprimé');
-      await fetchProducts();
-      setShowDeleteModal(false);
-      setProductToDelete(null);
-    } catch (error) {
-      console.error('❌ Erreur lors de la suppression:', error);
-      alert('Erreur lors de la suppression du produit');
-    } finally {
-      setDeleteLoading(false);
+  const handleDelete = async (productId) => {
+    if (window.confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')) {
+      try {
+        // Utiliser la méthode delete de l'API des offres
+        await offersApi.delete(productId);
+        // Mettre à jour l'état local
+        setProducts(products.filter(product => product._id !== productId));
+        alert('Produit supprimé avec succès');
+      } catch (err) {
+        console.error('Erreur lors de la suppression du produit:', err);
+        alert('Erreur lors de la suppression du produit');
+      }
     }
   };
 

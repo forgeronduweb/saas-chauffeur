@@ -41,38 +41,38 @@ export default function EditProductOfferPage() {
     additionalImages: []
   });
 
-  // Templates de champs de caractéristiques par catégorie avec icônes
+  // Templates de champs de caractéristiques par catégorie avec icônes et options
   const characteristicFields = {
     vehicules: [
-      { key: 'type', label: 'Type', placeholder: 'Ex: Berline, SUV, Utilitaire...', icon: FaCar },
-      { key: 'annee', label: 'Année', placeholder: 'Ex: 2020', icon: FaCalendarAlt },
-      { key: 'km', label: 'KM', placeholder: 'Ex: 50 000 km', icon: FaTachometerAlt },
-      { key: 'motorisation', label: 'Motorisation', placeholder: 'Ex: Essence, Diesel, Hybride...', icon: FaGasPump },
-      { key: 'etat', label: 'État', placeholder: 'Ex: Excellent, Bon, Correct...', icon: FaCheckCircle },
-      { key: 'options', label: 'Options', placeholder: 'Ex: Climatisation, GPS, Bluetooth...', icon: FaCogs },
-      { key: 'securite', label: 'Sécurité', placeholder: 'Ex: ABS, Airbags, Alarme...', icon: FaShieldAlt },
-      { key: 'entretien', label: 'Entretien', placeholder: 'Ex: Révision récente, Garantie...', icon: FaWrench },
-      { key: 'documents', label: 'Documents', placeholder: 'Ex: Carte grise, Contrôle technique...', icon: FaFileAlt }
+      { key: 'type', label: 'Type', icon: FaCar, options: ['Berline', 'SUV', 'Citadine', 'Break', 'Coupé', 'Cabriolet', 'Utilitaire', 'Pick-up', 'Monospace', 'Camionnette'] },
+      { key: 'annee', label: 'Année', icon: FaCalendarAlt, options: Array.from({length: 30}, (_, i) => (new Date().getFullYear() - i).toString()) },
+      { key: 'km', label: 'Kilométrage', icon: FaTachometerAlt, options: ['0-10 000 km', '10 000-30 000 km', '30 000-50 000 km', '50 000-100 000 km', '100 000-150 000 km', '150 000-200 000 km', '+200 000 km'] },
+      { key: 'motorisation', label: 'Motorisation', icon: FaGasPump, options: ['Essence', 'Diesel', 'Hybride', 'Électrique', 'GPL', 'Hydrogène'] },
+      { key: 'etat', label: 'État', icon: FaCheckCircle, options: ['Neuf', 'Excellent', 'Très bon', 'Bon', 'Correct', 'À rénover'] },
+      { key: 'options', label: 'Équipements', icon: FaCogs, options: ['Climatisation', 'Climatisation automatique', 'GPS', 'Bluetooth', 'Régulateur de vitesse', 'Caméra de recul', 'Jantes alu', 'Toit ouvrant', 'Sièges cuir', 'Sièges chauffants'] },
+      { key: 'securite', label: 'Sécurité', icon: FaShieldAlt, options: ['ABS', 'ESP', 'Airbags frontaux', 'Airbags latéraux', 'Alarme', 'Anti-démarrage', 'Détecteur de pression pneus', 'Assistance freinage', 'Contrôle de trajectoire'] },
+      { key: 'entretien', label: 'Entretien', icon: FaWrench, options: ['Révision récente', 'Carnet d\'entretien complet', 'Garantie constructeur', 'Extension de garantie', 'Maintenance à jour', 'Historique complet'] },
+      { key: 'documents', label: 'Documents', icon: FaFileAlt, options: ['Carte grise', 'Contrôle technique à jour', 'Certificat de non-gage', 'Factures d\'entretien', 'Manuel utilisateur', 'Double de clés'] }
     ],
     pieces: [
-      { key: 'type', label: 'Type', placeholder: 'Ex: Pneus, Batterie, Filtre...', icon: FaPuzzlePiece },
-      { key: 'compatibilite', label: 'Compatibilité', placeholder: 'Ex: Toyota Camry 2015-2020...', icon: FaLink },
-      { key: 'etat', label: 'État', placeholder: 'Ex: Neuf, Occasion, Reconditionné...', icon: FaCheckCircle },
-      { key: 'reference', label: 'Référence', placeholder: 'Ex: Référence fabricant...', icon: FaBarcode },
-      { key: 'garantie', label: 'Garantie', placeholder: 'Ex: 2 ans, 6 mois...', icon: FaCertificate },
-      { key: 'materiau', label: 'Matériau', placeholder: 'Ex: Acier, Plastique, Caoutchouc...', icon: FaCube },
-      { key: 'performance', label: 'Performance', placeholder: 'Ex: Haute performance, Standard...', icon: FaChartLine },
-      { key: 'installation', label: 'Installation', placeholder: 'Ex: Installation incluse, Facile...', icon: FaTools }
+      { key: 'type', label: 'Type de pièce', icon: FaPuzzlePiece, options: ['Pneus', 'Batterie', 'Filtre à huile', 'Filtre à air', 'Plaquettes de frein', 'Disques de frein', 'Amortisseurs', 'Bougies', 'Courroie', 'Phares', 'Pare-brise', 'Rétroviseurs'] },
+      { key: 'compatibilite', label: 'Compatibilité', icon: FaLink, options: ['Toutes marques', 'Toyota', 'Nissan', 'Honda', 'Mercedes', 'BMW', 'Volkswagen', 'Peugeot', 'Renault', 'Ford', 'Hyundai', 'Kia'] },
+      { key: 'etat', label: 'État', icon: FaCheckCircle, options: ['Neuf', 'Reconditionné', 'Occasion - Excellent', 'Occasion - Bon', 'Origine constructeur', 'Pièce adaptable'] },
+      { key: 'reference', label: 'Référence', icon: FaBarcode, options: ['Origine constructeur', 'OEM', 'Adaptable qualité premium', 'Adaptable standard', 'Référence disponible'] },
+      { key: 'garantie', label: 'Garantie', icon: FaCertificate, options: ['6 mois', '1 an', '2 ans', '3 ans', '5 ans', 'À vie', 'Garantie constructeur', 'Sans garantie'] },
+      { key: 'materiau', label: 'Matériau', icon: FaCube, options: ['Acier', 'Aluminium', 'Plastique ABS', 'Caoutchouc', 'Composite', 'Fibre de carbone', 'Verre', 'Cuir'] },
+      { key: 'performance', label: 'Performance', icon: FaChartLine, options: ['Haute performance', 'Performance optimale', 'Standard', 'Économique', 'Longue durée', 'Renforcé'] },
+      { key: 'installation', label: 'Installation', icon: FaTools, options: ['Installation incluse', 'Installation facile', 'Installation professionnelle recommandée', 'Plug and play', 'Nécessite adaptation', 'Notice fournie'] }
     ],
     service: [
-      { key: 'type', label: 'Type', placeholder: 'Ex: Réparation, Maintenance, Formation...', icon: FaTools },
-      { key: 'domaine', label: 'Domaine', placeholder: 'Ex: Mécanique, Électronique, Carrosserie...', icon: FaBullseye },
-      { key: 'expertise', label: 'Expertise', placeholder: 'Ex: 10 ans d\'expérience...', icon: FaUserTie },
-      { key: 'disponibilite', label: 'Disponibilité', placeholder: 'Ex: 7j/7, Sur RDV, Urgence 24h...', icon: FaClock },
-      { key: 'qualite', label: 'Qualité', placeholder: 'Ex: Certifié, Agréé constructeur...', icon: FaAward },
-      { key: 'garantie', label: 'Garantie', placeholder: 'Ex: Garantie 1 an sur travaux...', icon: FaHandshake },
-      { key: 'delais', label: 'Délais', placeholder: 'Ex: Intervention sous 24h...', icon: FaHourglass },
-      { key: 'documents', label: 'Documents', placeholder: 'Ex: Devis gratuit, Facture...', icon: FaFileAlt }
+      { key: 'type', label: 'Type de service', icon: FaTools, options: ['Réparation mécanique', 'Réparation électrique', 'Carrosserie', 'Peinture', 'Maintenance', 'Diagnostic', 'Révision', 'Dépannage', 'Formation', 'Conseil'] },
+      { key: 'domaine', label: 'Domaine d\'expertise', icon: FaBullseye, options: ['Mécanique générale', 'Électronique embarquée', 'Carrosserie', 'Peinture', 'Climatisation', 'Transmission', 'Freinage', 'Suspension', 'Direction', 'Électricité'] },
+      { key: 'expertise', label: 'Niveau d\'expertise', icon: FaUserTie, options: ['Expert - +15 ans', 'Expérimenté - 10-15 ans', 'Confirmé - 5-10 ans', 'Qualifié - 2-5 ans', 'Certifié constructeur', 'Formation spécialisée'] },
+      { key: 'disponibilite', label: 'Disponibilité', icon: FaClock, options: ['7j/7 - 24h/24', 'Tous les jours', 'Du lundi au samedi', 'Sur rendez-vous', 'Urgence 24h', 'Déplacement à domicile', 'Atelier fixe'] },
+      { key: 'qualite', label: 'Qualifications', icon: FaAward, options: ['Agréé constructeur', 'Certifié ISO', 'Label qualité', 'Garantie décennale', 'Assurance professionnelle', 'Centre agréé', 'Expert indépendant'] },
+      { key: 'garantie', label: 'Garantie des travaux', icon: FaHandshake, options: ['Garantie 2 ans', 'Garantie 1 an', 'Garantie 6 mois', 'Garantie 3 mois', 'Garantie pièces et main d\'œuvre', 'Extension garantie possible'] },
+      { key: 'delais', label: 'Délais d\'intervention', icon: FaHourglass, options: ['Intervention immédiate', 'Sous 24h', 'Sous 48h', 'Sur rendez-vous', 'Délai selon diagnostic', 'Selon disponibilité pièces'] },
+      { key: 'documents', label: 'Documents fournis', icon: FaFileAlt, options: ['Devis gratuit', 'Facture détaillée', 'Bon de garantie', 'Certificat de conformité', 'Rapport d\'intervention', 'Suivi entretien'] }
     ]
   };
 
@@ -312,13 +312,21 @@ export default function EditProductOfferPage() {
       const convertedPrice = formData.price ? Number(formData.price) : 0;
       console.log('💰 Prix après conversion:', convertedPrice, 'Type:', typeof convertedPrice);
       
-      // Convertir les caractéristiques dynamiques en format "Label: Value"
+      // Convertir les caractéristiques dynamiques en format "Label: Value" (pour compatibilité)
       const characteristicsList = Object.entries(characteristicValues)
         .filter(([key, value]) => value && value.trim())
         .map(([key, value]) => {
           const field = characteristicFields[formData.category]?.find(f => f.key === key);
           return `${field?.label}: ${value.trim()}`;
         });
+
+      // Préparer les caractéristiques structurées (objet clé-valeur)
+      const structuredCharacteristics = Object.entries(characteristicValues)
+        .filter(([key, value]) => value && value.trim())
+        .reduce((acc, [key, value]) => {
+          acc[key] = value.trim();
+          return acc;
+        }, {});
 
       // Préparer les données avec tous les champs nécessaires
       const dataToSubmit = {
@@ -335,6 +343,7 @@ export default function EditProductOfferPage() {
           address: formData.location?.address || ''
         },
         requirementsList: characteristicsList.length > 0 ? characteristicsList : formData.requirementsList.filter(item => item.trim() !== ''),
+        characteristics: structuredCharacteristics, // Objet structuré (nouveau)
         benefits: formData.benefits.filter(item => item.trim() !== ''),
         mainImage: formData.mainImage || '',
         additionalImages: formData.additionalImages || [],
@@ -639,16 +648,26 @@ export default function EditProductOfferPage() {
                         {field.label}
                       </label>
                       <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
                           <IconComponent className="w-4 h-4 text-gray-400" />
                         </div>
-                        <input
-                          type="text"
+                        <select
                           value={characteristicValues[field.key] || ''}
                           onChange={(e) => handleCharacteristicChange(field.key, e.target.value)}
-                          className="w-full pl-10 pr-3 py-2 border border-gray-300 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all text-sm"
-                          placeholder={field.placeholder}
-                        />
+                          className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all text-sm appearance-none bg-white cursor-pointer"
+                        >
+                          <option value="">Sélectionner...</option>
+                          {field.options.map((option) => (
+                            <option key={option} value={option}>
+                              {option}
+                            </option>
+                          ))}
+                        </select>
+                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </div>
                       </div>
                     </div>
                   );

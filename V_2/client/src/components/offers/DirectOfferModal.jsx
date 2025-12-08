@@ -1,30 +1,18 @@
-import React, { useState } from 'react';
-import { X } from 'lucide-react';
+import { useState } from 'react';
 import { offersApi } from '../../services/api';
-import { useAuth } from '../../contexts/AuthContext';
 
-/**
- * Modal pour créer une offre d'emploi directe à un chauffeur spécifique
- * @param {Object} props - Props du composant
- * @param {boolean} props.isOpen - État d'ouverture de la modal
- * @param {Function} props.onClose - Fonction de fermeture
- * @param {Object} props.driver - Chauffeur ciblé
- * @param {Function} props.onSuccess - Callback de succès
- */
-export default function DirectOfferModal({ isOpen, onClose, driver, onSuccess }) {
-  const { user } = useAuth();
-  const [loading, setLoading] = useState(false);
+const DirectOfferModal = ({ isOpen, onClose, driver, onSuccess }) => {
   const [formData, setFormData] = useState({
     title: '',
-    location: '',
+    description: '',
     salary: '',
-    description: ''
+    workType: 'full-time',
+    startDate: '',
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  
-  
-  // Gérer les changements du formulaire
-  const handleInputChange = (e) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -35,53 +23,27 @@ export default function DirectOfferModal({ isOpen, onClose, driver, onSuccess })
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
 
     try {
-      console.log('🔍 Données du chauffeur:', driver);
-      console.log('🔍 ID utilisateur:', user.id);
-      console.log('🔍 ID chauffeur:', driver.id || driver._id);
-
+      // Créer une offre directe pour ce chauffeur
       const offerData = {
-        title: formData.title,
-        description: formData.description,
-        // Type d'offre d'emploi générique (doit être compatible avec l'énum du modèle)
-        type: 'Transport',
-        employerId: user.id,
-        targetDriverId: driver._id || driver.id, // Essayer _id en premier
-        status: 'active',
-        isDirect: true,
-        location: {
-          address: '',
-          city: formData.location,
-        },
-        conditions: {
-          salary: Number(formData.salary) || 0,
-          salaryType: 'mensuel',
-          workType: 'temps_plein',
-        },
+        ...formData,
+        type: 'direct',
+        targetDriverId: driver._id,
+        status: 'pending',
       };
 
-      const response = await offersApi.create(offerData);
+      const response = await offersApi.createDirectOffer(offerData);
       
-      // Réinitialiser le formulaire
-      setFormData({
-        title: '',
-        location: '',
-        salary: '',
-        description: ''
-      });
-      
-      // Callback de succès avec l'offre créée
       if (onSuccess) {
-        onSuccess(response?.data || null);
+        onSuccess(response.data);
       }
       
-      // Fermer la modal
       onClose();
-      
-    } catch (error) {
-      console.error('❌ Erreur création offre directe:', error);
-      alert(error.response?.data?.message || 'Erreur lors de la création de l\'offre directe');
+    } catch (err) {
+      console.error('Error creating direct offer:', err);
+      setError(err.response?.data?.message || 'Une erreur est survenue lors de la création de l\'offre');
     } finally {
       setLoading(false);
     }
@@ -90,113 +52,134 @@ export default function DirectOfferModal({ isOpen, onClose, driver, onSuccess })
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
-      {/* Overlay */}
-      <div className="fixed inset-0 bg-transparent" onClick={onClose}></div>
-      
-      {/* Modal */}
-      <div className="relative min-h-screen flex items-center justify-center p-4">
-        <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto mt-10 sm:mt-16">
-          {/* Header simple */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-200">
-            <h2 className="text-xl text-gray-900">
-              Offre pour {driver?.firstName} {driver?.lastName}
-            </h2>
-            <button
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg w-full max-w-md">
+        <div className="p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-semibold">Faire une offre directe</h3>
+            <button 
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="text-gray-500 hover:text-gray-700"
             >
-              <X className="w-6 h-6 text-gray-600" />
+              ✕
             </button>
           </div>
-
-          {/* Formulaire simplifié */}
-          <form onSubmit={handleSubmit} className="p-4 space-y-3">
-            {/* Titre */}
-            <div>
-              <label className="text-sm text-gray-700 mb-1 block">
-                Titre du poste *
-              </label>
-              <input
-                type="text"
-                name="title"
-                value={formData.title}
-                onChange={handleInputChange}
-                placeholder="Ex: Chauffeur livraison"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                required
-              />
+          
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
+              {error}
             </div>
+          )}
 
-            {/* Lieu */}
-            <div>
-              <label className="text-sm text-gray-700 mb-1 block">
-                Lieu de travail *
-              </label>
-              <input
-                type="text"
-                name="location"
-                value={formData.location}
-                onChange={handleInputChange}
-                placeholder="Ex: Abidjan, Cocody"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                required
-              />
-            </div>
+          <form onSubmit={handleSubmit}>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Poste proposé *
+                </label>
+                <input
+                  type="text"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded"
+                  required
+                  placeholder="Ex: Chauffeur VTC"
+                />
+              </div>
 
-            {/* Salaire */}
-            <div>
-              <label className="text-sm text-gray-700 mb-1 block">
-                Salaire mensuel (FCFA) *
-              </label>
-              <input
-                type="number"
-                name="salary"
-                value={formData.salary}
-                onChange={handleInputChange}
-                placeholder="Ex: 150000"
-                min="0"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                required
-              />
-            </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Description *
+                </label>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  rows="3"
+                  className="w-full p-2 border rounded"
+                  required
+                  placeholder="Décrivez le poste et les missions"
+                />
+              </div>
 
-            {/* Description */}
-            <div>
-              <label className="text-sm text-gray-700 mb-1 block">
-                Description *
-              </label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                placeholder="Décrivez le poste..."
-                rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
-                required
-              />
-            </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Rémunération *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      name="salary"
+                      value={formData.salary}
+                      onChange={handleChange}
+                      className="w-full p-2 border rounded pl-8"
+                      required
+                      placeholder="2000"
+                      min="0"
+                    />
+                    <span className="absolute left-2 top-2 text-gray-500">€</span>
+                  </div>
+                </div>
 
-            {/* Boutons */}
-            <div className="flex gap-3 pt-2">
-              <button
-                type="button"
-                onClick={onClose}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                Annuler
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex-1 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50"
-              >
-                {loading ? 'Envoi...' : 'Envoyer'}
-              </button>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Type de contrat *
+                  </label>
+                  <select
+                    name="workType"
+                    value={formData.workType}
+                    onChange={handleChange}
+                    className="w-full p-2 border rounded"
+                    required
+                  >
+                    <option value="full-time">Temps plein</option>
+                    <option value="part-time">Temps partiel</option>
+                    <option value="cdi">CDI</option>
+                    <option value="cdd">CDD</option>
+                    <option value="interim">Intérim</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Date de début souhaitée *
+                </label>
+                <input
+                  type="date"
+                  name="startDate"
+                  value={formData.startDate}
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded"
+                  required
+                />
+              </div>
+
+              <div className="flex justify-end space-x-3 pt-4">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-50"
+                  disabled={loading}
+                >
+                  Annuler
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                  disabled={loading}
+                >
+                  {loading ? 'Envoi en cours...' : 'Envoyer l\'offre'}
+                </button>
+              </div>
             </div>
           </form>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default DirectOfferModal;

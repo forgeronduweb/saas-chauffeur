@@ -198,7 +198,13 @@ export const offersApi = {
   // Supprimer une offre
   delete: (offerId) => api.delete(`/offers/${offerId}`),
   // Récupérer une offre spécifique
-  getById: (offerId) => api.get(`/offers/${offerId}`),
+  getById(offerId) {
+    return api.get(`/offers/${offerId}`)
+  },
+  // Créer une offre directe pour un chauffeur spécifique
+  createDirectOffer(offerData) {
+    return api.post('/offers/direct', offerData)
+  }
 }
 
 // API pour les candidatures intelligentes
@@ -397,5 +403,36 @@ export const authService = {
   verifyEmail: (email, code) => api.post('/auth/verify-email', { email, code }),
   resendVerificationCode: (email) => api.post('/auth/resend-verification-code', { email }),
 }
+
+// API pour les produits
+// API pour les produits
+export const productsApi = {
+  // Récupérer les produits d'un utilisateur
+  getByUser: (userId) => api.get(`/products/user/${userId}`),
+  
+  // Récupérer un produit par son ID
+  getById: (productId) => api.get(`/products/${productId}`),
+  
+  // Créer un nouveau produit
+  create: (data) => api.post('/products', data),
+  
+  // Mettre à jour un produit
+  update: (productId, data) => api.put(`/products/${productId}`, data),
+  
+  // Supprimer un produit
+  delete: (productId) => api.delete(`/products/${productId}`),
+  
+  // Mettre à jour l'image d'un produit
+  updateImage: (productId, imageData) => 
+    api.put(`/products/${productId}/image`, imageData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    }),
+  
+  // Récupérer les produits mis en avant
+  getFeatured: () => api.get('/products/featured'),
+  
+  // Rechercher des produits
+  search: (query) => api.get('/products/search', { params: { q: query } })
+};
 
 export default api

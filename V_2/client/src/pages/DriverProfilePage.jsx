@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { driversService } from '../services/api';
+import { messagesApi, driversApi } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import SimpleHeader from '../component/common/SimpleHeader';
+import ChatModal from '../component/messaging/ChatModal';
 import DirectOfferModal from '../components/offers/DirectOfferModal';
 import { MapPin, Phone, Mail, Star, Award, Calendar, Car, Shield, Briefcase, CheckCircle, MessageCircle } from 'lucide-react';
 
@@ -46,12 +47,13 @@ export default function DriverProfilePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showDirectOfferModal, setShowDirectOfferModal] = useState(false);
+  const [showChatModal, setShowChatModal] = useState(false);
 
   useEffect(() => {
     const fetchDriver = async () => {
       try {
         setLoading(true);
-        const response = await driversService.getById(id);
+        const response = await driversApi.getProfile(id);
         
         if (response.data) {
           console.log('Données du chauffeur:', response.data);
@@ -72,20 +74,64 @@ export default function DriverProfilePage() {
     fetchDriver();
   }, [id]);
 
-  const handleContact = () => {
+  const [currentConversation, setCurrentConversation] = useState(null);
+
+  const handleContact = async () => {
     if (!user) {
       navigate('/auth');
       return;
     }
 
-    // Vérifier que l'utilisateur est un employeur
-    if (user.role !== 'employer') {
-      alert('Seuls les employeurs peuvent envoyer des offres directes aux chauffeurs.');
-      return;
-    }
+    try {
+      // Créer ou récupérer la conversation avec le chauffeur
+      // IMPORTANT: Utiliser driver.userId (ID User) et non driver._id (ID Driver)
+      const response = await messagesApi.createOrGetConversation(driver.userId, {
+        type: 'driver_contact',
+        driverId: driver._id,
+        driverName: `${driver.firstName} ${driver.lastName}`
+      });
 
-    // Ouvrir la modal d'offre directe
-    setShowDirectOfferModal(true);
+      // L'API retourne { conversation, messages }
+      const conversation = response.data.conversation || response.data;
+      setCurrentConversation(conversation);
+      setShowChatModal(true);
+    } catch (error) {
+      console.error('Erreur lors de la création de la conversation:', error);
+      
+      if (!user) {
+        console.error("Aucun utilisateur connecté");
+        return;
+      }
+
+      // Créer une conversation temporaire avec les informations disponibles
+      const tempConversation = {
+        _id: `temp-${user.id || user._id}-${driver.userId}`,
+        participants: [
+          { 
+            _id: user.id || user._id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            profilePhotoUrl: user.profilePhotoUrl,
+            companyName: user.companyName
+          },
+          { 
+            _id: driver.userId, 
+            firstName: driver.firstName,
+            lastName: driver.lastName,
+            profilePhotoUrl: driver.profilePhotoUrl,
+            companyName: driver.companyName
+          }
+        ],
+        lastMessage: {},
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        isTemporary: true // Ajout d'un flag pour indiquer que c'est une conversation temporaire
+      };
+      
+      console.log('Création d\'une conversation temporaire:', tempConversation);
+      setCurrentConversation(tempConversation);
+      setShowChatModal(true);
+    }
   };
 
   const handleDirectOfferSuccess = (offer) => {
@@ -182,7 +228,7 @@ export default function DriverProfilePage() {
                     </div>
                   </div>
 
-                  {/* Bouton d'offre directe */}
+                  {/* Bouton de contact */}
                   {!user ? (
                     <button
                       onClick={() => navigate('/auth')}
@@ -191,18 +237,14 @@ export default function DriverProfilePage() {
                       <MessageCircle className="w-5 h-5" />
                       Se connecter pour contacter
                     </button>
-                  ) : user.role === 'employer' ? (
+                  ) : (
                     <button
                       onClick={handleContact}
                       className="w-full lg:w-auto px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors flex items-center justify-center gap-2"
                     >
-                      <Briefcase className="w-5 h-5" />
-                      Envoyer une offre
+                      <MessageCircle className="w-5 h-5" />
+                      Envoyer un message
                     </button>
-                  ) : (
-                    <div className="w-full lg:w-auto px-4 py-3 bg-gray-100 text-gray-700 text-sm border border-gray-300">
-                      Seuls les employeurs peuvent envoyer des offres directes aux chauffeurs.
-                    </div>
                   )}
                 </div>
               </div>
@@ -418,6 +460,15 @@ export default function DriverProfilePage() {
         driver={driver}
         onSuccess={handleDirectOfferSuccess}
       />
+      
+      {showChatModal && driver && currentConversation && (
+        <ChatModal
+          isOpen={showChatModal}
+          onClose={() => setShowChatModal(false)}
+          conversation={currentConversation}
+          onBack={() => setShowChatModal(false)}
+        />
+      )}
     </div>
   );
 }

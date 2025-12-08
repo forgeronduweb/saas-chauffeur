@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { chatService } from '../services/api';
+import { messagesApi } from '../services/api';
 
 const useUnreadMessages = () => {
   const [unreadCount, setUnreadCount] = useState(0);
@@ -27,10 +27,8 @@ const useUnreadMessages = () => {
       setError(null);
       
       console.log('🔄 Chargement des conversations...');
-      // TODO: Réactiver quand l'API chat sera implémentée
-      // const response = await chatService.getConversations();
-      // const conversationsList = response.data || [];
-      const conversationsList = []; // Temporaire
+      const response = await messagesApi.getConversations();
+      const conversationsList = response.data || [];
       
       console.log('📨 Conversations reçues:', conversationsList);
       setConversations(conversationsList);
@@ -97,7 +95,7 @@ const useUnreadMessages = () => {
   // Fonction pour marquer une conversation comme lue
   const markConversationAsRead = useCallback(async (conversationId) => {
     try {
-      await chatService.markConversationAsRead(conversationId);
+      await messagesApi.markAsRead(conversationId);
       
       // Mettre à jour localement
       setConversations(prev => {

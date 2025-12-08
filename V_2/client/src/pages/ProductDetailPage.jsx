@@ -664,7 +664,7 @@ export default function ProductDetailPage() {
                 style={{ scrollSnapType: 'x mandatory' }}
               >
                 {similarProducts.map((item) => (
-                  <div key={item._id} className="flex-shrink-0" style={{ scrollSnapAlign: 'start' }}>
+                  <div key={item._id} className="flex-shrink-0 w-64 sm:w-72 lg:w-80" style={{ scrollSnapAlign: 'start' }}>
                     <ProductCard product={item} noShadow noBorder />
                   </div>
                 ))}

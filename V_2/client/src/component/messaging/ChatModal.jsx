@@ -198,47 +198,78 @@ const ChatModal = ({ isOpen, conversation, onClose, onBack }) => {
                         <div className={`max-w-[75%] ${isOwn ? 'order-2' : 'order-1'}`}>
                           {/* Carte produit si métadonnées présentes */}
                           {(() => {
-                            // MongoDB Map est converti en objet par Mongoose
+                            // MongoDB Map est converti en objet par Mongoose avec .lean()
                             const metadata = message.metadata;
                             
-                            // Log pour déboguer
-                            if (metadata) {
-                              console.log('🔍 Metadata trouvé:', metadata);
-                              console.log('🔍 Type de metadata:', typeof metadata);
-                              console.log('🔍 Keys:', Object.keys(metadata || {}));
-                            }
+                            if (!metadata) return null;
                             
-                            const productImage = metadata?.productImage || metadata?.get?.('productImage');
-                            const productTitle = metadata?.productTitle || metadata?.get?.('productTitle');
-                            const productPrice = metadata?.productPrice || metadata?.get?.('productPrice');
-                            const productUrl = metadata?.productUrl || metadata?.get?.('productUrl');
+                            // Log pour déboguer
+                            console.log('🔍 Message ID:', message._id);
+                            console.log('🔍 Metadata complet:', metadata);
+                            console.log('🔍 Type de metadata:', typeof metadata);
+                            console.log('🔍 Keys:', Object.keys(metadata || {}));
+                            
+                            // Fonction helper pour extraire la valeur (Map ou objet)
+                            const getValue = (key) => {
+                              if (metadata instanceof Map) {
+                                return metadata.get(key);
+                              }
+                              return metadata[key];
+                            };
+                            
+                            const productImage = getValue('productImage');
+                            const productTitle = getValue('productTitle');
+                            const productPrice = getValue('productPrice');
+                            const productUrl = getValue('productUrl');
                             
                             console.log('🖼️ Product Image:', productImage);
+                            console.log('📝 Product Title:', productTitle);
+                            console.log('💰 Product Price:', productPrice);
+                            console.log('🔗 Product URL:', productUrl);
                             
-                            if (!productImage) return null;
+                            if (!productImage && !productTitle) return null;
                             
                             return (
                               <div className={`mb-2 rounded-lg overflow-hidden border ${
                                 isOwn ? 'border-orange-300' : 'border-gray-200'
                               }`}>
                                 <a 
-                                  href={productUrl} 
+                                  href={productUrl || '#'} 
                                   target="_blank" 
                                   rel="noopener noreferrer"
                                   className="block hover:opacity-90 transition-opacity"
+                                  onClick={(e) => {
+                                    if (!productUrl) e.preventDefault();
+                                  }}
                                 >
-                                  <img 
-                                    src={productImage} 
-                                    alt={productTitle}
-                                    className="w-full h-32 object-cover"
-                                  />
+                                  {productImage ? (
+                                    <img 
+                                      src={productImage} 
+                                      alt={productTitle || 'Produit'}
+                                      className="w-full h-32 object-cover"
+                                    />
+                                  ) : (
+                                    <div className="w-full h-32 bg-gray-100 flex items-center justify-center">
+                                      <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                      </svg>
+                                    </div>
+                                  )}
                                   <div className="p-2 bg-white">
                                     <p className="text-sm font-medium text-gray-900 truncate">
-                                      {productTitle}
+                                      {productTitle || 'Produit'}
                                     </p>
                                     {productPrice && (
                                       <p className="text-xs font-semibold text-green-600 mt-1">
-                                        {productPrice} FCFA
+                                        {Number(productPrice).toLocaleString()} FCFA
+                                      </p>
+                                    )}
+                                    {productUrl && (
+                                      <p className="text-xs text-blue-500 mt-1 flex items-center gap-1">
+                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                        </svg>
+                                        Voir le produit
                                       </p>
                                     )}
                                   </div>
