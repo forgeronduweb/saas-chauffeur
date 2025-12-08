@@ -275,8 +275,7 @@ async function seedCompleteOffers() {
         contractType: offerData.contractType,
         salaryRange: offerData.salaryRange,
         benefits: offerData.benefits,
-        isUrgent: false,
-        isDirect: false
+        isUrgent: false
       });
 
       console.log(`✅ ${offer.title}`);

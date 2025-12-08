@@ -201,8 +201,7 @@ async function seedOffersFromCode() {
         contractType: offerData.contractType,
         salaryRange: offerData.salary,
         offerType: offerType,
-        isUrgent: false,
-        isDirect: false
+        isUrgent: false
       });
 
       console.log(`✅ ${offer.title}`);

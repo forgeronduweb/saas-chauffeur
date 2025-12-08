@@ -184,14 +184,6 @@ const createOffer = async (req, res) => {
       offerData.characteristics = new Map(Object.entries(req.body.characteristics));
     }
 
-    // Log spécial pour les offres directes
-    if (offerData.isDirect) {
-      console.log('🎯 OFFRE DIRECTE détectée:');
-      console.log('   - targetDriverId:', offerData.targetDriverId);
-      console.log('   - isDirect:', offerData.isDirect);
-      console.log('   - title:', offerData.title);
-    }
-
     console.log('📸 Images à créer:', {
       mainImage: offerData.mainImage ? 'Oui' : 'Non',
       additionalImages: offerData.additionalImages?.length || 0
@@ -310,13 +302,6 @@ const updateOffer = async (req, res) => {
     if (!offer) {
       return res.status(404).json({ 
         error: 'Offre non trouvée ou vous n\'êtes pas autorisé à la modifier' 
-      });
-    }
-
-    // Empêcher la modification des offres d'emploi directes
-    if (offer.isDirect) {
-      return res.status(400).json({
-        error: 'Les offres d\'emploi directes ne peuvent pas être modifiées'
       });
     }
 

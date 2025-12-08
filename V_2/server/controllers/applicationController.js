@@ -325,11 +325,11 @@ exports.getMyApplications = async (req, res) => {
       return res.json([]);
     }
 
-    // 1. Récupérer les candidatures existantes
+    // Récupérer les candidatures
     const applications = await Application.find({ driverId: driverProfile._id })
       .populate({
         path: 'offerId',
-        select: 'title company location salary type contractType workType isDirect targetDriverId',
+        select: 'title company location salary type contractType workType',
         populate: {
           path: 'employerId',
           select: 'firstName lastName companyName'
@@ -341,23 +341,11 @@ exports.getMyApplications = async (req, res) => {
       })
       .sort({ createdAt: -1 });
 
-    // 2. Récupérer les offres directes non encore converties en candidature
-    const directOffers = await Offer.find({
-      targetDriverId: driverProfile._id,
-      isDirect: true,
-      _id: { $nin: applications.map(app => app.offerId?._id).filter(Boolean) }
-    })
-    .populate('employerId', 'firstName lastName companyName')
-    .sort({ createdAt: -1 });
-
-    // 3. Formater les candidatures existantes
+    // Formater les candidatures
     const formattedApplications = applications.map(app => ({
       _id: app._id,
       offerId: app.offerId?._id,
-      offer: app.offerId ? {
-        ...app.offerId.toObject(),
-        isDirect: app.offerId.isDirect || false
-      } : null,
+      offer: app.offerId ? app.offerId.toObject() : null,
       status: app.status,
       message: app.message,
       hasConversation: app.hasConversation,
@@ -366,32 +354,10 @@ exports.getMyApplications = async (req, res) => {
       finalOffer: app.finalOffer,
       createdAt: app.createdAt,
       updatedAt: app.updatedAt,
-      finalDecisionAt: app.finalDecisionAt,
-      isDirectOffer: app.offerId?.isDirect || false
+      finalDecisionAt: app.finalDecisionAt
     }));
 
-    // 4. Ajouter les offres directes comme des candidatures spéciales
-    const directOfferApplications = directOffers.map(offer => ({
-      _id: `direct_${offer._id}`, // ID temporaire pour le frontend
-      offerId: offer._id,
-      offer: {
-        ...offer.toObject(),
-        isDirect: true
-      },
-      status: 'direct_offer', // Statut spécial pour les offres directes
-      message: 'Vous avez reçu une offre directe pour ce poste',
-      hasConversation: false,
-      isDirectOffer: true,
-      createdAt: offer.createdAt,
-      updatedAt: offer.updatedAt
-    }));
-
-    // 5. Combiner et trier par date (du plus récent)
-    const allApplications = [...formattedApplications, ...directOfferApplications].sort(
-      (a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt)
-    );
-
-    res.json(allApplications);
+    res.json(formattedApplications);
 
   } catch (error) {
     console.error('❌ Erreur récupération candidatures:', error);
