@@ -99,6 +99,14 @@ const offerSchema = new mongoose.Schema(
       type: Number,
       default: 50
     },
+    views: {
+      type: Number,
+      default: 0
+    },
+    messagesCount: {
+      type: Number,
+      default: 0
+    },
     isUrgent: {
       type: Boolean,
       default: false
@@ -201,6 +209,18 @@ offerSchema.methods.canReceiveApplications = function() {
 // Middleware pour incrémenter le compteur de candidatures
 offerSchema.methods.incrementApplicationCount = function() {
   this.applicationCount += 1;
+  return this.save();
+};
+
+// Méthode pour incrémenter le compteur de vues
+offerSchema.methods.incrementViews = function() {
+  this.views += 1;
+  return this.save();
+};
+
+// Méthode pour incrémenter le compteur de messages
+offerSchema.methods.incrementMessagesCount = function() {
+  this.messagesCount += 1;
   return this.save();
 };
 

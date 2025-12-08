@@ -91,6 +91,11 @@ exports.createOrGetConversation = async (req, res) => {
           
           console.log('✅ Message automatique sauvegardé:', initialMessage._id);
           
+          // Incrémenter le compteur de messages de l'offre
+          offer.incrementMessagesCount().catch(err => 
+            console.error('Erreur lors de l\'incrémentation des messages:', err)
+          );
+          
           // Mettre à jour le dernier message de la conversation
           conversation.lastMessage = {
             content: messageContent,
@@ -145,6 +150,11 @@ exports.createOrGetConversation = async (req, res) => {
           await initialMessage.save();
           
           console.log('✅ Message automatique créé pour conversation existante');
+          
+          // Incrémenter le compteur de messages de l'offre
+          offer.incrementMessagesCount().catch(err => 
+            console.error('Erreur lors de l\'incrémentation des messages:', err)
+          );
           
           // Mettre à jour le dernier message et le compteur
           conversation.lastMessage = {
@@ -324,6 +334,17 @@ exports.sendMessage = async (req, res) => {
 
     await message.save();
     await message.populate('senderId', 'firstName lastName profilePhotoUrl');
+
+    // Si la conversation concerne une offre, incrémenter le compteur de messages
+    if (conversation.context?.type === 'product_inquiry' && conversation.context?.offerId) {
+      const Offer = require('../models/Offer');
+      const offer = await Offer.findById(conversation.context.offerId);
+      if (offer) {
+        offer.incrementMessagesCount().catch(err => 
+          console.error('Erreur lors de l\'incrémentation des messages:', err)
+        );
+      }
+    }
 
     // Mettre à jour la conversation
     conversation.lastMessage = {

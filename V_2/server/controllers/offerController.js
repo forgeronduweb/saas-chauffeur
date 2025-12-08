@@ -255,9 +255,9 @@ const getOfferById = async (req, res) => {
   try {
     const { offerId } = req.params;
     
+    // Récupérer l'offre sans lean() pour pouvoir utiliser les méthodes du modèle
     const offer = await Offer.findById(offerId)
-      .populate('employerId', 'firstName lastName email phone')
-      .lean();
+      .populate('employerId', 'firstName lastName email phone');
 
     if (!offer) {
       return res.status(404).json({ 
@@ -265,13 +265,21 @@ const getOfferById = async (req, res) => {
       });
     }
 
+    // Incrémenter le compteur de vues (de manière asynchrone sans bloquer la réponse)
+    offer.incrementViews().catch(err => 
+      console.error('Erreur lors de l\'incrémentation des vues:', err)
+    );
+
     // Ajouter le nombre de candidatures
     const applicationCount = await Application.countDocuments({ 
       offerId: offer._id 
     });
-    offer.applicationCount = applicationCount;
 
-    res.json(offer);
+    // Convertir en objet simple pour la réponse
+    const offerData = offer.toObject();
+    offerData.applicationCount = applicationCount;
+
+    res.json(offerData);
 
   } catch (error) {
     console.error('Erreur lors de la récupération de l\'offre:', error);
