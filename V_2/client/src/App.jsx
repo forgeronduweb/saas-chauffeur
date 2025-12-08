@@ -184,6 +184,40 @@ function App() {
             <Route path="/a-propos" element={<AProposPage />} />
             <Route path="/contact" element={<ContactPage />} />
             
+            {/* Pages d'inscription spécifiques */}
+            <Route path="/inscription-chauffeur" element={<RoleSelection />} />
+            <Route path="/inscription-employeur" element={<RoleSelection />} />
+            
+            {/* Pages avec redirections */}
+            <Route path="/creer-offre" element={<CreateOfferPage />} />
+            <Route path="/chauffeurs" element={<DriversPage />} />
+            
+            {/* Pages avec alias pour le footer */}
+            <Route 
+              path="/mes-candidatures" 
+              element={
+                <PrivateRoute>
+                  <MyApplications />
+                </PrivateRoute>
+              } 
+            />
+            <Route 
+              path="/profil-chauffeur" 
+              element={
+                <PrivateRoute>
+                  <UserProfilePage />
+                </PrivateRoute>
+              } 
+            />
+            <Route 
+              path="/mes-offres" 
+              element={
+                <PrivateRoute>
+                  <MyOffers />
+                </PrivateRoute>
+              } 
+            />
+            
             {/* Pages employeur protégées */}
             <Route 
               path="/employer/candidates" 

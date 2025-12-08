@@ -169,8 +169,6 @@ export default function MyProducts() {
                   options={[
                     { value: 'all', label: `Tous les articles (${products.length})` },
                     { value: 'active', label: `Articles actifs (${products.filter(p => p.status === 'active').length})` },
-                    { value: 'premium', label: `Articles premium (${products.filter(p => p.isPremium || p.isPromoted).length})` },
-                    { value: 'simple', label: `Articles simples (${products.filter(p => !p.isPremium && !p.isPromoted).length})` },
                     { value: 'inactive', label: `Inactives (${products.filter(p => p.status === 'paused').length})` }
                   ]}
                   placeholder="Filtrer par statut"
@@ -206,41 +204,20 @@ export default function MyProducts() {
                   onClick={() => {setFilter('all'); setCurrentView('list');}}
                   className={`w-full p-3 rounded-lg transition-colors text-left ${
                     currentView === 'list' && filter === 'all'
-                      ? 'bg-blue-50 border border-blue-200' 
+                      ? 'bg-orange-50 border border-orange-200' 
                       : 'hover:bg-gray-50 border border-transparent'
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                        <TrendingUp className="w-4 h-4 text-blue-600" />
+                      <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                        <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                        </svg>
                       </div>
                       <div>
-                        <p className="text-sm lg:text-xl text-gray-900">Tous les articles</p>
+                        <p className="text-sm lg:text-xl text-gray-900">Mes articles</p>
                         <p className="text-sm text-gray-600">Toutes vos offres</p>
-                      </div>
-                    </div>
-                  </div>
-                </button>
-
-
-                {/* Mes revenus */}
-                <button
-                  onClick={() => setCurrentView('earnings')}
-                  className={`w-full p-3 rounded-lg transition-colors text-left ${
-                    currentView === 'earnings' 
-                      ? 'bg-green-50 border border-green-200' 
-                      : 'bg-white hover:bg-green-50'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                        <DollarSign className="w-4 h-4 text-green-600" />
-                      </div>
-                      <div>
-                        <p className="text-sm lg:text-xl text-gray-900">Mes revenus</p>
-                        <p className="text-xs text-gray-600">Gains potentiels</p>
                       </div>
                     </div>
                   </div>
@@ -251,14 +228,16 @@ export default function MyProducts() {
                   onClick={() => setCurrentView('statistics')}
                   className={`w-full p-3 rounded-lg transition-colors text-left ${
                     currentView === 'statistics' 
-                      ? 'bg-blue-50 border border-blue-200' 
+                      ? 'bg-orange-50 border border-orange-200' 
                       : 'bg-white hover:bg-gray-50'
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                        <BarChart3 className="w-4 h-4 text-blue-600" />
+                      <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                        <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
                       </div>
                       <div>
                         <p className="text-sm lg:text-xl text-gray-900">Statistiques</p>
@@ -272,12 +251,14 @@ export default function MyProducts() {
                 {unreadCount > 0 && (
                   <button
                     onClick={() => navigate('/messages')}
-                    className="w-full p-3 rounded-lg transition-colors text-left bg-red-50 border border-red-200 hover:bg-red-100"
+                    className="w-full p-3 rounded-lg transition-colors text-left bg-orange-50 border border-orange-200 hover:bg-orange-100"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-                          <MessageCircle className="w-4 h-4 text-red-600" />
+                        <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                          <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                          </svg>
                         </div>
                         <div>
                           <p className="text-sm lg:text-xl text-gray-900">Messages</p>
@@ -382,11 +363,11 @@ export default function MyProducts() {
                         <div className="absolute bottom-2 left-2 flex gap-2">
                           <div className="bg-black/70 backdrop-blur-sm text-white px-2 py-1 rounded text-xs flex items-center gap-1">
                             <Eye className="w-3 h-3" />
-                            {Math.floor(Math.random() * 50) + 10}
+                            {product.views || 0}
                           </div>
                           <div className="bg-black/70 backdrop-blur-sm text-white px-2 py-1 rounded text-xs flex items-center gap-1">
                             <MessageCircle className="w-3 h-3" />
-                            {Math.floor(Math.random() * 8) + 1}
+                            {product.messagesCount || 0}
                           </div>
                         </div>
                       </figure>
@@ -477,119 +458,121 @@ export default function MyProducts() {
                 </div>
               </div>
             )
-            ) : currentView === 'statistics' ? (
-              // Vue Statistiques
+            ) : (
+              // Vue Statistiques et Revenus fusionnés
               <div className="space-y-6">
 
-                {/* Métriques principales */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-                  <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-xs lg:text-sm text-gray-600">Vues totales</p>
-                        <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{(products.length * 23).toLocaleString()}</p>
-                        <p className="text-xs lg:text-sm text-green-600 mt-1">+12% vs période précédente</p>
-                      </div>
-                      <div className="w-10 h-10 lg:w-12 lg:h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                        <Eye className="w-5 h-5 lg:w-6 lg:h-6 text-blue-600" />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-xs lg:text-sm text-gray-600">Messages reçus</p>
-                        <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{products.length * 5}</p>
-                        <p className="text-xs lg:text-sm text-green-600 mt-1">+8% vs période précédente</p>
-                      </div>
-                      <div className="w-10 h-10 lg:w-12 lg:h-12 bg-green-100 rounded-full flex items-center justify-center">
-                        <MessageCircle className="w-5 h-5 lg:w-6 lg:h-6 text-green-600" />
+                {/* Section Statistiques */}
+                <div>
+                  <h2 className="text-lg text-gray-900 mb-4">Statistiques</h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+                    <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs lg:text-sm text-gray-600">Vues totales</p>
+                          <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{(products.length * 23).toLocaleString()}</p>
+                          <p className="text-xs lg:text-sm text-green-600 mt-1">+12% vs période précédente</p>
+                        </div>
+                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                          <Eye className="w-5 h-5 lg:w-6 lg:h-6 text-blue-600" />
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-xs lg:text-sm text-gray-600">Taux de conversion</p>
-                        <p className="text-2xl lg:text-3xl text-gray-900 mt-1">12.5%</p>
-                        <p className="text-xs lg:text-sm text-red-600 mt-1">-2% vs période précédente</p>
-                      </div>
-                      <div className="w-10 h-10 lg:w-12 lg:h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                        <TrendingUp className="w-5 h-5 lg:w-6 lg:h-6 text-purple-600" />
+                    <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs lg:text-sm text-gray-600">Messages reçus</p>
+                          <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{products.length * 5}</p>
+                          <p className="text-xs lg:text-sm text-green-600 mt-1">+8% vs période précédente</p>
+                        </div>
+                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-green-100 rounded-full flex items-center justify-center">
+                          <MessageCircle className="w-5 h-5 lg:w-6 lg:h-6 text-green-600" />
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-xs lg:text-sm text-gray-600">Articles actifs</p>
-                        <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{products.filter(p => p.status === 'active').length}</p>
-                        <p className="text-xs lg:text-sm text-gray-600 mt-1">sur {products.length} total</p>
+                    <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs lg:text-sm text-gray-600">Taux de conversion</p>
+                          <p className="text-2xl lg:text-3xl text-gray-900 mt-1">12.5%</p>
+                          <p className="text-xs lg:text-sm text-red-600 mt-1">-2% vs période précédente</p>
+                        </div>
+                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                          <TrendingUp className="w-5 h-5 lg:w-6 lg:h-6 text-purple-600" />
+                        </div>
                       </div>
-                      <div className="w-10 h-10 lg:w-12 lg:h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                        <Activity className="w-5 h-5 lg:w-6 lg:h-6 text-orange-600" />
+                    </div>
+
+                    <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs lg:text-sm text-gray-600">Articles actifs</p>
+                          <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{products.filter(p => p.status === 'active').length}</p>
+                          <p className="text-xs lg:text-sm text-gray-600 mt-1">sur {products.length} total</p>
+                        </div>
+                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                          <Activity className="w-5 h-5 lg:w-6 lg:h-6 text-orange-600" />
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ) : (
-              // Vue Revenus
-              <div className="space-y-6">
 
-                {/* Métriques principales */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-                  <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-xs lg:text-sm text-gray-600">Revenus potentiels</p>
-                        <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{products.reduce((sum, p) => sum + (Number(p.conditions?.salary || p.price) || 0), 0).toLocaleString()} F</p>
-                        <p className="text-xs lg:text-sm text-green-600 mt-1">Toutes vos offres</p>
-                      </div>
-                      <div className="w-10 h-10 lg:w-12 lg:h-12 bg-green-100 rounded-full flex items-center justify-center">
-                        <DollarSign className="w-5 h-5 lg:w-6 lg:h-6 text-green-600" />
+                {/* Section Revenus */}
+                <div>
+                  <h2 className="text-lg text-gray-900 mb-4">Revenus</h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+                    <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs lg:text-sm text-gray-600">Revenus potentiels</p>
+                          <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{products.reduce((sum, p) => sum + (Number(p.conditions?.salary || p.price) || 0), 0).toLocaleString()} F</p>
+                          <p className="text-xs lg:text-sm text-green-600 mt-1">Toutes vos offres</p>
+                        </div>
+                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-green-100 rounded-full flex items-center justify-center">
+                          <DollarSign className="w-5 h-5 lg:w-6 lg:h-6 text-green-600" />
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-xs lg:text-sm text-gray-600">Revenus actifs</p>
-                        <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{products.filter(p => p.status === 'active').reduce((sum, p) => sum + (Number(p.conditions?.salary || p.price) || 0), 0).toLocaleString()} F</p>
-                        <p className="text-xs lg:text-sm text-blue-600 mt-1">Offres en ligne</p>
-                      </div>
-                      <div className="w-10 h-10 lg:w-12 lg:h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                        <Target className="w-5 h-5 lg:w-6 lg:h-6 text-blue-600" />
+                    <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs lg:text-sm text-gray-600">Revenus actifs</p>
+                          <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{products.filter(p => p.status === 'active').reduce((sum, p) => sum + (Number(p.conditions?.salary || p.price) || 0), 0).toLocaleString()} F</p>
+                          <p className="text-xs lg:text-sm text-blue-600 mt-1">Offres en ligne</p>
+                        </div>
+                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                          <Target className="w-5 h-5 lg:w-6 lg:h-6 text-blue-600" />
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-xs lg:text-sm text-gray-600">Estimation mensuelle</p>
-                        <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{Math.floor(products.filter(p => p.status === 'active').reduce((sum, p) => sum + (Number(p.conditions?.salary || p.price) || 0), 0) * 0.12).toLocaleString()} F</p>
-                        <p className="text-xs lg:text-sm text-purple-600 mt-1">Basé sur 12% conversion</p>
-                      </div>
-                      <div className="w-10 h-10 lg:w-12 lg:h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                        <Wallet className="w-5 h-5 lg:w-6 lg:h-6 text-purple-600" />
+                    <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs lg:text-sm text-gray-600">Estimation mensuelle</p>
+                          <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{Math.floor(products.filter(p => p.status === 'active').reduce((sum, p) => sum + (Number(p.conditions?.salary || p.price) || 0), 0) * 0.12).toLocaleString()} F</p>
+                          <p className="text-xs lg:text-sm text-purple-600 mt-1">Basé sur 12% conversion</p>
+                        </div>
+                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                          <Wallet className="w-5 h-5 lg:w-6 lg:h-6 text-purple-600" />
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-xs lg:text-sm text-gray-600">Moyenne par offre</p>
-                        <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{products.length > 0 ? Math.floor(products.reduce((sum, p) => sum + (Number(p.conditions?.salary || p.price) || 0), 0) / products.length).toLocaleString() : 0} F</p>
-                        <p className="text-xs lg:text-sm text-gray-600 mt-1">Prix moyen</p>
-                      </div>
-                      <div className="w-10 h-10 lg:w-12 lg:h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                        <TrendingUp className="w-5 h-5 lg:w-6 lg:h-6 text-orange-600" />
+                    <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs lg:text-sm text-gray-600">Moyenne par offre</p>
+                          <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{products.length > 0 ? Math.floor(products.reduce((sum, p) => sum + (Number(p.conditions?.salary || p.price) || 0), 0) / products.length).toLocaleString() : 0} F</p>
+                          <p className="text-xs lg:text-sm text-gray-600 mt-1">Prix moyen</p>
+                        </div>
+                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                          <TrendingUp className="w-5 h-5 lg:w-6 lg:h-6 text-orange-600" />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -636,41 +619,20 @@ export default function MyProducts() {
                 onClick={() => {setFilter('all'); setCurrentView('list'); setShowMobileSidebar(false);}}
                 className={`w-full p-3 rounded-lg transition-colors text-left ${
                   currentView === 'list' && filter === 'all'
-                    ? 'bg-blue-50 border border-blue-200' 
+                    ? 'bg-orange-50 border border-orange-200' 
                     : 'hover:bg-gray-50 border border-transparent'
                 }`}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                      <TrendingUp className="w-4 h-4 text-blue-600" />
+                    <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                      <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                      </svg>
                     </div>
                     <div>
-                      <p className="text-base lg:text-xl text-gray-900">Tous les articles</p>
+                      <p className="text-base lg:text-xl text-gray-900">Mes articles</p>
                       <p className="text-xs text-gray-600">Toutes vos offres</p>
-                    </div>
-                  </div>
-                </div>
-              </button>
-
-
-              {/* Mes revenus */}
-              <button
-                onClick={() => {setCurrentView('earnings'); setShowMobileSidebar(false);}}
-                className={`w-full p-3 rounded-lg transition-colors text-left ${
-                  currentView === 'earnings' 
-                    ? 'bg-green-50 border border-green-200' 
-                    : 'bg-white hover:bg-green-50'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                      <DollarSign className="w-4 h-4 text-green-600" />
-                    </div>
-                    <div>
-                      <p className="text-base lg:text-xl text-gray-900">Mes revenus</p>
-                      <p className="text-xs text-gray-600">Gains potentiels</p>
                     </div>
                   </div>
                 </div>
@@ -681,14 +643,16 @@ export default function MyProducts() {
                 onClick={() => {setCurrentView('statistics'); setShowMobileSidebar(false);}}
                 className={`w-full p-3 rounded-lg transition-colors text-left ${
                   currentView === 'statistics' 
-                    ? 'bg-blue-50 border border-blue-200' 
+                    ? 'bg-orange-50 border border-orange-200' 
                     : 'bg-white hover:bg-gray-50'
                 }`}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                      <BarChart3 className="w-4 h-4 text-blue-600" />
+                    <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                      <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                      </svg>
                     </div>
                     <div>
                       <p className="text-base lg:text-xl text-gray-900">Statistiques</p>
@@ -702,12 +666,14 @@ export default function MyProducts() {
               {unreadCount > 0 && (
                 <button
                   onClick={() => {navigate('/messages'); setShowMobileSidebar(false);}}
-                  className="w-full p-3 rounded-lg transition-colors text-left bg-red-50 border border-red-200 hover:bg-red-100"
+                  className="w-full p-3 rounded-lg transition-colors text-left bg-orange-50 border border-orange-200 hover:bg-orange-100"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-                        <MessageCircle className="w-4 h-4 text-red-600" />
+                      <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                        <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                        </svg>
                       </div>
                       <div>
                         <p className="text-sm text-gray-900">Messages</p>

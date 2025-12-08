@@ -202,41 +202,20 @@ export default function MyProducts() {
                   onClick={() => {setFilter('all'); setCurrentView('list');}}
                   className={`w-full p-3 rounded-lg transition-colors text-left ${
                     currentView === 'list' && filter === 'all'
-                      ? 'bg-blue-50 border border-blue-200' 
+                      ? 'bg-orange-50 border border-orange-200' 
                       : 'hover:bg-gray-50 border border-transparent'
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                        <TrendingUp className="w-4 h-4 text-blue-600" />
+                      <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                        <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                        </svg>
                       </div>
                       <div>
-                        <p className="text-sm lg:text-xl text-gray-900">Tous les articles</p>
+                        <p className="text-sm lg:text-xl text-gray-900">Mes articles</p>
                         <p className="text-sm text-gray-600">Toutes vos offres</p>
-                      </div>
-                    </div>
-                  </div>
-                </button>
-
-
-                {/* Mes revenus */}
-                <button
-                  onClick={() => setCurrentView('earnings')}
-                  className={`w-full p-3 rounded-lg transition-colors text-left ${
-                    currentView === 'earnings' 
-                      ? 'bg-green-50 border border-green-200' 
-                      : 'bg-white hover:bg-green-50'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                        <DollarSign className="w-4 h-4 text-green-600" />
-                      </div>
-                      <div>
-                        <p className="text-sm lg:text-xl text-gray-900">Mes revenus</p>
-                        <p className="text-xs text-gray-600">Gains potentiels</p>
                       </div>
                     </div>
                   </div>
@@ -247,14 +226,16 @@ export default function MyProducts() {
                   onClick={() => setCurrentView('statistics')}
                   className={`w-full p-3 rounded-lg transition-colors text-left ${
                     currentView === 'statistics' 
-                      ? 'bg-blue-50 border border-blue-200' 
+                      ? 'bg-orange-50 border border-orange-200' 
                       : 'bg-white hover:bg-gray-50'
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                        <BarChart3 className="w-4 h-4 text-blue-600" />
+                      <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                        <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
                       </div>
                       <div>
                         <p className="text-sm lg:text-xl text-gray-900">Statistiques</p>
@@ -268,12 +249,14 @@ export default function MyProducts() {
                 {unreadCount > 0 && (
                   <button
                     onClick={() => navigate('/messages')}
-                    className="w-full p-3 rounded-lg transition-colors text-left bg-red-50 border border-red-200 hover:bg-red-100"
+                    className="w-full p-3 rounded-lg transition-colors text-left bg-orange-50 border border-orange-200 hover:bg-orange-100"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-                          <MessageCircle className="w-4 h-4 text-red-600" />
+                        <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                          <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                          </svg>
                         </div>
                         <div>
                           <p className="text-sm lg:text-xl text-gray-900">Messages</p>
@@ -325,17 +308,17 @@ export default function MyProducts() {
                 <div className="bg-white rounded-lg border border-gray-200 px-4 py-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <h2 className="text-gray-900">
+                      <h2 className="text-sm lg:text-lg text-gray-900">
                         {filter === 'all' ? 'Toutes vos offres' : 
                          filter === 'active' ? 'Offres actives' : 'Offres inactives'}
                       </h2>
-                      <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-sm">
+                      <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs">
                         {filteredProducts.length}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <BarChart3 className="w-4 h-4" />
-                      <span>Performance globale: 87%</span>
+                    <div className="flex items-center gap-2 text-xs lg:text-sm text-gray-600">
+                      <BarChart3 className="w-3 h-3 lg:w-4 lg:h-4" />
+                      <span>Performance: 87%</span>
                     </div>
                   </div>
                 </div>
@@ -376,11 +359,11 @@ export default function MyProducts() {
                         <div className="absolute bottom-2 left-2 flex gap-2">
                           <div className="bg-black/70 backdrop-blur-sm text-white px-2 py-1 rounded text-xs flex items-center gap-1">
                             <Eye className="w-3 h-3" />
-                            {Math.floor(Math.random() * 50) + 10}
+                            {product.views || 0}
                           </div>
                           <div className="bg-black/70 backdrop-blur-sm text-white px-2 py-1 rounded text-xs flex items-center gap-1">
                             <MessageCircle className="w-3 h-3" />
-                            {Math.floor(Math.random() * 8) + 1}
+                            {product.messagesCount || 0}
                           </div>
                         </div>
                       </figure>
@@ -398,19 +381,19 @@ export default function MyProducts() {
                         
                         {/* Titre et prix */}
                         <div className="flex items-start justify-between gap-2 mb-2">
-                          <h3 className="text-lg text-gray-900 line-clamp-2 flex-1">
+                          <h3 className="text-sm lg:text-lg text-gray-900 line-clamp-2 flex-1">
                             {product.title}
                           </h3>
                           <div className="flex items-baseline gap-1 flex-shrink-0">
-                            <span className="text-xl text-blue-600 whitespace-nowrap">
+                            <span className="text-base lg:text-xl text-blue-600 whitespace-nowrap">
                               {(Number(product.conditions?.salary || product.price) || 0).toLocaleString()}
                             </span>
-                            <span className="text-sm text-gray-600">F</span>
+                            <span className="text-xs lg:text-sm text-gray-600">F</span>
                           </div>
                         </div>
 
                         {/* Localisation et date */}
-                        <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
+                        <div className="flex items-center justify-between text-xs lg:text-sm text-gray-600 mb-3">
                           <div className="flex items-center gap-1">
                             <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -428,7 +411,7 @@ export default function MyProducts() {
                           <div className="flex gap-2">
                             <button 
                               onClick={() => navigate(`/produit/${product._id}`)}
-                              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-sm transition-colors"
+                              className="bg-blue-600 hover:bg-blue-700 text-white px-2 lg:px-3 py-1 lg:py-1.5 rounded text-xs lg:text-sm transition-colors"
                             >
                               Voir
                             </button>
@@ -471,119 +454,121 @@ export default function MyProducts() {
                 </div>
               </div>
             )
-            ) : currentView === 'statistics' ? (
-              // Vue Statistiques
+            ) : (
+              // Vue Statistiques et Revenus fusionnés
               <div className="space-y-6">
 
-                {/* Métriques principales */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-                  <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-xs lg:text-sm text-gray-600">Vues totales</p>
-                        <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{(products.length * 23).toLocaleString()}</p>
-                        <p className="text-xs lg:text-sm text-green-600 mt-1">+12% vs période précédente</p>
-                      </div>
-                      <div className="w-10 h-10 lg:w-12 lg:h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                        <Eye className="w-5 h-5 lg:w-6 lg:h-6 text-blue-600" />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-xs lg:text-sm text-gray-600">Messages reçus</p>
-                        <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{products.length * 5}</p>
-                        <p className="text-xs lg:text-sm text-green-600 mt-1">+8% vs période précédente</p>
-                      </div>
-                      <div className="w-10 h-10 lg:w-12 lg:h-12 bg-green-100 rounded-full flex items-center justify-center">
-                        <MessageCircle className="w-5 h-5 lg:w-6 lg:h-6 text-green-600" />
+                {/* Section Statistiques */}
+                <div>
+                  <h2 className="text-lg text-gray-900 mb-4">Statistiques</h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+                    <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs lg:text-sm text-gray-600">Vues totales</p>
+                          <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{(products.length * 23).toLocaleString()}</p>
+                          <p className="text-xs lg:text-sm text-green-600 mt-1">+12% vs période précédente</p>
+                        </div>
+                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                          <Eye className="w-5 h-5 lg:w-6 lg:h-6 text-blue-600" />
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-xs lg:text-sm text-gray-600">Taux de conversion</p>
-                        <p className="text-2xl lg:text-3xl text-gray-900 mt-1">12.5%</p>
-                        <p className="text-xs lg:text-sm text-red-600 mt-1">-2% vs période précédente</p>
-                      </div>
-                      <div className="w-10 h-10 lg:w-12 lg:h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                        <TrendingUp className="w-5 h-5 lg:w-6 lg:h-6 text-purple-600" />
+                    <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs lg:text-sm text-gray-600">Messages reçus</p>
+                          <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{products.length * 5}</p>
+                          <p className="text-xs lg:text-sm text-green-600 mt-1">+8% vs période précédente</p>
+                        </div>
+                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-green-100 rounded-full flex items-center justify-center">
+                          <MessageCircle className="w-5 h-5 lg:w-6 lg:h-6 text-green-600" />
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-xs lg:text-sm text-gray-600">Articles actifs</p>
-                        <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{products.filter(p => p.status === 'active').length}</p>
-                        <p className="text-xs lg:text-sm text-gray-600 mt-1">sur {products.length} total</p>
+                    <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs lg:text-sm text-gray-600">Taux de conversion</p>
+                          <p className="text-2xl lg:text-3xl text-gray-900 mt-1">12.5%</p>
+                          <p className="text-xs lg:text-sm text-red-600 mt-1">-2% vs période précédente</p>
+                        </div>
+                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                          <TrendingUp className="w-5 h-5 lg:w-6 lg:h-6 text-purple-600" />
+                        </div>
                       </div>
-                      <div className="w-10 h-10 lg:w-12 lg:h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                        <Activity className="w-5 h-5 lg:w-6 lg:h-6 text-orange-600" />
+                    </div>
+
+                    <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs lg:text-sm text-gray-600">Articles actifs</p>
+                          <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{products.filter(p => p.status === 'active').length}</p>
+                          <p className="text-xs lg:text-sm text-gray-600 mt-1">sur {products.length} total</p>
+                        </div>
+                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                          <Activity className="w-5 h-5 lg:w-6 lg:h-6 text-orange-600" />
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ) : (
-              // Vue Revenus
-              <div className="space-y-6">
 
-                {/* Métriques principales */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-                  <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-xs lg:text-sm text-gray-600">Revenus potentiels</p>
-                        <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{products.reduce((sum, p) => sum + (Number(p.conditions?.salary || p.price) || 0), 0).toLocaleString()} F</p>
-                        <p className="text-xs lg:text-sm text-green-600 mt-1">Toutes vos offres</p>
-                      </div>
-                      <div className="w-10 h-10 lg:w-12 lg:h-12 bg-green-100 rounded-full flex items-center justify-center">
-                        <DollarSign className="w-5 h-5 lg:w-6 lg:h-6 text-green-600" />
+                {/* Section Revenus */}
+                <div>
+                  <h2 className="text-lg text-gray-900 mb-4">Revenus</h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+                    <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs lg:text-sm text-gray-600">Revenus potentiels</p>
+                          <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{products.reduce((sum, p) => sum + (Number(p.conditions?.salary || p.price) || 0), 0).toLocaleString()} F</p>
+                          <p className="text-xs lg:text-sm text-green-600 mt-1">Toutes vos offres</p>
+                        </div>
+                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-green-100 rounded-full flex items-center justify-center">
+                          <DollarSign className="w-5 h-5 lg:w-6 lg:h-6 text-green-600" />
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-xs lg:text-sm text-gray-600">Revenus actifs</p>
-                        <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{products.filter(p => p.status === 'active').reduce((sum, p) => sum + (Number(p.conditions?.salary || p.price) || 0), 0).toLocaleString()} F</p>
-                        <p className="text-xs lg:text-sm text-blue-600 mt-1">Offres en ligne</p>
-                      </div>
-                      <div className="w-10 h-10 lg:w-12 lg:h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                        <Target className="w-5 h-5 lg:w-6 lg:h-6 text-blue-600" />
+                    <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs lg:text-sm text-gray-600">Revenus actifs</p>
+                          <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{products.filter(p => p.status === 'active').reduce((sum, p) => sum + (Number(p.conditions?.salary || p.price) || 0), 0).toLocaleString()} F</p>
+                          <p className="text-xs lg:text-sm text-blue-600 mt-1">Offres en ligne</p>
+                        </div>
+                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                          <Target className="w-5 h-5 lg:w-6 lg:h-6 text-blue-600" />
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-xs lg:text-sm text-gray-600">Estimation mensuelle</p>
-                        <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{Math.floor(products.filter(p => p.status === 'active').reduce((sum, p) => sum + (Number(p.conditions?.salary || p.price) || 0), 0) * 0.12).toLocaleString()} F</p>
-                        <p className="text-xs lg:text-sm text-purple-600 mt-1">Basé sur 12% conversion</p>
-                      </div>
-                      <div className="w-10 h-10 lg:w-12 lg:h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                        <Wallet className="w-5 h-5 lg:w-6 lg:h-6 text-purple-600" />
+                    <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs lg:text-sm text-gray-600">Estimation mensuelle</p>
+                          <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{Math.floor(products.filter(p => p.status === 'active').reduce((sum, p) => sum + (Number(p.conditions?.salary || p.price) || 0), 0) * 0.12).toLocaleString()} F</p>
+                          <p className="text-xs lg:text-sm text-purple-600 mt-1">Basé sur 12% conversion</p>
+                        </div>
+                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                          <Wallet className="w-5 h-5 lg:w-6 lg:h-6 text-purple-600" />
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-xs lg:text-sm text-gray-600">Moyenne par offre</p>
-                        <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{products.length > 0 ? Math.floor(products.reduce((sum, p) => sum + (Number(p.conditions?.salary || p.price) || 0), 0) / products.length).toLocaleString() : 0} F</p>
-                        <p className="text-xs lg:text-sm text-gray-600 mt-1">Prix moyen</p>
-                      </div>
-                      <div className="w-10 h-10 lg:w-12 lg:h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                        <TrendingUp className="w-5 h-5 lg:w-6 lg:h-6 text-orange-600" />
+                    <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs lg:text-sm text-gray-600">Moyenne par offre</p>
+                          <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{products.length > 0 ? Math.floor(products.reduce((sum, p) => sum + (Number(p.conditions?.salary || p.price) || 0), 0) / products.length).toLocaleString() : 0} F</p>
+                          <p className="text-xs lg:text-sm text-gray-600 mt-1">Prix moyen</p>
+                        </div>
+                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                          <TrendingUp className="w-5 h-5 lg:w-6 lg:h-6 text-orange-600" />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -630,17 +615,19 @@ export default function MyProducts() {
                 onClick={() => {setFilter('all'); setCurrentView('list'); setShowMobileSidebar(false);}}
                 className={`w-full p-3 rounded-lg transition-colors text-left ${
                   currentView === 'list' && filter === 'all'
-                    ? 'bg-blue-50 border border-blue-200' 
+                    ? 'bg-orange-50 border border-orange-200' 
                     : 'hover:bg-gray-50 border border-transparent'
                 }`}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                      <TrendingUp className="w-4 h-4 text-blue-600" />
+                    <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                      <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                      </svg>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-900">Tous les articles</p>
+                      <p className="text-base lg:text-xl text-gray-900">Mes articles</p>
                       <p className="text-xs text-gray-600">Toutes vos offres</p>
                     </div>
                   </div>
@@ -648,44 +635,24 @@ export default function MyProducts() {
               </button>
 
 
-              {/* Mes revenus */}
-              <button
-                onClick={() => {setCurrentView('earnings'); setShowMobileSidebar(false);}}
-                className={`w-full p-3 rounded-lg transition-colors text-left ${
-                  currentView === 'earnings' 
-                    ? 'bg-green-50 border border-green-200' 
-                    : 'bg-white hover:bg-green-50'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                      <DollarSign className="w-4 h-4 text-green-600" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-900">Mes revenus</p>
-                      <p className="text-xs text-gray-600">Gains potentiels</p>
-                    </div>
-                  </div>
-                </div>
-              </button>
-
               {/* Statistiques */}
               <button
                 onClick={() => {setCurrentView('statistics'); setShowMobileSidebar(false);}}
                 className={`w-full p-3 rounded-lg transition-colors text-left ${
                   currentView === 'statistics' 
-                    ? 'bg-blue-50 border border-blue-200' 
+                    ? 'bg-orange-50 border border-orange-200' 
                     : 'bg-white hover:bg-gray-50'
                 }`}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                      <BarChart3 className="w-4 h-4 text-blue-600" />
+                    <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                      <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                      </svg>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-900">Statistiques</p>
+                      <p className="text-base lg:text-xl text-gray-900">Statistiques</p>
                       <p className="text-xs text-gray-600">Voir les détails</p>
                     </div>
                   </div>
@@ -696,12 +663,14 @@ export default function MyProducts() {
               {unreadCount > 0 && (
                 <button
                   onClick={() => {navigate('/messages'); setShowMobileSidebar(false);}}
-                  className="w-full p-3 rounded-lg transition-colors text-left bg-red-50 border border-red-200 hover:bg-red-100"
+                  className="w-full p-3 rounded-lg transition-colors text-left bg-orange-50 border border-orange-200 hover:bg-orange-100"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-                        <MessageCircle className="w-4 h-4 text-red-600" />
+                      <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                        <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                        </svg>
                       </div>
                       <div>
                         <p className="text-sm text-gray-900">Messages</p>
@@ -709,373 +678,6 @@ export default function MyProducts() {
                       </div>
                     </div>
                   </div>
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Menu Boost - Bottom Sheet Mobile / Sidebar Desktop */}
-      {showBoostMenu && (
-        <div className="fixed inset-0 z-50">
-          {/* Overlay */}
-          <div
-            className="absolute inset-0 bg-black/50"
-            onClick={() => setShowBoostMenu(false)}
-          ></div>
-
-          {/* Menu - Bottom Sheet Mobile / Sidebar Desktop */}
-          <div className="absolute bottom-0 left-0 right-0 lg:right-0 lg:top-0 lg:bottom-0 lg:left-auto lg:w-96 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out rounded-t-lg lg:rounded-none max-h-[80vh] lg:max-h-full overflow-hidden">
-            {/* Barre de glissement mobile */}
-            <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mt-2 mb-3 lg:hidden"></div>
-            
-            {/* Header */}
-            <div className="px-4 py-3 border-b border-gray-200 bg-white">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  {boostStep === 2 && (
-                    <button
-                      onClick={handlePreviousStep}
-                      className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
-                    >
-                      <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-                      </svg>
-                    </button>
-                  )}
-                  <h3 className="text-lg text-gray-900">
-                    {boostStep === 1 ? 'Créer votre publicité' : boostStep === 2 ? 'Choisir votre plan' : 'Paiement'}
-                  </h3>
-                </div>
-                <button
-                  onClick={() => setShowBoostMenu(false)}
-                  className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
-                >
-                  <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-              
-              {/* Indicateur d'étapes */}
-              <div className="flex items-center justify-center mt-3 space-x-2">
-                <div className={`w-2 h-2 rounded-full ${boostStep === 1 ? 'bg-orange-500' : 'bg-gray-300'}`}></div>
-                <div className={`w-2 h-2 rounded-full ${boostStep === 2 ? 'bg-orange-500' : 'bg-gray-300'}`}></div>
-                <div className={`w-2 h-2 rounded-full ${boostStep === 3 ? 'bg-orange-500' : 'bg-gray-300'}`}></div>
-              </div>
-            </div>
-
-            {/* Contenu */}
-            <div className="p-4 space-y-4 overflow-y-auto flex-1 pb-24 max-h-[calc(80vh-120px)] lg:max-h-[calc(100vh-120px)]">
-              {selectedProduct && (
-                <>
-                  {/* Aperçu du produit */}
-                  <div className="bg-orange-50 rounded-lg p-3 border border-orange-200">
-                    <h4 className="text-sm text-gray-900 mb-1">{selectedProduct.title}</h4>
-                    <p className="text-xs text-orange-600">
-                      {(Number(selectedProduct.conditions?.salary || selectedProduct.price) || 0).toLocaleString()} F
-                    </p>
-                  </div>
-
-                  {/* Étape 1: Image et Texte */}
-                  {boostStep === 1 && (
-                    <>
-                      {/* Upload d'image publicitaire */}
-                      <div className="space-y-3">
-                        <h5 className="text-sm text-gray-900">Image publicitaire (optionnel)</h5>
-                    
-                    {!boostImagePreview ? (
-                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-orange-400 transition-colors">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageUpload}
-                          className="hidden"
-                          id="boost-image-upload"
-                        />
-                        <label htmlFor="boost-image-upload" className="cursor-pointer">
-                          <div className="space-y-2">
-                            <svg className="w-8 h-8 text-gray-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            <p className="text-sm text-gray-600">Cliquez pour ajouter une image</p>
-                            <p className="text-xs text-gray-500">PNG, JPG jusqu'à 5MB</p>
-                          </div>
-                        </label>
-                      </div>
-                    ) : (
-                      <div className="relative">
-                        <img 
-                          src={boostImagePreview} 
-                          alt="Aperçu publicité" 
-                          className="w-full h-32 object-cover rounded-lg"
-                        />
-                        <button
-                          onClick={removeBoostImage}
-                          className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                          </svg>
-                        </button>
-                      </div>
-                    )}
-                      </div>
-
-                      {/* Texte publicitaire */}
-                      <div className="space-y-3">
-                        <h5 className="text-sm text-gray-900">Texte publicitaire</h5>
-                        <textarea
-                          value={boostText}
-                          onChange={(e) => setBoostText(e.target.value)}
-                          placeholder="Écrivez un message accrocheur pour votre publicité..."
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-orange-500 resize-none"
-                          rows="4"
-                          maxLength="200"
-                        />
-                        <p className="text-xs text-gray-500 text-right">{boostText.length}/200 caractères</p>
-                      </div>
-                    </>
-                  )}
-
-                  {/* Étape 2: Plans de boost */}
-                  {boostStep === 2 && (
-                    <>
-                      <div className="space-y-4">
-                        <h5 className="text-sm text-gray-900">Choisissez votre formule</h5>
-                    
-                    {/* Formule Découverte - 1 semaine */}
-                    <button 
-                      onClick={() => handleSelectBoostDuration({ days: 7, price: 2500, label: 'Découverte', weeks: 1 })}
-                      className={`w-full p-4 border rounded-lg transition-colors text-left ${
-                        selectedBoostDuration?.label === 'Découverte'
-                          ? 'border-orange-500 bg-orange-50' 
-                          : 'border-gray-200 hover:border-orange-300 hover:bg-orange-50'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <div>
-                          <p className="text-xs text-gray-900">Découverte</p>
-                          <p className="text-xs text-gray-600">1 semaine</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm text-orange-600">2 500 F</p>
-                        </div>
-                      </div>
-                      <div className="space-y-1 text-xs text-gray-600">
-                        <p>• +200% de visibilité</p>
-                        <p>• Publication Facebook automatique</p>
-                        <p>• Badge "Boostée" visible</p>
-                      </div>
-                    </button>
-
-                    {/* Formule Croissance - 3 semaines */}
-                    <div className="relative">
-                      <div className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full z-10">
-                        Recommandé
-                      </div>
-                      <button 
-                        onClick={() => handleSelectBoostDuration({ days: 21, price: 6000, label: 'Croissance', weeks: 3 })}
-                        className={`w-full p-4 border rounded-lg transition-colors text-left ${
-                          selectedBoostDuration?.label === 'Croissance'
-                            ? 'border-orange-500 bg-orange-50' 
-                            : 'border-gray-200 hover:border-orange-300 hover:bg-orange-50'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between mb-2">
-                          <div>
-                            <p className="text-xs text-gray-900">Croissance</p>
-                            <p className="text-xs text-orange-600">3 semaines</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-sm text-orange-600">6 000 F</p>
-                            <p className="text-xs text-gray-500 line-through">7 500 F</p>
-                          </div>
-                        </div>
-                        <div className="space-y-1 text-xs text-gray-600">
-                          <p>• +400% de visibilité</p>
-                          <p>• 3 publications Facebook</p>
-                          <p>• Support prioritaire</p>
-                          <p className="text-gray-600">• Économie de 20%</p>
-                        </div>
-                      </button>
-                    </div>
-
-                    {/* Formule Succès - 1 mois et demi */}
-                    <button 
-                      onClick={() => handleSelectBoostDuration({ days: 45, price: 8500, label: 'Succès', weeks: 6 })}
-                      className={`w-full p-4 border rounded-lg transition-colors text-left ${
-                        selectedBoostDuration?.label === 'Succès'
-                          ? 'border-orange-500 bg-orange-50' 
-                          : 'border-gray-200 hover:border-orange-300 hover:bg-orange-50'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <div>
-                          <p className="text-xs text-gray-900">Succès</p>
-                          <p className="text-xs text-gray-600">1 mois et demi</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm text-orange-600">8 500 F</p>
-                          <p className="text-xs text-gray-500 line-through">11 250 F</p>
-                        </div>
-                      </div>
-                      <div className="space-y-1 text-xs text-gray-600">
-                        <p>• +600% de visibilité maximale</p>
-                        <p>• Publications Facebook hebdomadaires</p>
-                        <p>• Badge "Vendeur Vérifié"</p>
-                        <p className="text-gray-600">• Économie de 35%</p>
-                      </div>
-                    </button>
-                      </div>
-
-                    </>
-                  )}
-
-                  {/* Étape 3: Paiement */}
-                  {boostStep === 3 && (
-                    <>
-                      <div className="space-y-4">
-                        <h5 className="text-sm text-gray-900">Choisissez votre méthode de paiement</h5>
-                        
-                        {/* Récapitulatif de la commande */}
-                        <div className="bg-gray-50 rounded-lg p-4 border">
-                          <h6 className="text-xs font-medium text-gray-700 mb-2">Récapitulatif</h6>
-                          <div className="flex justify-between items-center mb-1">
-                            <span className="text-sm text-gray-600">Formule {selectedBoostDuration?.label}</span>
-                            <span className="text-sm font-medium">{selectedBoostDuration?.price.toLocaleString()} F</span>
-                          </div>
-                          <div className="flex justify-between items-center text-xs text-gray-500">
-                            <span>Durée: {selectedBoostDuration?.weeks ? `${selectedBoostDuration.weeks} semaine${selectedBoostDuration.weeks > 1 ? 's' : ''}` : `${selectedBoostDuration?.days} jour${selectedBoostDuration?.days > 1 ? 's' : ''}`}</span>
-                          </div>
-                        </div>
-
-                        {/* Options de paiement */}
-                        <div className="space-y-3">
-                          {/* Paiement mobile */}
-                          <div>
-                            <h6 className="text-xs font-medium text-gray-700 mb-2">Paiement mobile</h6>
-                            <div className="grid grid-cols-2 gap-2">
-                              {[
-                                { id: 'wave', name: 'Wave', color: 'bg-blue-500'},
-                                { id: 'mtn', name: 'MTN Money', color: 'bg-yellow-500'},
-                                { id: 'orange', name: 'Orange Money', color: 'bg-orange-500'},
-                                { id: 'moov', name: 'Moov Money', color: 'bg-green-500'}
-                              ].map((method) => (
-                                <button
-                                  key={method.id}
-                                  onClick={() => setSelectedPaymentMethod(method.id)}
-                                  className={`p-3 border rounded-lg transition-colors text-left ${
-                                    selectedPaymentMethod === method.id
-                                      ? 'border-orange-500 bg-orange-50'
-                                      : 'border-gray-200 hover:border-orange-300 hover:bg-orange-50'
-                                  }`}
-                                >
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-lg">{method.icon}</span>
-                                    <span className="text-xs font-medium">{method.name}</span>
-                                  </div>
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-
-                          {/* Carte bancaire */}
-                          <div>
-                            <h6 className="text-xs font-medium text-gray-700 mb-2">Carte bancaire</h6>
-                            <button
-                              onClick={() => setSelectedPaymentMethod('visa')}
-                              className={`w-full p-3 border rounded-lg transition-colors text-left ${
-                                selectedPaymentMethod === 'visa'
-                                  ? 'border-orange-500 bg-orange-50'
-                                  : 'border-gray-200 hover:border-orange-300 hover:bg-orange-50'
-                              }`}
-                            >
-                              <div className="flex items-center gap-2">
-                                <span className="text-lg">💳</span>
-                                <span className="text-xs font-medium">Carte Visa/MasterCard</span>
-                              </div>
-                            </button>
-                          </div>
-
-                          {selectedPaymentMethod === 'visa' && (
-                            <div className="space-y-3">
-                              <input
-                                type="text"
-                                placeholder="Numéro de carte"
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-orange-500 text-sm"
-                              />
-                              <div className="grid grid-cols-2 gap-2">
-                                <input
-                                  type="text"
-                                  placeholder="MM/AA"
-                                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-orange-500 text-sm"
-                                />
-                                <input
-                                  type="text"
-                                  placeholder="CVV"
-                                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-orange-500 text-sm"
-                                />
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </>
-              )}
-            </div>
-
-            {/* Footer avec bouton */}
-            <div className="absolute bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200">
-              {boostStep === 1 ? (
-                <button 
-                  onClick={handleNextStep}
-                  className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg transition-all flex items-center justify-center gap-2"
-                >
-                  Suivant
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              ) : boostStep === 2 ? (
-                <button 
-                  onClick={handleNextStep}
-                  disabled={!selectedBoostDuration}
-                  className={`w-full py-3 rounded-lg transition-all flex items-center justify-center gap-2 ${
-                    !selectedBoostDuration
-                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                      : 'bg-orange-500 hover:bg-orange-600 text-white'
-                  }`}
-                >
-                  Continuer vers le paiement
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              ) : (
-                <button 
-                  onClick={handleCreateBoost}
-                  disabled={!selectedPaymentMethod || creatingBoost}
-                  className={`w-full py-3 rounded-lg transition-all flex items-center justify-center gap-2 ${
-                    !selectedPaymentMethod || creatingBoost
-                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                      : 'bg-orange-500 hover:bg-orange-600 text-white'
-                  }`}
-                >
-                  {creatingBoost ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Traitement du paiement...
-                    </>
-                  ) : (
-                    <>
-                      <Zap className="w-4 h-4" />
-                      Confirmer le paiement ({selectedBoostDuration?.price.toLocaleString()} F)
-                    </>
-                  )}
                 </button>
               )}
             </div>
@@ -1139,30 +741,31 @@ export default function MyProducts() {
                       { value: '30', label: '30 derniers jours' },
                       { value: '90', label: '90 derniers jours' }
                     ]}
-                    placeholder="Sélectionner période"
+                    placeholder="Sélectionner une période"
                     className="w-full"
                   />
                 </div>
               )}
+            </div>
 
-              {/* Boutons */}
-              <div className="flex gap-2 pt-3">
-                <button 
-                  onClick={() => {
-                    setFilter('all');
-                    setTimeRange('30');
-                  }}
-                  className="flex-1 px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
-                >
-                  Réinitialiser
-                </button>
-                <button 
-                  onClick={() => setShowMobileFilters(false)}
-                  className="flex-1 px-3 py-2 text-sm bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium"
-                >
-                  Appliquer
-                </button>
-              </div>
+            {/* Actions */}
+            <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 flex gap-2">
+              <button
+                onClick={() => {
+                  setFilter('all');
+                  setTimeRange('30');
+                  setShowMobileFilters(false);
+                }}
+                className="flex-1 px-3 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+              >
+                Réinitialiser
+              </button>
+              <button
+                onClick={() => setShowMobileFilters(false)}
+                className="flex-1 px-3 py-2 text-sm bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium"
+              >
+                Appliquer
+              </button>
             </div>
           </div>
         </div>

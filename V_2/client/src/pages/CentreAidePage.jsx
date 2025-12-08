@@ -10,7 +10,10 @@ export default function CentreAidePage() {
   const categories = [
     { id: 'all', name: 'Toutes' },
     { id: 'account', name: 'Compte' },
-    { id: 'offers', name: 'Offres' },
+    { id: 'driver', name: 'Chauffeurs' },
+    { id: 'employer', name: 'Employeurs' },
+    { id: 'offers', name: 'Offres d\'emploi' },
+    { id: 'marketplace', name: 'Marketplace' },
     { id: 'payment', name: 'Paiements' },
     { id: 'security', name: 'Sécurité' }
   ];
@@ -111,6 +114,60 @@ export default function CentreAidePage() {
       category: 'security',
       question: 'Que faire en cas de problème avec un utilisateur ?',
       answer: 'Si vous rencontrez un problème avec un utilisateur (comportement inapproprié, fausse information, arnaque), vous pouvez le signaler à notre équipe. Utilisez le bouton "Signaler" sur le profil concerné ou contactez-nous directement à support@godriver.ci. Notre équipe examine chaque signalement et prend les mesures appropriées (avertissement, suspension, bannissement). Nous prenons la sécurité de notre communauté très au sérieux.'
+    },
+    {
+      id: 17,
+      category: 'driver',
+      question: 'Quels documents sont requis pour les chauffeurs ?',
+      answer: 'Pour créer un profil chauffeur complet, vous devez fournir : Permis de conduire valide (recto-verso), Carte d\'identité nationale, Photo de profil professionnelle, et éventuellement : Certificat de bonne conduite, Attestation d\'assurance, Références professionnelles. Ces documents garantissent votre crédibilité et augmentent vos chances d\'être recruté.'
+    },
+    {
+      id: 18,
+      category: 'driver',
+      question: 'Comment optimiser mon profil chauffeur ?',
+      answer: 'Un profil complet attire plus d\'employeurs. Ajoutez une photo professionnelle, décrivez votre expérience détaillée, mentionnez vos spécialités (transport VIP, livraison, tourisme), indiquez vos disponibilités, et ajoutez vos références. Mettez à jour régulièrement votre statut et répondez rapidement aux messages pour montrer votre sérieux.'
+    },
+    {
+      id: 19,
+      category: 'driver',
+      question: 'Puis-je postuler à plusieurs offres simultanément ?',
+      answer: 'Oui, vous pouvez postuler à autant d\'offres que vous le souhaitez. Cependant, nous vous recommandons de cibler les offres qui correspondent réellement à votre profil et à vos attentes. Personnalisez chaque message de candidature pour augmenter vos chances. Vous pouvez suivre toutes vos candidatures depuis "Mes candidatures" dans votre tableau de bord.'
+    },
+    {
+      id: 20,
+      category: 'employer',
+      question: 'Comment trouver le chauffeur idéal ?',
+      answer: 'Utilisez notre recherche avancée avec filtres : localisation, type de transport, expérience, disponibilités, et évaluations. Consultez les profils vérifiés (badge vert). Lisez les avis précédents et vérifiez les documents. Vous pouvez aussi publier une offre ciblée pour attirer les meilleurs candidats.'
+    },
+    {
+      id: 21,
+      category: 'employer',
+      question: 'Comment évaluer un chauffeur après un service ?',
+      answer: 'Après la fin d\'une mission, vous recevrez une notification pour évaluer le chauffeur. Vous pouvez noter sur 5 étoiles et laisser un commentaire détaillé. Votre évaluation aide la communauté et permet au chauffeur d\'améliorer ses services. Soyez honnête et constructif dans vos commentaires.'
+    },
+    {
+      id: 22,
+      category: 'employer',
+      question: 'Puis-je contacter directement un chauffeur ?',
+      answer: 'Oui, vous pouvez contacter les chauffeurs directement via leur profil. Utilisez la messagerie interne pour discuter des détails avant de publier une offre ou pour proposer une mission directe. Les coordonnées personnelles ne sont partagées qu\'après accord mutuel pour protéger la vie privée de chacun.'
+    },
+    {
+      id: 23,
+      category: 'marketplace',
+      question: 'Comment vendre sur la marketplace GoDriver ?',
+      answer: 'Connectez-vous et cliquez sur "Publier une offre". Choisissez "Produit/Service" et sélectionnez la catégorie appropriée (véhicules, pièces, services, etc.). Remplissez tous les champs : titre, description détaillée, prix, photos de bonne qualité, et conditions de vente. Les acheteurs pourront vous contacter via la messagerie interne.'
+    },
+    {
+      id: 24,
+      category: 'marketplace',
+      question: 'Quels types de produits puis-je vendre ?',
+      answer: 'Vous pouvez vendre : véhicules professionnels (berlines, SUV, utilitaires), pièces détachées (moteurs, pneus, batteries), équipements (GPS, dashcam, systèmes de communication), services (entretien, réparation, detailing), formations (permis, sécurité routière), et assurances spécialisées pour chauffeurs.'
+    },
+    {
+      id: 25,
+      category: 'marketplace',
+      question: 'Comment sécuriser une transaction sur la marketplace ?',
+      answer: 'Rencontrez toujours l\'acheteur/vendeur dans un lieu public. Vérifiez l\'état du produit avant paiement. Utilisez des méthodes de paiement sécurisées. Conservez tous les documents de transaction. GoDriver propose un service d\'escrow pour les transactions importantes (contactez-nous pour en savoir plus). Signalez tout comportement suspect.'
     }
   ];
 
