@@ -77,7 +77,7 @@ exports.createOrGetConversation = async (req, res) => {
           metadata.set('productId', offer._id.toString());
           metadata.set('productTitle', offer.title);
           metadata.set('productPrice', offer.price);
-          metadata.set('productImage', offer.images && offer.images.length > 0 ? offer.images[0] : null);
+          metadata.set('productImage', offer.mainImage || (offer.images && offer.images.length > 0 ? offer.images[0] : null));
           metadata.set('productUrl', productUrl);
           
           const initialMessage = new Message({
@@ -132,7 +132,7 @@ exports.createOrGetConversation = async (req, res) => {
           metadata.set('productId', offer._id.toString());
           metadata.set('productTitle', offer.title);
           metadata.set('productPrice', offer.price);
-          metadata.set('productImage', offer.images && offer.images.length > 0 ? offer.images[0] : null);
+          metadata.set('productImage', offer.mainImage || (offer.images && offer.images.length > 0 ? offer.images[0] : null));
           metadata.set('productUrl', productUrl);
           
           const initialMessage = new Message({

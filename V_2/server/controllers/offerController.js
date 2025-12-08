@@ -29,35 +29,6 @@ const getAllOffers = async (req, res) => {
       filters.type = { $nin: ['product', 'Autre'] };
     }
     
-    // Filtrage des offres directes (optimisé)
-    if (req.user && req.user.sub) {
-      const user = await User.findById(req.user.sub).select('role').lean();
-      
-      // Pour tout le monde, on exclut les offres directes
-      filters.isDirect = { $ne: true };
-      
-      // Pour les chauffeurs, on peut ajouter des filtres spécifiques si nécessaire
-      if (user && user.role === 'driver') {
-        // On garde uniquement les offres générales (sans targetDriverId)
-        filters.$or = [
-          { targetDriverId: { $exists: false } },
-          { targetDriverId: null }
-        ];
-      } else if (user && user.role === 'employer') {
-        // Les employeurs voient leurs propres offres directes mais pas celles des autres
-        filters.$or = [
-          { employer: user._id },
-          { isDirect: { $ne: true } }
-        ];
-      }
-    } else {
-      // Utilisateur non connecté : seulement les offres générales, pas d'offres directes
-      filters.isDirect = { $ne: true };
-      filters.$or = [
-        { targetDriverId: { $exists: false } },
-        { targetDriverId: null }
-      ];
-    }
     if (zone) filters['requirements.zone'] = new RegExp(zone, 'i');
     if (workType) filters['conditions.workType'] = workType;
     
@@ -207,6 +178,12 @@ const createOffer = async (req, res) => {
       employerId: userId
     };
 
+    // Traiter les caractéristiques structurées (provenant des menus déroulants)
+    if (req.body.characteristics && typeof req.body.characteristics === 'object') {
+      console.log('📋 Caractéristiques structurées reçues:', Object.keys(req.body.characteristics).length, 'champs');
+      offerData.characteristics = new Map(Object.entries(req.body.characteristics));
+    }
+
     // Log spécial pour les offres directes
     if (offerData.isDirect) {
       console.log('🎯 OFFRE DIRECTE détectée:');
@@ -351,8 +328,15 @@ const updateOffer = async (req, res) => {
       additionalImages: offer.additionalImages?.length || 0
     });
 
+    // Traiter les caractéristiques structurées avant la mise à jour
+    const updateData = { ...req.body };
+    if (req.body.characteristics && typeof req.body.characteristics === 'object') {
+      console.log('📋 Caractéristiques structurées reçues pour mise à jour:', Object.keys(req.body.characteristics).length, 'champs');
+      updateData.characteristics = new Map(Object.entries(req.body.characteristics));
+    }
+
     // Mettre à jour toutes les propriétés
-    Object.assign(offer, req.body);
+    Object.assign(offer, updateData);
     
     console.log('💰 Prix après Object.assign:', offer.price);
     

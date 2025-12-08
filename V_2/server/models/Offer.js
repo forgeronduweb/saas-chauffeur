@@ -103,14 +103,6 @@ const offerSchema = new mongoose.Schema(
       type: Boolean,
       default: false
     },
-    isDirect: {
-      type: Boolean,
-      default: false
-    },
-    targetDriverId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Driver'
-    },
     tags: [{
       type: String,
       trim: true
@@ -164,6 +156,12 @@ const offerSchema = new mongoose.Schema(
     deliveryOptions: {
       type: String,
       trim: true
+    },
+    // Caractéristiques structurées pour les offres marketing (menu déroulant)
+    characteristics: {
+      type: Map,
+      of: String,
+      default: new Map()
     }
   },
   {

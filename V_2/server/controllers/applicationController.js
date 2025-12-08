@@ -18,7 +18,7 @@ exports.createApplication = async (req, res) => {
     const { message, messageAnalysis, hasConversation } = req.body;
     const userId = req.user.sub;
 
-    console.log('📝 Création candidature:', {
+    console.log(' Création candidature:', {
       offerId,
       userId,
       hasConversation,
@@ -85,7 +85,7 @@ exports.createApplication = async (req, res) => {
     const application = new Application(applicationData);
     await application.save();
 
-    console.log('✅ Candidature créée:', application._id);
+    console.log(' Candidature créée:', application._id);
 
     // Populer les données pour la réponse
     await application.populate([
@@ -518,94 +518,5 @@ function validateStatusTransition(currentStatus, newStatus, userRole, userId, ap
 
   return { valid: true };
 }
-
-/**
- * Répondre à une offre directe (accepter/refuser)
- */
-exports.respondToDirectOffer = async (req, res) => {
-  try {
-    const { offerId } = req.params;
-    const { response, message } = req.body; // response: 'accept' ou 'reject'
-    const driverId = req.user.sub;
-
-    console.log('📋 Réponse à offre directe:', { offerId, response, driverId });
-
-    // Vérifier que l'offre existe et est directe
-    const Offer = require('../models/Offer');
-    const offer = await Offer.findById(offerId);
-    if (!offer) {
-      return res.status(404).json({ error: 'Offre non trouvée' });
-    }
-
-    if (!offer.isDirect) {
-      return res.status(400).json({ error: 'Cette offre n\'est pas une offre directe' });
-    }
-
-    // Vérifier que l'offre est destinée à ce chauffeur
-    const Driver = require('../models/Driver');
-    const driverProfile = await Driver.findOne({ userId: driverId });
-    if (!driverProfile) {
-      return res.status(404).json({ error: 'Profil chauffeur non trouvé' });
-    }
-
-    if (offer.targetDriverId.toString() !== driverProfile._id.toString()) {
-      return res.status(403).json({ error: 'Cette offre ne vous est pas destinée' });
-    }
-
-    // Vérifier si une candidature existe déjà
-    const Application = require('../models/Application');
-    let application = await Application.findOne({
-      offerId: offerId,
-      driverId: driverProfile._id
-    });
-
-    const status = response === 'accept' ? 'accepted' : 'rejected';
-    const responseMessage = message || (response === 'accept' ? 'J\'accepte votre offre directe.' : 'Je décline votre offre directe.');
-
-    if (application) {
-      // Mettre à jour la candidature existante
-      application.status = status;
-      application.message = responseMessage;
-      application.updatedAt = new Date();
-      await application.save();
-    } else {
-      // Créer une nouvelle candidature
-      application = new Application({
-        offerId: offerId,
-        driverId: driverProfile._id,
-        status: status,
-        message: responseMessage
-      });
-      await application.save();
-    }
-
-    // Populer les données pour la réponse
-    await application.populate([
-      {
-        path: 'offerId',
-        select: 'title company location salary type contractType workType isDirect',
-        populate: {
-          path: 'employerId',
-          select: 'firstName lastName companyName'
-        }
-      }
-    ]);
-
-    console.log('✅ Réponse à offre directe enregistrée:', application._id);
-
-    res.json({
-      success: true,
-      application: application,
-      message: response === 'accept' ? 'Offre acceptée avec succès' : 'Offre refusée avec succès'
-    });
-
-  } catch (error) {
-    console.error('❌ Erreur réponse offre directe:', error);
-    res.status(500).json({ 
-      error: 'Erreur lors de la réponse à l\'offre directe',
-      details: error.message 
-    });
-  }
-};
 
 module.exports = exports;
