@@ -30,25 +30,6 @@ export default function MyCandidates() {
       
       // Transformer les données de l'API pour correspondre au format attendu
       const formattedCandidates = response.data.map(application => {
-        console.log('Application complète:', application);
-        console.log('Offer isDirect:', application.offer?.isDirect);
-        console.log('OfferId isDirect:', application.offerId?.isDirect);
-        console.log('Application status:', application.status);
-        
-        // Détection plus robuste des offres directes
-        const isDirectOffer = !!(
-          application.offer?.isDirect || 
-          application.offerId?.isDirect || 
-          application.status === 'direct_offer' ||
-          application.isDirectOffer
-        );
-        
-        // TEMPORAIRE : Forcer la première candidature comme offre directe pour tester le design
-        const isFirstCandidate = response.data.indexOf(application) === 0;
-        const finalIsDirectOffer = isDirectOffer || isFirstCandidate;
-        
-        console.log('Final isDirectOffer:', finalIsDirectOffer);
-        
         return {
           id: application._id,
           driverId: application.driverProfileId || application.driver?.driverProfileId || application.driverId?._id || null,
@@ -59,8 +40,7 @@ export default function MyCandidates() {
           status: application.status, // pending, accepted, rejected
           experience: application.driver?.experience || application.driverId?.experience || 'Non spécifié',
           licenseType: application.driver?.licenseType || application.driverId?.licenseType || 'N/A',
-          phone: application.driver?.phone || application.driverId?.phone || 'Non disponible',
-          isDirectOffer: finalIsDirectOffer
+          phone: application.driver?.phone || application.driverId?.phone || 'Non disponible'
         };
       });
       
@@ -76,18 +56,16 @@ export default function MyCandidates() {
 
   const getStatusBadge = (status) => {
     const badges = {
-      pending: { text: 'En attente', color: 'bg-gray-100 text-gray-700' },
-      accepted: { text: 'Acceptée', color: 'bg-gray-100 text-gray-700' },
-      rejected: { text: 'Rejetée', color: 'bg-gray-100 text-gray-700' }
+      pending: { text: 'En attente', color: 'bg-orange-50 text-orange-600 border border-orange-500' },
+      accepted: { text: 'Acceptée', color: 'bg-orange-50 text-orange-600 border border-orange-500' },
+      rejected: { text: 'Rejetée', color: 'bg-orange-50 text-orange-600 border border-orange-500' }
     };
     return badges[status] || badges.pending;
   };
 
   const filteredCandidates = filter === 'all' 
     ? candidates 
-    : filter === 'direct_offer'
-      ? candidates.filter(c => c.isDirectOffer)
-      : candidates.filter(c => c.status === filter);
+    : candidates.filter(c => c.status === filter);
 
   const handleAccept = async (candidateId) => {
     try {
@@ -144,7 +122,6 @@ export default function MyCandidates() {
                 placeholder="Filtrer par statut"
                 options={[
                   { value: 'all', label: `Toutes (${candidates.length})` },
-                  { value: 'direct_offer', label: `Offres directes (${candidates.filter(c => c.isDirectOffer).length})` },
                   { value: 'pending', label: `En attente (${candidates.filter(c => c.status === 'pending').length})` },
                   { value: 'accepted', label: `Acceptées (${candidates.filter(c => c.status === 'accepted').length})` },
                   { value: 'rejected', label: `Rejetées (${candidates.filter(c => c.status === 'rejected').length})` }
@@ -172,11 +149,8 @@ export default function MyCandidates() {
         ) : (
           <div className="grid grid-cols-1 gap-4">
             {filteredCandidates.map((candidate) => {
-              console.log('Rendu candidat:', candidate.driverName, 'isDirectOffer:', candidate.isDirectOffer);
               const badge = getStatusBadge(candidate.status);
-              const cardClasses = candidate.isDirectOffer 
-                ? "bg-white border-l-4 border-l-orange-500 rounded-lg shadow-sm transition-all overflow-hidden"
-                : "bg-white rounded-lg border border-gray-200 transition-all overflow-hidden";
+              const cardClasses = "bg-white rounded-lg border border-gray-200 transition-all overflow-hidden";
               
               return (
                 <div
@@ -184,32 +158,20 @@ export default function MyCandidates() {
                   className={cardClasses}
                 >
                   <div className="p-3 sm:p-4 lg:p-6">
-                    {/* Badge pour offres directes */}
-                    {candidate.isDirectOffer && (
-                      <div className="mb-3 sm:mb-4 inline-flex items-center gap-2 px-2 sm:px-3 py-1 bg-orange-100 border border-orange-200 rounded">
-                        <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-orange-500 rounded-full"></div>
-                        <span className="text-xs sm:text-sm text-orange-700 font-semibold">OFFRE DIRECTE</span>
-                      </div>
-                    )}
-
                     <div className="flex flex-col gap-3 sm:gap-4">
                       {/* Info candidat */}
                       <div className="flex items-start gap-3 flex-1">
                         <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white border-2 border-orange-500 rounded-full flex items-center justify-center flex-shrink-0">
-                          <span className="text-orange-500 text-sm sm:text-base font-semibold">
+                          <span className="text-orange-500 text-sm sm:text-base">
                             {candidate.driverName.charAt(0)}
                           </span>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="text-sm sm:text-base font-medium text-gray-900 mb-1">
+                          <h3 className="text-sm sm:text-base text-gray-900 mb-1">
                             {candidate.driverName}
                           </h3>
                           <p className="text-xs sm:text-sm text-gray-600 mb-2 leading-relaxed">
-                            {candidate.isDirectOffer ? (
-                              <span className="text-orange-600 font-medium">Réponse à votre offre directe</span>
-                            ) : (
-                              'Candidature pour'
-                            )} : <span className="text-gray-900 font-medium">{candidate.offerTitle}</span>
+                            Candidature pour : <span className="text-gray-900">{candidate.offerTitle}</span>
                           </p>
                           <div className="flex flex-wrap gap-2 text-xs text-gray-500">
                             <span className="bg-gray-100 px-2 py-1 rounded">{new Date(candidate.appliedDate).toLocaleDateString('fr-FR')}</span>
@@ -221,7 +183,7 @@ export default function MyCandidates() {
 
                       {/* Status et actions */}
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium self-start ${badge.color}`}>
+                        <span className={`px-3 py-1 rounded-full text-xs self-start ${badge.color}`}>
                           {badge.text}
                         </span>
                         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
@@ -229,9 +191,9 @@ export default function MyCandidates() {
                             <>
                               <button 
                                 onClick={() => handleAccept(candidate.id)}
-                                className="flex-1 sm:w-auto px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm font-medium"
+                                className="flex-1 sm:w-auto px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm"
                               >
-                                {candidate.isDirectOffer ? 'Accepter' : 'Accepter'}
+                                Accepter
                               </button>
                               <button 
                                 onClick={() => handleReject(candidate.id)}
@@ -299,7 +261,6 @@ export default function MyCandidates() {
                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                   >
                     <option value="all">Toutes ({candidates.length})</option>
-                    <option value="direct_offer">Offres directes ({candidates.filter(c => c.isDirectOffer).length})</option>
                     <option value="pending">En attente ({candidates.filter(c => c.status === 'pending').length})</option>
                     <option value="accepted">Acceptées ({candidates.filter(c => c.status === 'accepted').length})</option>
                     <option value="rejected">Rejetées ({candidates.filter(c => c.status === 'rejected').length})</option>

@@ -241,11 +241,7 @@ export const applicationsApi = {
   
   // Retirer une candidature (chauffeur)
   withdraw: (applicationId, reason) => 
-    api.patch(`/applications/${applicationId}/status`, { status: 'withdrawn', reason }),
-  
-  // Répondre à une offre directe (accepter/refuser)
-  respondToDirectOffer: (offerId, response, message) => 
-    api.post(`/applications/direct-offer/${offerId}/respond`, { response, message }),
+    api.patch(`/applications/${applicationId}/status`, { status: 'withdrawn', reason })
 }
 
 // API pour les missions

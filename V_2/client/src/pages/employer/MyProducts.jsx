@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { offersApi, promotionsApi, productsApi } from '../../services/api';
+import { offersApi } from '../../services/api';
 import SimpleHeader from '../../component/common/SimpleHeader';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
-import BoostModal from '../../components/modals/BoostModal';
 import CustomDropdown from '../../component/common/CustomDropdown';
 import useUnreadMessages from '../../hooks/useUnreadMessages';
-import { Eye, MessageCircle, Copy, Power, Edit3, Trash2, Plus, TrendingUp, Zap, Star, Clock, BarChart3, Filter, AlertCircle, TrendingDown, DollarSign, PieChart, Activity, Target, Wallet, Calendar } from 'lucide-react';
+import { Eye, MessageCircle, Copy, Power, Edit3, Trash2, Plus, TrendingUp, Star, Clock, BarChart3, Filter, AlertCircle, TrendingDown, DollarSign, PieChart, Activity, Target, Wallet, Calendar } from 'lucide-react';
 
 export default function MyProducts() {
   const navigate = useNavigate();
@@ -21,20 +20,6 @@ export default function MyProducts() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
-  
-  // États pour le système de boost
-  const [showBoostModal, setShowBoostModal] = useState(false);
-  const [showBoostMenu, setShowBoostMenu] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [selectedBoostDuration, setSelectedBoostDuration] = useState(null);
-  const [boostImage, setBoostImage] = useState(null);
-  const [boostImagePreview, setBoostImagePreview] = useState(null);
-  const [boostText, setBoostText] = useState('');
-  const [boostStep, setBoostStep] = useState(1); // 1: Image/Texte, 2: Plans, 3: Paiement
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
-  const [userBoosts, setUserBoosts] = useState([]);
-  const [loadingBoosts, setLoadingBoosts] = useState(false);
-  const [creatingBoost, setCreatingBoost] = useState(false);
   
   // Hook pour les messages non lus
   const { unreadCount } = useUnreadMessages();
@@ -67,164 +52,20 @@ export default function MyProducts() {
     }
   };
 
-  const fetchUserBoosts = async () => {
-    // Implémentation de la fonction fetchUserBoosts si nécessaire
-    setUserBoosts([]);
-  };
-
   useEffect(() => {
     if (!user) {
       navigate('/auth');
       return;
     }
     fetchProducts();
-    fetchUserBoosts();
   }, [user, navigate]);
 
-  const handleBoostClick = (product) => {
-    setSelectedProduct(product);
-    setSelectedBoostDuration(null);
-    setBoostImage(null);
-    setBoostImagePreview(null);
-    setBoostText('');
-    setBoostStep(1);
-    setShowBoostMenu(true);
-  };
-
-  const handleBoostCreated = (boostData) => {
-    // Recharger les boosts après création
-    fetchUserBoosts();
-  };
-
-  const handleSelectBoostDuration = (duration) => {
-    setSelectedBoostDuration(duration);
-  };
-
-  const handleImageUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      // Vérifier le type de fichier
-      if (!file.type.startsWith('image/')) {
-        alert('Veuillez sélectionner un fichier image');
-        return;
-      }
-      
-      // Vérifier la taille (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        alert('L\'image ne doit pas dépasser 5MB');
-        return;
-      }
-
-      setBoostImage(file);
-      
-      // Créer un aperçu
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setBoostImagePreview(e.target.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const removeBoostImage = () => {
-    setBoostImage(null);
-    setBoostImagePreview(null);
-  };
-
-  const handleNextStep = () => {
-    if (boostStep === 1) {
-      setBoostStep(2);
-    } else if (boostStep === 2 && selectedBoostDuration) {
-      setBoostStep(3);
-    }
-  };
-
-  const handlePreviousStep = () => {
-    if (boostStep === 2) {
-      setBoostStep(1);
-    } else if (boostStep === 3) {
-      setBoostStep(2);
-    }
-  };
-
-  const handleCreateBoost = async () => {
-    if (!selectedProduct || !selectedBoostDuration || !selectedPaymentMethod) {
-      alert('Veuillez sélectionner une méthode de paiement');
-      return;
-    }
-
-    setCreatingBoost(true);
-    try {
-      // Créer FormData pour inclure l'image
-      const formData = new FormData();
-      formData.append('offerId', selectedProduct._id);
-      formData.append('duration', selectedBoostDuration.days);
-      formData.append('price', selectedBoostDuration.price);
-      formData.append('boostText', boostText);
-      formData.append('paymentMethod', selectedPaymentMethod);
-      
-      if (boostImage) {
-        formData.append('boostImage', boostImage);
-      }
-
-      const response = await productsApi.createBoost(formData);
-      
-      if (response.data.success) {
-        alert(`Paiement confirmé ! Boost créé avec succès pour ${selectedBoostDuration.days} jour${selectedBoostDuration.days > 1 ? 's' : ''} !`);
-        setShowBoostMenu(false);
-        setSelectedProduct(null);
-        setSelectedBoostDuration(null);
-        setSelectedPaymentMethod(null);
-        setBoostImage(null);
-        setBoostImagePreview(null);
-        setBoostText('');
-        setBoostStep(1);
-        fetchProducts(); // Recharger les produits pour mettre à jour l'affichage
-      } else {
-        alert('Erreur lors du traitement du paiement');
-      }
-    } catch (error) {
-      console.error('Erreur lors du traitement du paiement:', error);
-      alert('Erreur lors du traitement du paiement');
-    } finally {
-      setCreatingBoost(false);
-    }
-  };
-
-  const getProductBoost = (productId) => {
-    return userBoosts.find(boost => 
-      boost.offerId._id === productId && 
-      boost.isActive
-    );
-  };
-
-  const getBoostIcon = (type) => {
-    switch (type) {
-      case 'featured': return <TrendingUp className="w-4 h-4" />;
-      case 'premium': return <Star className="w-4 h-4" />;
-      case 'urgent': return <Zap className="w-4 h-4" />;
-      default: return <TrendingUp className="w-4 h-4" />;
-    }
-  };
-
-  const getBoostColor = (type) => {
-    switch (type) {
-      case 'featured': return 'blue';
-      case 'premium': return 'yellow';
-      case 'urgent': return 'red';
-      default: return 'blue';
-    }
-  };
 
   const filteredProducts = filter === 'all' 
     ? products 
     : filter === 'inactive' 
       ? products.filter(p => p.status === 'paused')
-      : filter === 'premium'
-        ? products.filter(p => getProductBoost(p._id))
-        : filter === 'simple'
-          ? products.filter(p => !getProductBoost(p._id))
-          : products.filter(p => p.status === filter);
+      : products.filter(p => p.status === filter);
 
   const openDeleteModal = (product) => {
     setProductToDelete(product);
@@ -238,18 +79,22 @@ export default function MyProducts() {
     setDeleteLoading(false);
   };
 
-  const handleDelete = async (productId) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')) {
-      try {
-        // Utiliser la méthode delete de l'API des offres
-        await offersApi.delete(productId);
-        // Mettre à jour l'état local
-        setProducts(products.filter(product => product._id !== productId));
-        alert('Produit supprimé avec succès');
-      } catch (err) {
-        console.error('Erreur lors de la suppression du produit:', err);
-        alert('Erreur lors de la suppression du produit');
-      }
+  const handleDelete = async () => {
+    if (!productToDelete || deleteLoading) return;
+
+    setDeleteLoading(true);
+    try {
+      await offersApi.delete(productToDelete._id);
+      console.log('✅ Produit supprimé');
+      // Mettre à jour l'état local
+      setProducts(products.filter(product => product._id !== productToDelete._id));
+      setShowDeleteModal(false);
+      setProductToDelete(null);
+    } catch (error) {
+      console.error('❌ Erreur lors de la suppression:', error);
+      alert('Erreur lors de la suppression du produit');
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -322,8 +167,6 @@ export default function MyProducts() {
                   options={[
                     { value: 'all', label: `Tous les articles (${products.length})` },
                     { value: 'active', label: `Articles actifs (${products.filter(p => p.status === 'active').length})` },
-                    { value: 'premium', label: `Articles premium (${products.filter(p => p.isPremium || p.isPromoted).length})` },
-                    { value: 'simple', label: `Articles simples (${products.filter(p => !p.isPremium && !p.isPromoted).length})` },
                     { value: 'inactive', label: `Inactives (${products.filter(p => p.status === 'paused').length})` }
                   ]}
                   placeholder="Filtrer par statut"
@@ -506,17 +349,6 @@ export default function MyProducts() {
                     >
                       {/* Image en haut */}
                       <figure className="relative h-48 overflow-hidden">
-                        {/* Badge de boost */}
-                        {(() => {
-                          const boost = getProductBoost(product._id);
-                          return boost ? (
-                            <div className="absolute top-2 left-2 px-2 py-1 rounded-full text-xs text-white bg-purple-500 flex items-center gap-1 z-10">
-                              <Zap className="w-3 h-3" />
-                              <span>Boostée</span>
-                            </div>
-                          ) : null;
-                        })()}
-                        
                         {/* Statut */}
                         <div className="absolute top-2 right-2">
                           <span className={`px-2 py-1 rounded-full text-xs ${
@@ -600,17 +432,6 @@ export default function MyProducts() {
                             >
                               Voir
                             </button>
-                            
-                            {/* Bouton Boost */}
-                            {!getProductBoost(product._id) && product.status === 'active' && (
-                              <button 
-                                onClick={() => handleBoostClick(product)}
-                                className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-3 py-1.5 rounded text-sm transition-all flex items-center gap-1"
-                              >
-                                <Zap className="w-3 h-3" />
-                                Boost
-                              </button>
-                            )}
                           </div>
                           
                           <div className="flex gap-1">
@@ -1299,8 +1120,6 @@ export default function MyProducts() {
                     options={[
                       { value: 'all', label: `Tous les articles (${products.length})` },
                       { value: 'active', label: `Articles actifs (${products.filter(p => p.status === 'active').length})` },
-                      { value: 'premium', label: `Articles premium (${products.filter(p => p.isPremium || p.isPromoted).length})` },
-                      { value: 'simple', label: `Articles simples (${products.filter(p => !p.isPremium && !p.isPromoted).length})` },
                       { value: 'inactive', label: `Inactives (${products.filter(p => p.status === 'paused').length})` }
                     ]}
                     placeholder="Filtrer par statut"
@@ -1348,6 +1167,20 @@ export default function MyProducts() {
           </div>
         </div>
       )}
+
+      {/* Modal de suppression */}
+      <ConfirmDialog
+        isOpen={showDeleteModal}
+        onClose={closeDeleteModal}
+        onConfirm={handleDelete}
+        title="Supprimer l'offre"
+        subtitle={productToDelete?.title}
+        message="Êtes-vous sûr de vouloir supprimer cette offre ? Cette action est irréversible."
+        confirmText="Supprimer"
+        cancelText="Annuler"
+        type="danger"
+        loading={deleteLoading}
+      />
     </div>
   );
 }

@@ -52,11 +52,10 @@ export default function MyApplications() {
     navigate(`/messages?conversation=${conversationId}`);
   };
 
-  // Filtres avec tous les nouveaux statuts
+  // Filtres avec tous les statuts
   const getStatusCounts = () => {
     const counts = {
       all: applications.length,
-      direct_offer: 0,
       pending: 0,
       in_negotiation: 0,
       accepted: 0,
@@ -66,10 +65,7 @@ export default function MyApplications() {
     };
 
     applications.forEach(app => {
-      // Compter les offres directes
-      if (app.status === 'direct_offer' || app.isDirectOffer) {
-        counts.direct_offer++;
-      } else if (counts[app.status] !== undefined) {
+      if (counts[app.status] !== undefined) {
         counts[app.status]++;
       }
     });
@@ -81,11 +77,7 @@ export default function MyApplications() {
 
   const filteredApplications = filter === 'all' 
     ? applications 
-    : applications.filter(a => 
-        filter === 'direct_offer' 
-          ? a.status === 'direct_offer' || a.isDirectOffer 
-          : a.status === filter
-      );
+    : applications.filter(a => a.status === filter);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -115,7 +107,6 @@ export default function MyApplications() {
                 onChange={setFilter}
                 options={[
                   { value: 'all', label: `Toutes (${statusCounts.all})` },
-                  { value: 'direct_offer', label: `Offres directes (${statusCounts.direct_offer})` },
                   { value: 'pending', label: `En attente (${statusCounts.pending})` },
                   { value: 'in_negotiation', label: `En négociation (${statusCounts.in_negotiation})` },
                   { value: 'accepted', label: `Acceptées (${statusCounts.accepted})` },
@@ -143,14 +134,10 @@ export default function MyApplications() {
               </svg>
             </div>
             <h3 className="text-2xl text-gray-900 mb-3">
-              {filter === 'direct_offer' 
-                ? 'Aucune offre directe pour le moment' 
-                : 'Aucune candidature'}
+              Aucune candidature
             </h3>
             <p className="text-gray-600 mb-8 max-w-md mx-auto">
-              {filter === 'direct_offer' 
-                ? 'Les employeurs peuvent vous envoyer des offres directes qui apparaîtront ici.'
-                : 'Commencez votre recherche d\'emploi. Explorez les offres disponibles et postulez aux postes qui vous intéressent.'}
+              Commencez votre recherche d'emploi. Explorez les offres disponibles et postulez aux postes qui vous intéressent.
             </p>
             <button
               onClick={() => navigate('/offres')}
@@ -189,7 +176,7 @@ export default function MyApplications() {
             <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl max-h-[70vh] overflow-y-auto">
               {/* Header */}
               <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
-                <h3 className="text-base font-semibold text-gray-900">Filtres</h3>
+                <h3 className="text-base text-gray-900">Filtres</h3>
                 <button
                   onClick={() => setShowMobileFilters(false)}
                   className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
@@ -203,7 +190,7 @@ export default function MyApplications() {
               {/* Filtres */}
               <div className="p-4 space-y-3">
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1.5">
+                  <label className="block text-xs text-gray-700 mb-1.5">
                     Statut
                   </label>
                   <CustomDropdown
@@ -211,7 +198,6 @@ export default function MyApplications() {
                     onChange={setFilter}
                     options={[
                       { value: 'all', label: `Toutes (${statusCounts.all})` },
-                      { value: 'direct_offer', label: `Offres directes (${statusCounts.direct_offer})` },
                       { value: 'pending', label: `En attente (${statusCounts.pending})` },
                       { value: 'in_negotiation', label: `En négociation (${statusCounts.in_negotiation})` },
                       { value: 'accepted', label: `Acceptées (${statusCounts.accepted})` },
@@ -228,13 +214,13 @@ export default function MyApplications() {
                 <div className="flex gap-2 pt-3">
                   <button 
                     onClick={() => setFilter('all')}
-                    className="flex-1 px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+                    className="flex-1 px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
                   >
                     Réinitialiser
                   </button>
                   <button 
                     onClick={() => setShowMobileFilters(false)}
-                    className="flex-1 px-3 py-2 text-sm bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium"
+                    className="flex-1 px-3 py-2 text-sm bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
                   >
                     Appliquer
                   </button>

@@ -491,32 +491,17 @@ export default function UserProfilePage() {
         )}
 
         {/* Indicateur de complétion du profil */}
-        <div 
-          className="border rounded-xl p-4 sm:p-6 mb-4 sm:mb-6 shadow-sm transition-all duration-500"
-          style={{
-            background: `linear-gradient(135deg, ${getCompletionColor(profileCompletion).light} 0%, white 100%)`,
-            borderColor: getCompletionColor(profileCompletion).primary
-          }}
-        >
+        <div className="bg-white border border-orange-500 rounded-lg p-4 sm:p-6 mb-4 sm:mb-6">
           <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
             {/* Indicateur radial */}
             <div className="flex-shrink-0">
-              <div 
-                className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full transition-all duration-700"
-                style={{
-                  background: `conic-gradient(${getCompletionColor(profileCompletion).primary} ${profileCompletion * 3.6}deg, #e5e7eb ${profileCompletion * 3.6}deg)`,
-                  boxShadow: `0 4px 16px ${getCompletionColor(profileCompletion).shadow}`
-                }}
-              >
-                <div className="absolute inset-2 bg-white rounded-full flex items-center justify-center shadow-inner">
+              <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full border-4 border-orange-500 bg-gray-50">
+                <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center">
-                    <div 
-                      className="text-3xl sm:text-4xl font-bold transition-all duration-500"
-                      style={{ color: getCompletionColor(profileCompletion).primary }}
-                    >
+                    <div className="text-3xl sm:text-4xl text-orange-500">
                       {profileCompletion}%
                     </div>
-                    <div className="text-xs text-gray-500 font-medium">Complété</div>
+                    <div className="text-xs text-gray-500">Complété</div>
                   </div>
                 </div>
               </div>
@@ -524,14 +509,14 @@ export default function UserProfilePage() {
 
             {/* Message et conseils */}
             <div className="flex-1 text-center sm:text-left">
-              <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-1">
+              <h3 className="text-base sm:text-lg text-gray-900 mb-1">
                 {profileCompletion === 100 
-                  ? '🎉 Profil complet !' 
+                  ? 'Profil complet' 
                   : profileCompletion >= 75 
-                  ? '👍 Presque terminé !' 
+                  ? 'Presque terminé' 
                   : profileCompletion >= 50 
-                  ? '💪 Bon début !' 
-                  : '📝 Complétez votre profil'}
+                  ? 'Bon début' 
+                  : 'Complétez votre profil'}
               </h3>
               <p className="text-xs sm:text-sm text-gray-600 mb-3">
                 {profileCompletion === 100 
@@ -545,7 +530,7 @@ export default function UserProfilePage() {
               
               {/* Toujours afficher les champs manquants */}
               <div>
-                <p className="text-xs font-semibold text-gray-700 mb-2">
+                <p className="text-xs text-gray-700 mb-2">
                   {profileCompletion === 100 
                     ? 'Tous les champs sont remplis' 
                     : 'Champs manquants :'}
@@ -553,81 +538,81 @@ export default function UserProfilePage() {
                 <div className="flex flex-wrap gap-1.5 sm:gap-2 justify-center sm:justify-start">
                   {/* Champs de base */}
                   {!userInfo.firstName && (
-                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
+                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border border-orange-500 text-orange-600">
                       Prénom
                     </span>
                   )}
                   {!userInfo.lastName && (
-                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
+                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border border-orange-500 text-orange-600">
                       Nom
                     </span>
                   )}
                   {!userInfo.phone && (
-                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
+                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border border-orange-500 text-orange-600">
                       Téléphone
                     </span>
                   )}
                   
                   {/* Champs chauffeur */}
                   {isDriver && !driverInfo.licenseNumber && (
-                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
+                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border border-orange-500 text-orange-600">
                       N° Permis
                     </span>
                   )}
                   {isDriver && !driverInfo.licenseExpiryDate && (
-                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
+                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border border-orange-500 text-orange-600">
                       Date expiration
                     </span>
                   )}
                   {isDriver && !driverInfo.workZone && (
-                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
+                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border border-orange-500 text-orange-600">
                       Zone de travail
                     </span>
                   )}
                   {isDriver && !driverInfo.profilePhotoUrl && (
-                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
+                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border border-orange-500 text-orange-600">
                       Photo
                     </span>
                   )}
                   {isDriver && !workExperiences.some(exp => exp.company && exp.position && exp.startDate) && (
-                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
+                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border border-orange-500 text-orange-600">
                       Expérience pro
                     </span>
                   )}
                   
                   {/* Champs employeur */}
                   {user?.role === 'employer' && !employerInfo.companyName && (
-                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
+                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border border-orange-500 text-orange-600">
                       Nom entreprise
                     </span>
                   )}
                   {user?.role === 'employer' && !employerInfo.companyType && (
-                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
+                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border border-orange-500 text-orange-600">
                       Type entreprise
                     </span>
                   )}
                   {user?.role === 'employer' && !employerInfo.sector && (
-                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
+                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border border-orange-500 text-orange-600">
                       Secteur
                     </span>
                   )}
                   {user?.role === 'employer' && !employerInfo.address && (
-                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
+                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border border-orange-500 text-orange-600">
                       Adresse
                     </span>
                   )}
                   {user?.role === 'employer' && !employerInfo.description && (
-                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
+                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border border-orange-500 text-orange-600">
                       Description
                     </span>
                   )}
                   {user?.role === 'employer' && !employerInfo.companyPhone && (
-                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
+                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border border-orange-500 text-orange-600">
                       Tél. entreprise
                     </span>
                   )}
                   {user?.role === 'employer' && !employerInfo.companyEmail && (
-                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border-2 font-medium transition-all hover:scale-105" style={{ color: getCompletionColor(profileCompletion).primary, borderColor: getCompletionColor(profileCompletion).primary }}>
+                    <span className="text-xs px-2.5 py-1 bg-white rounded-full border border-orange-500 text-orange-600">
                       Email entreprise
                     </span>
                   )}
