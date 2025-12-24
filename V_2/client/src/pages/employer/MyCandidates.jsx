@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { CiFilter } from 'react-icons/ci';
 import { useAuth } from '../../contexts/AuthContext';
 import SimpleHeader from '../../component/common/SimpleHeader';
 import CustomDropdown from '../../component/common/CustomDropdown';
@@ -106,12 +107,9 @@ export default function MyCandidates() {
             {/* Bouton filtres mobile */}
             <button
               onClick={() => setShowMobileFilters(true)}
-              className="sm:hidden flex items-center gap-1.5 px-3 py-1.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm"
+              className="sm:hidden p-2 text-orange-500 hover:bg-orange-50 rounded-lg transition-colors"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-              </svg>
-              Filtres
+              <CiFilter className="w-6 h-6" />
             </button>
             
             {/* Dropdown personnalisé - Desktop uniquement */}
@@ -138,11 +136,10 @@ export default function MyCandidates() {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
           </div>
         ) : filteredCandidates.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
-            
-            <h3 className="text-2xl text-gray-900 mb-3">Aucune candidature</h3>
-            <p className="text-gray-600 mb-8 max-w-md mx-auto">
-              Vous n'avez pas encore reçu de candidatures. Publiez des offres d'emploi attractives pour attirer les meilleurs chauffeurs.
+          <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
+            <h3 className="text-gray-900 mb-3">Aucune candidature</h3>
+            <p className="text-gray-600 max-w-md mx-auto">
+              Vous n'avez pas encore reçu de candidatures.
             </p>
             
           </div>

@@ -622,10 +622,9 @@ export default function ProductDetailPage() {
                   <p className="text-gray-500">Chargement des avis...</p>
                 </div>
               ) : comments.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  <FaUser className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                  <p>Aucun avis pour le moment</p>
-                  <p className="text-sm">Soyez le premier à laisser un commentaire !</p>
+                <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
+                  <p className="text-gray-900 mb-1">Aucun avis pour le moment</p>
+                  <p className="text-sm text-gray-600">Soyez le premier à laisser un commentaire !</p>
                 </div>
               ) : (
                 comments.map((comment) => (

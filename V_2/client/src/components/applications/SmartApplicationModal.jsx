@@ -126,12 +126,12 @@ export default function SmartApplicationModal({ offer, isOpen, onClose, onSucces
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 p-4 pointer-events-none">
-      <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 max-w-lg w-full max-h-[90vh] overflow-y-auto pointer-events-auto transform transition-all duration-300 ease-out scale-100">
+      <div className="bg-white rounded-lg shadow-md border border-gray-200 max-w-lg w-full max-h-[90vh] overflow-y-auto pointer-events-auto">
         {/* En-tête moderne */}
         <div className="p-6 pb-4">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <h2 className="text-lg font-semibold text-gray-900">
+              <h2 className="text-lg text-gray-900">
                 Postuler à cette offre
               </h2>
               <p className="text-gray-600 mt-1">{offer.title}</p>
@@ -156,13 +156,13 @@ export default function SmartApplicationModal({ offer, isOpen, onClose, onSucces
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {/* Champ message */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm text-gray-700 mb-2">
               Message personnel (optionnel)
             </label>
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="Présentez-vous brièvement, posez vos questions ou exprimez votre intérêt..."
+              placeholder="Votre message à l'employeur..."
               className="w-full border border-gray-200 rounded-xl p-4 h-32 resize-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
               maxLength={1000}
               disabled={submitting}

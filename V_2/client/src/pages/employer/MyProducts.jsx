@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { CiFilter } from 'react-icons/ci';
 import { useAuth } from '../../contexts/AuthContext';
 import { offersApi } from '../../services/api';
 import SimpleHeader from '../../component/common/SimpleHeader';
@@ -15,7 +16,6 @@ export default function MyProducts() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
   const [currentView, setCurrentView] = useState('list');
-  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
@@ -149,12 +149,9 @@ export default function MyProducts() {
               {/* Bouton filtres mobile */}
               <button
                 onClick={() => setShowMobileFilters(true)}
-                className="sm:hidden flex items-center gap-1.5 px-3 py-1.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm"
+                className="sm:hidden p-2 text-orange-500 hover:bg-orange-50 rounded-lg transition-colors"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                </svg>
-                Filtres
+                <CiFilter className="w-6 h-6" />
               </button>
             </div>
             
@@ -189,115 +186,29 @@ export default function MyProducts() {
           </div>
           <p className="text-gray-600 text-sm lg:text-base">Gérez vos produits et services publiés</p>
         </div>
-        <div className="flex gap-6">
-          {/* Sidebar */}
-          <div className="hidden lg:block w-64 flex-shrink-0">
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
-              <h3 className="text-base lg:text-xl text-gray-900 mb-4">Tableau de bord</h3>
-              
-              {/* Menu de navigation */}
-              <div className="space-y-2">
-                {/* Tous les articles */}
-                <button
-                  onClick={() => {setFilter('all'); setCurrentView('list');}}
-                  className={`w-full p-3 rounded-lg transition-colors text-left ${
-                    currentView === 'list' && filter === 'all'
-                      ? 'bg-orange-50 border border-orange-200' 
-                      : 'hover:bg-gray-50 border border-transparent'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
-                        <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                        </svg>
-                      </div>
-                      <div>
-                        <p className="text-sm lg:text-xl text-gray-900">Mes articles</p>
-                        <p className="text-sm text-gray-600">Toutes vos offres</p>
-                      </div>
-                    </div>
-                  </div>
-                </button>
-
-                {/* Statistiques */}
-                <button
-                  onClick={() => setCurrentView('statistics')}
-                  className={`w-full p-3 rounded-lg transition-colors text-left ${
-                    currentView === 'statistics' 
-                      ? 'bg-orange-50 border border-orange-200' 
-                      : 'bg-white hover:bg-gray-50'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
-                        <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                        </svg>
-                      </div>
-                      <div>
-                        <p className="text-sm lg:text-xl text-gray-900">Statistiques</p>
-                        <p className="text-xs text-gray-600">Voir les détails</p>
-                      </div>
-                    </div>
-                  </div>
-                </button>
-
-                {/* Messages non lus */}
-                {unreadCount > 0 && (
-                  <button
-                    onClick={() => navigate('/messages')}
-                    className="w-full p-3 rounded-lg transition-colors text-left bg-orange-50 border border-orange-200 hover:bg-orange-100"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
-                          <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                          </svg>
-                        </div>
-                        <div>
-                          <p className="text-sm lg:text-xl text-gray-900">Messages</p>
-                          <p className="text-xs text-gray-600">{unreadCount} non lu{unreadCount > 1 ? 's' : ''}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-
+        <div>
           {/* Main Content */}
           <div className="flex-1">
-            {/* Mobile Filter Button */}
-            <div className="lg:hidden mb-4">
-              <button
-                onClick={() => setShowMobileSidebar(true)}
-                className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors"
-              >
-                <span className="text-gray-700">Menu</span>
-                <Filter className="w-5 h-5 text-gray-400" />
-              </button>
-            </div>
-
+            
             {/* Content Area */}
             {currentView === 'list' ? (
               // Vue Liste des offres
               loading ? (
                 <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto"></div>
                   <p className="text-gray-600 mt-4">Chargement de vos offres...</p>
                 </div>
               ) : filteredProducts.length === 0 ? (
-              <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-                
-                <h3 className="text-xl text-gray-900 mb-2">Aucune offre trouvée</h3>
-                <p className="text-gray-600 mb-6 max-w-md mx-auto">
+              <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
+                <h3 className="text-gray-900 mb-2">
                   {filter === 'all' 
-                    ? "Vous n'avez pas encore créé d'offres marketing. Commencez dès maintenant !"
+                    ? "Aucune offre marketing"
+                    : `Aucune offre ${filter === 'active' ? 'active' : 'inactive'}`
+                  }
+                </h3>
+                <p className="text-gray-600 max-w-md mx-auto">
+                  {filter === 'all' 
+                    ? "Vous n'avez pas encore créé d'offres marketing."
                     : `Aucune offre ${filter === 'active' ? 'active' : 'inactive'} trouvée.`
                   }
                 </p>
@@ -318,7 +229,7 @@ export default function MyProducts() {
                     </div>
                     <div className="flex items-center gap-2 text-xs lg:text-sm text-gray-600">
                       <BarChart3 className="w-3 h-3 lg:w-4 lg:h-4" />
-                      <span>Performance: 87%</span>
+                      <span><span className="lg:hidden">Perf:</span><span className="hidden lg:inline">Performance:</span> 87%</span>
                     </div>
                   </div>
                 </div>
@@ -336,8 +247,8 @@ export default function MyProducts() {
                         <div className="absolute top-2 right-2">
                           <span className={`px-2 py-1 rounded-full text-xs ${
                             product.status === 'active' 
-                              ? 'bg-green-500 text-white' 
-                              : 'bg-gray-500 text-white'
+                              ? 'bg-orange-500 text-white' 
+                              : 'bg-gray-600 text-white'
                           }`}>
                             {product.status === 'active' ? 'Active' : 'Inactive'}
                           </span>
@@ -350,8 +261,8 @@ export default function MyProducts() {
                             className="w-full h-full object-cover" 
                           />
                         ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
-                            <TrendingUp className="w-12 h-12 text-blue-500" />
+                          <div className="w-full h-full bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center">
+                            <TrendingUp className="w-12 h-12 text-orange-500" />
                           </div>
                         )}
 
@@ -373,7 +284,7 @@ export default function MyProducts() {
                         {/* Catégorie */}
                         {product.category && (
                           <div className="mb-2">
-                            <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
+                            <span className="px-2 py-1 bg-orange-100 text-orange-800 rounded-full text-xs">
                               {product.category}
                             </span>
                           </div>
@@ -385,7 +296,7 @@ export default function MyProducts() {
                             {product.title}
                           </h3>
                           <div className="flex items-baseline gap-1 flex-shrink-0">
-                            <span className="text-base lg:text-xl text-blue-600 whitespace-nowrap">
+                            <span className="text-base lg:text-xl text-orange-600 whitespace-nowrap">
                               {(Number(product.conditions?.salary || product.price) || 0).toLocaleString()}
                             </span>
                             <span className="text-xs lg:text-sm text-gray-600">F</span>
@@ -411,7 +322,7 @@ export default function MyProducts() {
                           <div className="flex gap-2">
                             <button 
                               onClick={() => navigate(`/produit/${product._id}`)}
-                              className="bg-blue-600 hover:bg-blue-700 text-white px-2 lg:px-3 py-1 lg:py-1.5 rounded text-xs lg:text-sm transition-colors"
+                              className="bg-orange-600 hover:bg-orange-700 text-white px-2 lg:px-3 py-1 lg:py-1.5 rounded text-xs lg:text-sm transition-colors"
                             >
                               Voir
                             </button>
@@ -420,21 +331,21 @@ export default function MyProducts() {
                           <div className="flex gap-1">
                             <button 
                               onClick={() => handleToggleStatus(product._id, product.status)}
-                              className="p-1.5 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
+                              className="p-1.5 text-orange-600 hover:text-orange-800 hover:bg-orange-50 rounded transition-colors"
                               title={product.status === 'active' ? 'Désactiver' : 'Activer'}
                             >
                               <Power className="w-4 h-4" />
                             </button>
                             <button 
                               onClick={() => handleDuplicate(product)}
-                              className="p-1.5 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
+                              className="p-1.5 text-orange-600 hover:text-orange-800 hover:bg-orange-50 rounded transition-colors"
                               title="Dupliquer"
                             >
                               <Copy className="w-4 h-4" />
                             </button>
                             <button 
                               onClick={() => navigate(`/edit-offer/${product._id}`)}
-                              className="p-1.5 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
+                              className="p-1.5 text-orange-600 hover:text-orange-800 hover:bg-orange-50 rounded transition-colors"
                               title="Modifier"
                             >
                               <Edit3 className="w-4 h-4" />
@@ -467,10 +378,10 @@ export default function MyProducts() {
                         <div>
                           <p className="text-xs lg:text-sm text-gray-600">Vues totales</p>
                           <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{(products.length * 23).toLocaleString()}</p>
-                          <p className="text-xs lg:text-sm text-green-600 mt-1">+12% vs période précédente</p>
+                          <span className="text-xs lg:text-sm text-orange-600 mt-1">+12% vs période précédente</span>
                         </div>
-                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                          <Eye className="w-5 h-5 lg:w-6 lg:h-6 text-blue-600" />
+                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                          <Eye className="w-5 h-5 lg:w-6 lg:h-6 text-orange-600" />
                         </div>
                       </div>
                     </div>
@@ -480,10 +391,10 @@ export default function MyProducts() {
                         <div>
                           <p className="text-xs lg:text-sm text-gray-600">Messages reçus</p>
                           <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{products.length * 5}</p>
-                          <p className="text-xs lg:text-sm text-green-600 mt-1">+8% vs période précédente</p>
+                          <p className="text-xs lg:text-sm text-orange-600 mt-1">+8% vs période précédente</p>
                         </div>
-                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-green-100 rounded-full flex items-center justify-center">
-                          <MessageCircle className="w-5 h-5 lg:w-6 lg:h-6 text-green-600" />
+                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-orange-50 rounded-full flex items-center justify-center">
+                          <MessageCircle className="w-5 h-5 lg:w-6 lg:h-6 text-orange-600" />
                         </div>
                       </div>
                     </div>
@@ -493,10 +404,10 @@ export default function MyProducts() {
                         <div>
                           <p className="text-xs lg:text-sm text-gray-600">Taux de conversion</p>
                           <p className="text-2xl lg:text-3xl text-gray-900 mt-1">12.5%</p>
-                          <p className="text-xs lg:text-sm text-red-600 mt-1">-2% vs période précédente</p>
+                          <p className="text-xs lg:text-sm text-gray-600 mt-1">-2% vs période précédente</p>
                         </div>
-                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                          <TrendingUp className="w-5 h-5 lg:w-6 lg:h-6 text-purple-600" />
+                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-orange-50 rounded-full flex items-center justify-center">
+                          <TrendingUp className="w-5 h-5 lg:w-6 lg:h-6 text-orange-600" />
                         </div>
                       </div>
                     </div>
@@ -525,10 +436,10 @@ export default function MyProducts() {
                         <div>
                           <p className="text-xs lg:text-sm text-gray-600">Revenus potentiels</p>
                           <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{products.reduce((sum, p) => sum + (Number(p.conditions?.salary || p.price) || 0), 0).toLocaleString()} F</p>
-                          <p className="text-xs lg:text-sm text-green-600 mt-1">Toutes vos offres</p>
+                          <p className="text-xs lg:text-sm text-orange-600 mt-1">Toutes vos offres</p>
                         </div>
-                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-green-100 rounded-full flex items-center justify-center">
-                          <DollarSign className="w-5 h-5 lg:w-6 lg:h-6 text-green-600" />
+                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-orange-50 rounded-full flex items-center justify-center">
+                          <DollarSign className="w-5 h-5 lg:w-6 lg:h-6 text-orange-600" />
                         </div>
                       </div>
                     </div>
@@ -538,10 +449,10 @@ export default function MyProducts() {
                         <div>
                           <p className="text-xs lg:text-sm text-gray-600">Revenus actifs</p>
                           <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{products.filter(p => p.status === 'active').reduce((sum, p) => sum + (Number(p.conditions?.salary || p.price) || 0), 0).toLocaleString()} F</p>
-                          <p className="text-xs lg:text-sm text-blue-600 mt-1">Offres en ligne</p>
+                          <p className="text-xs lg:text-sm text-orange-600 mt-1">Offres en ligne</p>
                         </div>
-                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                          <Target className="w-5 h-5 lg:w-6 lg:h-6 text-blue-600" />
+                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-orange-50 rounded-full flex items-center justify-center">
+                          <Target className="w-5 h-5 lg:w-6 lg:h-6 text-orange-600" />
                         </div>
                       </div>
                     </div>
@@ -551,10 +462,10 @@ export default function MyProducts() {
                         <div>
                           <p className="text-xs lg:text-sm text-gray-600">Estimation mensuelle</p>
                           <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{Math.floor(products.filter(p => p.status === 'active').reduce((sum, p) => sum + (Number(p.conditions?.salary || p.price) || 0), 0) * 0.12).toLocaleString()} F</p>
-                          <p className="text-xs lg:text-sm text-purple-600 mt-1">Basé sur 12% conversion</p>
+                          <p className="text-xs lg:text-sm text-orange-600 mt-1">Basé sur 12% conversion</p>
                         </div>
-                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                          <Wallet className="w-5 h-5 lg:w-6 lg:h-6 text-purple-600" />
+                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-orange-50 rounded-full flex items-center justify-center">
+                          <Wallet className="w-5 h-5 lg:w-6 lg:h-6 text-orange-600" />
                         </div>
                       </div>
                     </div>
@@ -579,193 +490,52 @@ export default function MyProducts() {
         </div>
       </div>
 
-      {/* Modal Sidebar Mobile - Style Filtre */}
-      {showMobileSidebar && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          {/* Overlay */}
-          <div 
-            className="absolute inset-0 bg-black/50"
-            onClick={() => setShowMobileSidebar(false)}
-          ></div>
-          
-          {/* Modal Content - Bottom Sheet */}
-          <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-lg max-h-[60vh] overflow-y-auto">
-            {/* Barre de glissement */}
-            <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mt-2 mb-3"></div>
-            
-            {/* Header */}
-            <div className="px-4 pb-3 border-b border-gray-100">
-              <div className="flex items-center justify-between">
-                <h3 className="text-base font-medium text-gray-900">Tableau de bord</h3>
-                <button
-                  onClick={() => setShowMobileSidebar(false)}
-                  className="p-1 hover:bg-gray-100 rounded"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-
-            {/* Menu de navigation complet */}
-            <div className="p-4 space-y-2">
-              {/* Tous les articles */}
-              <button
-                onClick={() => {setFilter('all'); setCurrentView('list'); setShowMobileSidebar(false);}}
-                className={`w-full p-3 rounded-lg transition-colors text-left ${
-                  currentView === 'list' && filter === 'all'
-                    ? 'bg-orange-50 border border-orange-200' 
-                    : 'hover:bg-gray-50 border border-transparent'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
-                      <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-base lg:text-xl text-gray-900">Mes articles</p>
-                      <p className="text-xs text-gray-600">Toutes vos offres</p>
-                    </div>
-                  </div>
-                </div>
-              </button>
-
-
-              {/* Statistiques */}
-              <button
-                onClick={() => {setCurrentView('statistics'); setShowMobileSidebar(false);}}
-                className={`w-full p-3 rounded-lg transition-colors text-left ${
-                  currentView === 'statistics' 
-                    ? 'bg-orange-50 border border-orange-200' 
-                    : 'bg-white hover:bg-gray-50'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
-                      <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-base lg:text-xl text-gray-900">Statistiques</p>
-                      <p className="text-xs text-gray-600">Voir les détails</p>
-                    </div>
-                  </div>
-                </div>
-              </button>
-
-              {/* Messages non lus */}
-              {unreadCount > 0 && (
-                <button
-                  onClick={() => {navigate('/messages'); setShowMobileSidebar(false);}}
-                  className="w-full p-3 rounded-lg transition-colors text-left bg-orange-50 border border-orange-200 hover:bg-orange-100"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
-                        <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                        </svg>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-900">Messages</p>
-                        <p className="text-xs text-gray-600">{unreadCount} non lu{unreadCount > 1 ? 's' : ''}</p>
-                      </div>
-                    </div>
-                  </div>
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Modal Filtres Mobile */}
       {showMobileFilters && (
         <div className="fixed inset-0 z-50 sm:hidden">
           {/* Overlay */}
           <div 
-            className="absolute inset-0 bg-black/50"
+            className="absolute inset-0 bg-black/40"
             onClick={() => setShowMobileFilters(false)}
           ></div>
           
-          {/* Modal Content */}
-          <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl max-h-[70vh] overflow-y-auto">
+          {/* Modal Content - Bottom sheet */}
+          <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-xl">
             {/* Header */}
-            <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
-              <h3 className="text-base font-semibold text-gray-900">Filtres</h3>
+            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+              <span className="text-gray-900">Filtrer par statut</span>
               <button
                 onClick={() => setShowMobileFilters(false)}
-                className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-1 hover:bg-gray-100 rounded"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
 
-            {/* Filtres */}
-            <div className="p-4 space-y-3">
-              {currentView === 'list' ? (
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                    Statut
-                  </label>
-                  <CustomDropdown
-                    value={filter}
-                    onChange={setFilter}
-                    options={[
-                      { value: 'all', label: `Tous les articles (${products.length})` },
-                      { value: 'active', label: `Articles actifs (${products.filter(p => p.status === 'active').length})` },
-                      { value: 'inactive', label: `Inactives (${products.filter(p => p.status === 'paused').length})` }
-                    ]}
-                    placeholder="Filtrer par statut"
-                    className="w-full"
-                  />
-                </div>
-              ) : (
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                    Période
-                  </label>
-                  <CustomDropdown
-                    value={timeRange}
-                    onChange={setTimeRange}
-                    options={[
-                      { value: '7', label: '7 derniers jours' },
-                      { value: '30', label: '30 derniers jours' },
-                      { value: '90', label: '90 derniers jours' }
-                    ]}
-                    placeholder="Sélectionner une période"
-                    className="w-full"
-                  />
-                </div>
-              )}
-            </div>
-
-            {/* Actions */}
-            <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 flex gap-2">
-              <button
-                onClick={() => {
-                  setFilter('all');
-                  setTimeRange('30');
-                  setShowMobileFilters(false);
-                }}
-                className="flex-1 px-3 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors font-medium"
-              >
-                Réinitialiser
-              </button>
-              <button
-                onClick={() => setShowMobileFilters(false)}
-                className="flex-1 px-3 py-2 text-sm bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium"
-              >
-                Appliquer
-              </button>
+            {/* Liste des options */}
+            <div className="py-2">
+              {[
+                { value: 'all', label: `Tous les articles (${products.length})` },
+                { value: 'active', label: `Articles actifs (${products.filter(p => p.status === 'active').length})` },
+                { value: 'inactive', label: `Inactifs (${products.filter(p => p.status === 'paused').length})` }
+              ].map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => {
+                    setFilter(option.value);
+                    setShowMobileFilters(false);
+                  }}
+                  className={`w-full text-left px-4 py-2.5 text-sm ${
+                    filter === option.value 
+                      ? 'bg-orange-50 text-orange-600' 
+                      : 'text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
             </div>
           </div>
         </div>

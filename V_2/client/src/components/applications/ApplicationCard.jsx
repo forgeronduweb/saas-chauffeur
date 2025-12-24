@@ -112,7 +112,7 @@ export default function ApplicationCard({ application, userRole, onUpdate, onOpe
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
-            <h3 className="font-semibold text-gray-900 text-lg">
+            <h3 className="text-gray-900 text-lg">
               {application.offer?.title || 'Offre supprimée'}
             </h3>
           </div>
@@ -127,7 +127,7 @@ export default function ApplicationCard({ application, userRole, onUpdate, onOpe
         </div>
         
         {/* Badge de statut */}
-        <div className={`px-3 py-1 rounded text-xs font-medium border ${currentStatus.color}`}>
+        <div className={`px-3 py-1 rounded text-xs border ${currentStatus.color}`}>
           {currentStatus.label}
         </div>
       </div>
@@ -136,7 +136,7 @@ export default function ApplicationCard({ application, userRole, onUpdate, onOpe
       {application.message && (
         <div className="mb-4 p-3 bg-gray-50 rounded-lg">
           <p className="text-sm text-gray-700">
-            <span className="font-medium">Votre message :</span> {application.message}
+            <span>Votre message :</span> {application.message}
           </p>
           
           {/* Analyse du message */}

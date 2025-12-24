@@ -119,7 +119,7 @@ export default function Auth() {
         <div className="bg-white rounded-2xl border border-gray-300">
           <div className="p-8">
             {/* Titre simple */}
-            <h2 className="text-2xl font-bold text-gray-900 mb-2 text-center">
+            <h2 className="text-2xl font-normal text-gray-900 mb-2 text-center">
               {isLogin ? 'Connexion' : 'Créer un compte'}
             </h2>
             <p className="text-gray-600 text-sm mb-6 text-center">
@@ -133,7 +133,7 @@ export default function Auth() {
                   <svg className="w-5 h-5 text-red-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                   </svg>
-                  <p className="text-sm text-red-700 font-medium">{error}</p>
+                  <p className="text-sm text-red-700 font-normal">{error}</p>
                 </div>
               </div>
             )}
@@ -143,7 +143,7 @@ export default function Auth() {
                   <svg className="w-5 h-5 text-green-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
-                  <p className="text-sm text-green-700 font-medium">{success}</p>
+                  <p className="text-sm text-green-700 font-normal">{success}</p>
                 </div>
               </div>
             )}
@@ -154,7 +154,7 @@ export default function Auth() {
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="firstName" className="block text-sm font-semibold text-gray-700 mb-2">Prénom</label>
+                      <label htmlFor="firstName" className="block text-sm font-normal text-gray-700 mb-2">Prénom</label>
                       <input
                         type="text"
                         id="firstName"
@@ -167,7 +167,7 @@ export default function Auth() {
                       />
                     </div>
                     <div>
-                      <label htmlFor="lastName" className="block text-sm font-semibold text-gray-700 mb-2">Nom</label>
+                      <label htmlFor="lastName" className="block text-sm font-normal text-gray-700 mb-2">Nom</label>
                       <input
                         type="text"
                         id="lastName"
@@ -183,7 +183,7 @@ export default function Auth() {
                   
                   {/* Sélection du rôle */}
                   <div>
-                    <label htmlFor="userType" className="block text-sm font-semibold text-gray-700 mb-2">Je suis</label>
+                    <label htmlFor="userType" className="block text-sm font-normal text-gray-700 mb-2">Je suis</label>
                     <select
                       id="userType"
                       name="userType"
@@ -198,7 +198,7 @@ export default function Auth() {
                   </div>
                   
                   <div>
-                    <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">Adresse email</label>
+                    <label htmlFor="email" className="block text-sm font-normal text-gray-700 mb-2">Adresse email</label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -224,7 +224,7 @@ export default function Auth() {
               {isLogin && (
                 <>
                   <div>
-                    <label htmlFor="loginIdentifier" className="block text-sm font-semibold text-gray-700 mb-2">Email ou Téléphone</label>
+                    <label htmlFor="loginIdentifier" className="block text-sm font-normal text-gray-700 mb-2">Email ou Téléphone</label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -244,7 +244,7 @@ export default function Auth() {
                     </div>
                   </div>
                   <div>
-                    <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">Mot de passe</label>
+                    <label htmlFor="password" className="block text-sm font-normal text-gray-700 mb-2">Mot de passe</label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -272,7 +272,7 @@ export default function Auth() {
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">Mot de passe</label>
+                      <label htmlFor="password" className="block text-sm font-normal text-gray-700 mb-2">Mot de passe</label>
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                           <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -293,7 +293,7 @@ export default function Auth() {
                       </div>
                     </div>
                     <div>
-                      <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-700 mb-2">Confirmation</label>
+                      <label htmlFor="confirmPassword" className="block text-sm font-normal text-gray-700 mb-2">Confirmation</label>
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                           <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -327,14 +327,14 @@ export default function Auth() {
                     />
                     <span className="text-sm text-gray-600">Se souvenir de moi</span>
                   </label>
-                  <Link to="/forgot-password" className="text-sm text-orange-500 hover:text-orange-600 font-medium">Mot de passe oublié ?</Link>
+                  <Link to="/forgot-password" className="text-sm text-orange-500 hover:text-orange-600 font-normal">Mot de passe oublié ?</Link>
                 </div>
               )}
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full py-3.5 bg-orange-500 text-white font-normal rounded-lg hover:bg-orange-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <>
@@ -364,7 +364,7 @@ export default function Auth() {
                     <div className="w-full border-t border-gray-200"></div>
                   </div>
                   <div className="relative flex justify-center text-sm">
-                    <span className="px-4 bg-white text-gray-500 font-medium">Ou continuer avec</span>
+                    <span className="px-4 bg-white text-gray-500 font-normal">Ou continuer avec</span>
                   </div>
                 </div>
 
@@ -384,7 +384,7 @@ export default function Auth() {
                     <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                     <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                   </svg>
-                  <span className="text-sm font-medium text-gray-700">Google</span>
+                  <span className="text-sm font-normal text-gray-700">Google</span>
                 </button>
               </>
             )}
@@ -397,7 +397,7 @@ export default function Auth() {
                 <button
                   type="button"
                   onClick={() => setIsLogin(!isLogin)}
-                  className="text-orange-500 font-semibold hover:text-orange-600"
+                  className="text-orange-500 font-normal hover:text-orange-600"
                 >
                   {isLogin ? "Créer un compte gratuitement" : "Se connecter"}
                 </button>
@@ -408,7 +408,7 @@ export default function Auth() {
 
         {/* Retour à l'accueil */}
         <div className="mt-6 text-center">
-          <Link to="/" className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 font-medium">
+          <Link to="/" className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 font-normal">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { CiFilter } from 'react-icons/ci';
 import SimpleHeader from '../component/common/SimpleHeader';
 import Footer from '../component/common/Footer';
 import OfferCard from '../component/common/OfferCard';
@@ -180,12 +181,9 @@ export default function OffersPage() {
           {/* Bouton filtres mobile */}
           <button
             onClick={() => setShowMobileFilters(true)}
-            className="lg:hidden flex items-center gap-1.5 px-3 py-1.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm"
+            className="lg:hidden p-2 text-orange-500 hover:bg-orange-50 rounded-lg transition-colors"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-            </svg>
-            Filtres
+            <CiFilter className="w-6 h-6" />
           </button>
         </div>
 
@@ -283,12 +281,9 @@ export default function OffersPage() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-12">
-            <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            </svg>
-            <h3 className="text-lg text-gray-900 mb-2">Aucune offre disponible</h3>
-            <p className="text-gray-600">Aucune offre d'emploi publiée pour le moment</p>
+          <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
+            <h3 className="text-gray-900 mb-2">Aucune offre disponible</h3>
+            <p className="text-gray-600">Aucune offre d'emploi ne correspond à vos critères de recherche.</p>
           </div>
         )}
           </div>
