@@ -197,7 +197,7 @@ export default function MyProducts() {
               // Vue Liste des offres
               loading ? (
                 <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto"></div>
                   <p className="text-gray-600 mt-4">Chargement de vos offres...</p>
                 </div>
               ) : filteredProducts.length === 0 ? (
@@ -241,21 +241,9 @@ export default function MyProducts() {
                   {filteredProducts.map((product) => (
                     <div
                       key={product._id}
-                      className="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 overflow-hidden"
+                      className="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 overflow-hidden relative"
                     >
-                      {/* Image en haut */}
-                      <figure className="relative h-48 overflow-hidden">
-                        {/* Statut */}
-                        <div className="absolute top-2 right-2">
-                          <span className={`px-2 py-1 rounded-full text-xs ${
-                            product.status === 'active' 
-                              ? 'bg-green-500 text-white' 
-                              : 'bg-gray-500 text-white'
-                          }`}>
-                            {product.status === 'active' ? 'Active' : 'Inactive'}
-                          </span>
-                        </div>
-
+                      <div className="relative h-48 w-full">
                         {product.mainImage ? (
                           <img 
                             src={product.mainImage} 
@@ -263,8 +251,8 @@ export default function MyProducts() {
                             className="w-full h-full object-cover" 
                           />
                         ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
-                            <TrendingUp className="w-12 h-12 text-blue-500" />
+                          <div className="w-full h-full bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center">
+                            <TrendingUp className="w-12 h-12 text-orange-500" />
                           </div>
                         )}
 
@@ -279,14 +267,14 @@ export default function MyProducts() {
                             {product.messagesCount || 0}
                           </div>
                         </div>
-                      </figure>
+                      </div>
 
                       {/* Contenu de la carte */}
                       <div className="p-4">
                         {/* Catégorie */}
                         {product.category && (
                           <div className="mb-2">
-                            <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
+                            <span className="px-2 py-1 bg-orange-100 text-orange-800 rounded-full text-xs">
                               {product.category}
                             </span>
                           </div>
@@ -298,7 +286,7 @@ export default function MyProducts() {
                             {product.title}
                           </h3>
                           <div className="flex items-baseline gap-1 flex-shrink-0">
-                            <span className="text-base lg:text-xl text-blue-600 whitespace-nowrap">
+                            <span className="text-base lg:text-xl text-orange-600 whitespace-nowrap">
                               {(Number(product.conditions?.salary || product.price) || 0).toLocaleString()}
                             </span>
                             <span className="text-xs lg:text-sm text-gray-600">F</span>
@@ -324,7 +312,7 @@ export default function MyProducts() {
                           <div className="flex gap-2">
                             <button 
                               onClick={() => navigate(`/produit/${product._id}`)}
-                              className="bg-blue-600 hover:bg-blue-700 text-white px-2 lg:px-3 py-1 lg:py-1.5 rounded text-xs lg:text-sm transition-colors"
+                              className="bg-orange-600 hover:bg-orange-700 text-white px-2 lg:px-3 py-1 lg:py-1.5 rounded text-xs lg:text-sm transition-colors"
                             >
                               Voir
                             </button>
@@ -333,21 +321,21 @@ export default function MyProducts() {
                           <div className="flex gap-1">
                             <button 
                               onClick={() => handleToggleStatus(product._id, product.status)}
-                              className="p-1.5 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
+                              className="p-1.5 text-orange-600 hover:text-orange-800 hover:bg-orange-50 rounded transition-colors"
                               title={product.status === 'active' ? 'Désactiver' : 'Activer'}
                             >
                               <Power className="w-4 h-4" />
                             </button>
                             <button 
                               onClick={() => handleDuplicate(product)}
-                              className="p-1.5 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
+                              className="p-1.5 text-orange-600 hover:text-orange-800 hover:bg-orange-50 rounded transition-colors"
                               title="Dupliquer"
                             >
                               <Copy className="w-4 h-4" />
                             </button>
                             <button 
                               onClick={() => navigate(`/edit-offer/${product._id}`)}
-                              className="p-1.5 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
+                              className="p-1.5 text-orange-600 hover:text-orange-800 hover:bg-orange-50 rounded transition-colors"
                               title="Modifier"
                             >
                               <Edit3 className="w-4 h-4" />
@@ -380,10 +368,10 @@ export default function MyProducts() {
                         <div>
                           <p className="text-xs lg:text-sm text-gray-600">Vues totales</p>
                           <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{(products.length * 23).toLocaleString()}</p>
-                          <p className="text-xs lg:text-sm text-green-600 mt-1">+12% vs période précédente</p>
+                          <p className="text-xs lg:text-sm text-orange-600 mt-1">+12% vs période précédente</p>
                         </div>
-                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                          <Eye className="w-5 h-5 lg:w-6 lg:h-6 text-blue-600" />
+                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                          <Eye className="w-5 h-5 lg:w-6 lg:h-6 text-orange-600" />
                         </div>
                       </div>
                     </div>
@@ -393,10 +381,10 @@ export default function MyProducts() {
                         <div>
                           <p className="text-xs lg:text-sm text-gray-600">Messages reçus</p>
                           <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{products.length * 5}</p>
-                          <p className="text-xs lg:text-sm text-green-600 mt-1">+8% vs période précédente</p>
+                          <p className="text-xs lg:text-sm text-orange-600 mt-1">+8% vs période précédente</p>
                         </div>
-                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-green-100 rounded-full flex items-center justify-center">
-                          <MessageCircle className="w-5 h-5 lg:w-6 lg:h-6 text-green-600" />
+                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                          <MessageCircle className="w-5 h-5 lg:w-6 lg:h-6 text-orange-600" />
                         </div>
                       </div>
                     </div>
