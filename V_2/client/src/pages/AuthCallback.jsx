@@ -49,13 +49,8 @@ const AuthCallback = () => {
         // Sinon, sauvegarder l'utilisateur et rediriger selon le rôle
         localStorage.setItem('user', JSON.stringify(user));
 
-        if (user.role === 'driver') {
-          navigate('/driver/applications');
-        } else if (user.role === 'employer') {
-          navigate('/employer/candidates');
-        } else {
-          navigate('/');
-        }
+        // Rediriger vers la page d'accueil
+        navigate('/');
       } catch (error) {
         console.error('❌ Erreur lors de la récupération du profil:', error);
         localStorage.removeItem('token');

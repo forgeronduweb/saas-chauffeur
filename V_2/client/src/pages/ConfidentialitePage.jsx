@@ -4,13 +4,13 @@ export default function ConfidentialitePage() {
   return (
     <PublicPageLayout activeTab="confidentialite">
       <div className="max-w-4xl mx-auto px-4 lg:px-6 py-12">
-          <h1 className="text-3xl lg:text-4xl text-gray-900 mb-8">
+          <h1 className="text-xl lg:text-2xl font-semibold text-gray-900 mb-4">
             Politique de confidentialité
           </h1>
 
           <div className="bg-white border border-gray-200 p-6 lg:p-8 space-y-6">
             <section>
-              <h2 className="text-xl lg:text-2xl  text-gray-900 mb-4">
+              <h2 className="text-base lg:text-lg font-medium text-gray-900 mb-2">
                 1. Introduction
               </h2>
               <p className="text-gray-700 leading-relaxed">
@@ -20,7 +20,7 @@ export default function ConfidentialitePage() {
             </section>
 
             <section>
-              <h2 className="text-xl lg:text-2xl  text-gray-900 mb-4">
+              <h2 className="text-base lg:text-lg font-medium text-gray-900 mb-2">
                 2. Informations collectées
               </h2>
               <div className="text-gray-700 leading-relaxed space-y-3">
@@ -36,7 +36,7 @@ export default function ConfidentialitePage() {
             </section>
 
             <section>
-              <h2 className="text-xl lg:text-2xl  text-gray-900 mb-4">
+              <h2 className="text-base lg:text-lg font-medium text-gray-900 mb-2">
                 3. Utilisation des informations
               </h2>
               <div className="text-gray-700 leading-relaxed space-y-3">
@@ -53,7 +53,7 @@ export default function ConfidentialitePage() {
             </section>
 
             <section>
-              <h2 className="text-xl lg:text-2xl  text-gray-900 mb-4">
+              <h2 className="text-base lg:text-lg font-medium text-gray-900 mb-2">
                 4. Partage des informations
               </h2>
               <div className="text-gray-700 leading-relaxed space-y-3">
@@ -71,7 +71,7 @@ export default function ConfidentialitePage() {
             </section>
 
             <section>
-              <h2 className="text-xl lg:text-2xl  text-gray-900 mb-4">
+              <h2 className="text-base lg:text-lg font-medium text-gray-900 mb-2">
                 5. Protection des données
               </h2>
               <div className="text-gray-700 leading-relaxed space-y-3">
@@ -87,7 +87,7 @@ export default function ConfidentialitePage() {
             </section>
 
             <section>
-              <h2 className="text-xl lg:text-2xl  text-gray-900 mb-4">
+              <h2 className="text-base lg:text-lg font-medium text-gray-900 mb-2">
                 6. Vos droits
               </h2>
               <div className="text-gray-700 leading-relaxed space-y-3">
@@ -110,7 +110,7 @@ export default function ConfidentialitePage() {
             </section>
 
             <section>
-              <h2 className="text-xl lg:text-2xl  text-gray-900 mb-4">
+              <h2 className="text-base lg:text-lg font-medium text-gray-900 mb-2">
                 7. Cookies
               </h2>
               <p className="text-gray-700 leading-relaxed">
@@ -121,7 +121,7 @@ export default function ConfidentialitePage() {
             </section>
 
             <section>
-              <h2 className="text-xl lg:text-2xl  text-gray-900 mb-4">
+              <h2 className="text-base lg:text-lg font-medium text-gray-900 mb-2">
                 8. Conservation des données
               </h2>
               <p className="text-gray-700 leading-relaxed">
@@ -132,7 +132,7 @@ export default function ConfidentialitePage() {
             </section>
 
             <section>
-              <h2 className="text-xl lg:text-2xl  text-gray-900 mb-4">
+              <h2 className="text-base lg:text-lg font-medium text-gray-900 mb-2">
                 9. Transferts internationaux
               </h2>
               <p className="text-gray-700 leading-relaxed">
@@ -142,7 +142,7 @@ export default function ConfidentialitePage() {
             </section>
 
             <section>
-              <h2 className="text-xl lg:text-2xl  text-gray-900 mb-4">
+              <h2 className="text-base lg:text-lg font-medium text-gray-900 mb-2">
                 10. Mineurs
               </h2>
               <p className="text-gray-700 leading-relaxed">
@@ -152,7 +152,7 @@ export default function ConfidentialitePage() {
             </section>
 
             <section>
-              <h2 className="text-xl lg:text-2xl  text-gray-900 mb-4">
+              <h2 className="text-base lg:text-lg font-medium text-gray-900 mb-2">
                 11. Modifications de la politique
               </h2>
               <p className="text-gray-700 leading-relaxed">
@@ -163,7 +163,7 @@ export default function ConfidentialitePage() {
             </section>
 
             <section>
-              <h2 className="text-xl lg:text-2xl  text-gray-900 mb-4">
+              <h2 className="text-base lg:text-lg font-medium text-gray-900 mb-2">
                 12. Contact
               </h2>
               <p className="text-gray-700 leading-relaxed">

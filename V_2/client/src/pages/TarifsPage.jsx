@@ -12,7 +12,7 @@ export default function TarifsPage() {
     <PublicPageLayout activeTab="tarifs">
       <div className="max-w-7xl mx-auto px-4 lg:px-6 py-8">
         <div className="mb-8">
-          <h1 className="text-2xl lg:text-3xl text-gray-900 mb-3">
+          <h1 className="text-xl lg:text-2xl font-semibold text-gray-900 mb-4">
             Tarifs
           </h1>
           <p className="text-gray-600">
@@ -34,7 +34,7 @@ export default function TarifsPage() {
                 </div>
               )}
               
-              <h3 className="text-xl text-gray-900 mb-2">{plan.name}</h3>
+              <h3 className="text-base font-medium text-gray-900 mb-2">{plan.name}</h3>
               <p className="text-gray-600 mb-4">{plan.description}</p>
               
               <div className="mb-6">
@@ -69,7 +69,7 @@ export default function TarifsPage() {
         </div>
 
         <div className="bg-gray-50 border border-gray-200 p-6">
-          <h2 className="text-xl text-gray-900 mb-4">
+          <h2 className="text-base lg:text-lg font-medium text-gray-900 mb-2">
             Questions fréquentes
           </h2>
           <div className="space-y-4">

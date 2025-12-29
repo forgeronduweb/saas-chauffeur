@@ -46,14 +46,14 @@ export default function ContactPage() {
   return (
     <PublicPageLayout activeTab="contact">
       <div className="max-w-6xl mx-auto px-4 lg:px-6 py-12">
-        <h1 className="text-3xl lg:text-4xl text-gray-900 mb-8">
+        <h1 className="text-xl lg:text-2xl font-semibold text-gray-900 mb-4">
           Contactez-nous
         </h1>
 
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Formulaire de contact */}
           <div className="bg-white border border-gray-200 p-6 lg:p-8">
-            <h2 className="text-xl lg:text-2xl text-gray-900 mb-6">
+            <h2 className="text-base lg:text-lg font-medium text-gray-900 mb-3">
               Envoyez-nous un message
             </h2>
             
@@ -159,7 +159,7 @@ export default function ContactPage() {
           <div className="space-y-6">
             {/* Contact direct */}
             <div className="bg-white border border-gray-200 p-6 lg:p-8">
-              <h2 className="text-xl lg:text-2xl text-gray-900 mb-6">
+              <h2 className="text-base lg:text-lg font-medium text-gray-900 mb-3">
                 Contact direct
               </h2>
               
@@ -204,7 +204,7 @@ export default function ContactPage() {
 
             {/* Réseaux sociaux */}
             <div className="bg-white border border-gray-200 p-6 lg:p-8">
-              <h2 className="text-xl lg:text-2xl text-gray-900 mb-6">
+              <h2 className="text-base lg:text-lg font-medium text-gray-900 mb-3">
                 Suivez-nous
               </h2>
               

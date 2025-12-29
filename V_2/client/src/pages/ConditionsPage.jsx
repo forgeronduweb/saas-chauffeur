@@ -4,13 +4,13 @@ export default function ConditionsPage() {
   return (
     <PublicPageLayout activeTab="conditions">
       <div className="max-w-4xl mx-auto px-4 lg:px-6 py-12">
-          <h1 className="text-3xl lg:text-4xl text-gray-900 mb-8">
+          <h1 className="text-xl lg:text-2xl font-semibold text-gray-900 mb-4">
             Conditions d'utilisation
           </h1>
 
           <div className="bg-white border border-gray-200 p-6 lg:p-8 space-y-6">
             <section>
-              <h2 className="text-xl lg:text-2xl  text-gray-900 mb-4">
+              <h2 className="text-base lg:text-lg font-medium text-gray-900 mb-2">
                 1. Acceptation des conditions
               </h2>
               <p className="text-gray-700 leading-relaxed">
@@ -20,7 +20,7 @@ export default function ConditionsPage() {
             </section>
 
             <section>
-              <h2 className="text-xl lg:text-2xl  text-gray-900 mb-4">
+              <h2 className="text-base lg:text-lg font-medium text-gray-900 mb-2">
                 2. Description du service
               </h2>
               <p className="text-gray-700 leading-relaxed">
@@ -30,7 +30,7 @@ export default function ConditionsPage() {
             </section>
 
             <section>
-              <h2 className="text-xl lg:text-2xl  text-gray-900 mb-4">
+              <h2 className="text-base lg:text-lg font-medium text-gray-900 mb-2">
                 3. Inscription et compte utilisateur
               </h2>
               <div className="text-gray-700 leading-relaxed space-y-3">
@@ -45,7 +45,7 @@ export default function ConditionsPage() {
             </section>
 
             <section>
-              <h2 className="text-xl lg:text-2xl  text-gray-900 mb-4">
+              <h2 className="text-base lg:text-lg font-medium text-gray-900 mb-2">
                 4. Utilisation acceptable
               </h2>
               <div className="text-gray-700 leading-relaxed space-y-3">
@@ -61,7 +61,7 @@ export default function ConditionsPage() {
             </section>
 
             <section>
-              <h2 className="text-xl lg:text-2xl  text-gray-900 mb-4">
+              <h2 className="text-base lg:text-lg font-medium text-gray-900 mb-2">
                 5. Offres d'emploi et candidatures
               </h2>
               <p className="text-gray-700 leading-relaxed">
@@ -71,7 +71,7 @@ export default function ConditionsPage() {
             </section>
 
             <section>
-              <h2 className="text-xl lg:text-2xl  text-gray-900 mb-4">
+              <h2 className="text-base lg:text-lg font-medium text-gray-900 mb-2">
                 6. Frais et paiements
               </h2>
               <p className="text-gray-700 leading-relaxed">
@@ -81,7 +81,7 @@ export default function ConditionsPage() {
             </section>
 
             <section>
-              <h2 className="text-xl lg:text-2xl  text-gray-900 mb-4">
+              <h2 className="text-base lg:text-lg font-medium text-gray-900 mb-2">
                 7. Propriété intellectuelle
               </h2>
               <p className="text-gray-700 leading-relaxed">
@@ -91,7 +91,7 @@ export default function ConditionsPage() {
             </section>
 
             <section>
-              <h2 className="text-xl lg:text-2xl  text-gray-900 mb-4">
+              <h2 className="text-base lg:text-lg font-medium text-gray-900 mb-2">
                 8. Limitation de responsabilité
               </h2>
               <p className="text-gray-700 leading-relaxed">
@@ -101,7 +101,7 @@ export default function ConditionsPage() {
             </section>
 
             <section>
-              <h2 className="text-xl lg:text-2xl  text-gray-900 mb-4">
+              <h2 className="text-base lg:text-lg font-medium text-gray-900 mb-2">
                 9. Modification des conditions
               </h2>
               <p className="text-gray-700 leading-relaxed">
@@ -112,7 +112,7 @@ export default function ConditionsPage() {
             </section>
 
             <section>
-              <h2 className="text-xl lg:text-2xl  text-gray-900 mb-4">
+              <h2 className="text-base lg:text-lg font-medium text-gray-900 mb-2">
                 10. Contact
               </h2>
               <p className="text-gray-700 leading-relaxed">

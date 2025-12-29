@@ -265,7 +265,7 @@ export const notificationsApi = {
   // Marquer une notification comme lue
   markAsRead: (notificationId) => api.put(`/notifications/${notificationId}/read`),
   // Marquer toutes les notifications comme lues
-  markAllAsRead: () => api.put('/notifications/read-all'),
+  markAllAsRead: () => api.put('/notifications/mark-all-read'),
   // Supprimer une notification
   delete: (notificationId) => api.delete(`/notifications/${notificationId}`),
 }
@@ -429,6 +429,14 @@ export const productsApi = {
   
   // Rechercher des produits
   search: (query) => api.get('/products/search', { params: { q: query } })
+};
+
+// API pour les signalements
+export const reportsApi = {
+  create: (data) => api.post('/reports', data),
+  getAll: (params) => api.get('/reports', { params }),
+  getPendingCount: () => api.get('/reports/pending-count'),
+  updateStatus: (id, data) => api.put(`/reports/${id}`, data)
 };
 
 export default api

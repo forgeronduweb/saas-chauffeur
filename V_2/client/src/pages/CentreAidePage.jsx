@@ -193,7 +193,7 @@ export default function CentreAidePage() {
   return (
     <PublicPageLayout activeTab="aide">
       <div className="max-w-4xl mx-auto px-4 lg:px-6 py-12">
-        <h1 className="text-3xl lg:text-4xl text-gray-900 mb-8">
+        <h1 className="text-xl lg:text-2xl font-semibold text-gray-900 mb-4">
           Centre d'aide
         </h1>
         <p className="text-gray-600 mb-6">
@@ -208,23 +208,6 @@ export default function CentreAidePage() {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-orange-500 transition-colors"
           />
-        </div>
-
-        <div className="mb-8">
-          <h2 className="text-xl text-gray-900 mb-4">
-            Liens rapides
-          </h2>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {quickLinks.map((link, index) => (
-              <Link
-                key={index}
-                to={link.link}
-                className="bg-white border border-gray-200 p-4 hover:border-orange-500 transition-colors"
-              >
-                <h3 className="text-gray-900">{link.title}</h3>
-              </Link>
-            ))}
-          </div>
         </div>
 
         <div className="mb-6">
@@ -246,7 +229,7 @@ export default function CentreAidePage() {
         </div>
 
         <div className="mb-8">
-          <h2 className="text-xl text-gray-900 mb-6">
+          <h2 className="text-base lg:text-lg font-medium text-gray-900 mb-3">
             Questions fréquentes
           </h2>
 
@@ -291,7 +274,7 @@ export default function CentreAidePage() {
         </div>
 
         <div className="bg-gray-50 border border-gray-200 p-6 text-center">
-          <h2 className="text-xl text-gray-900 mb-3">
+          <h2 className="text-base lg:text-lg font-medium text-gray-900 mb-2">
             Besoin d'aide supplémentaire ?
           </h2>
           <p className="text-gray-600 mb-6">

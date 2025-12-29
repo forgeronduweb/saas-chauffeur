@@ -5,7 +5,8 @@ import { useAuth } from '../contexts/AuthContext';
 import SimpleHeader from '../component/common/SimpleHeader';
 import ChatModal from '../component/messaging/ChatModal';
 import DirectOfferModal from '../components/offers/DirectOfferModal';
-import { MapPin, Phone, Mail, Star, Award, Calendar, Car, Shield, Briefcase, CheckCircle, MessageCircle } from 'lucide-react';
+import ReportModal from '../components/common/ReportModal';
+import { MapPin, Phone, Mail, Star, Award, Calendar, Car, Shield, Briefcase, CheckCircle, MessageCircle, AlertTriangle } from 'lucide-react';
 
 // Fonction pour formater les dates YYYY-MM en format lisible
 const formatMonthYear = (dateString) => {
@@ -48,6 +49,7 @@ export default function DriverProfilePage() {
   const [error, setError] = useState(null);
   const [showDirectOfferModal, setShowDirectOfferModal] = useState(false);
   const [showChatModal, setShowChatModal] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
 
   useEffect(() => {
     const fetchDriver = async () => {
@@ -228,24 +230,37 @@ export default function DriverProfilePage() {
                     </div>
                   </div>
 
-                  {/* Bouton de contact */}
-                  {!user ? (
-                    <button
-                      onClick={() => navigate('/auth')}
-                      className="w-full lg:w-auto px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors flex items-center justify-center gap-2"
-                    >
-                      <MessageCircle className="w-5 h-5" />
-                      Se connecter pour contacter
-                    </button>
-                  ) : (
-                    <button
-                      onClick={handleContact}
-                      className="w-full lg:w-auto px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors flex items-center justify-center gap-2"
-                    >
-                      <MessageCircle className="w-5 h-5" />
-                      Envoyer un message
-                    </button>
-                  )}
+                  {/* Boutons d'action */}
+                  <div className="flex flex-col gap-2">
+                    {!user ? (
+                      <button
+                        onClick={() => navigate('/auth')}
+                        className="w-full lg:w-auto px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors flex items-center justify-center gap-2"
+                      >
+                        <MessageCircle className="w-5 h-5" />
+                        Se connecter pour contacter
+                      </button>
+                    ) : (
+                      <button
+                        onClick={handleContact}
+                        className="w-full lg:w-auto px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors flex items-center justify-center gap-2"
+                      >
+                        <MessageCircle className="w-5 h-5" />
+                        Envoyer un message
+                      </button>
+                    )}
+                    
+                    {/* Bouton signaler */}
+                    {user && (
+                      <button
+                        onClick={() => setShowReportModal(true)}
+                        className="w-full lg:w-auto px-4 py-2 bg-white border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 text-sm"
+                      >
+                        <AlertTriangle className="w-4 h-4" />
+                        Signaler ce profil
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -469,6 +484,15 @@ export default function DriverProfilePage() {
           onBack={() => setShowChatModal(false)}
         />
       )}
+
+      {/* Modal de signalement */}
+      <ReportModal
+        isOpen={showReportModal}
+        onClose={() => setShowReportModal(false)}
+        targetType="driver"
+        targetId={id}
+        targetTitle={driver ? `${driver.firstName} ${driver.lastName}` : ''}
+      />
     </div>
   );
 }

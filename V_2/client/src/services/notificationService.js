@@ -50,7 +50,8 @@ class NotificationService {
   async fetchNotifications() {
     try {
       const response = await notificationsApi.list();
-      const newNotifications = response.data;
+      const data = response.data;
+      const newNotifications = data.notifications || [];
       
       // Vérifier s'il y a de nouvelles notifications
       const hasNewNotifications = this.hasNewNotifications(newNotifications);

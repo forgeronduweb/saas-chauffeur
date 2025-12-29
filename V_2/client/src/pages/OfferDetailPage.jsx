@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import SimpleHeader from '../component/common/SimpleHeader';
 import SmartApplicationModal from '../components/applications/SmartApplicationModal';
+import ReportModal from '../components/common/ReportModal';
 import { offersApi, applicationsApi } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
+import { AlertTriangle } from 'lucide-react';
 
 export default function OfferDetailPage() {
   const { id } = useParams();
@@ -15,6 +17,7 @@ export default function OfferDetailPage() {
   const [error, setError] = useState(null);
   const [hasApplied, setHasApplied] = useState(false);
   const [showApplicationModal, setShowApplicationModal] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
 
 
   useEffect(() => {
@@ -340,6 +343,17 @@ export default function OfferDetailPage() {
                     Postuler à cette offre
                   </button>
                 )}
+
+                {/* Bouton signaler */}
+                {user && (
+                  <button
+                    onClick={() => setShowReportModal(true)}
+                    className="w-full py-2.5 px-4 bg-white border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 text-sm"
+                  >
+                    <AlertTriangle className="w-4 h-4" />
+                    Signaler l'offre
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -352,6 +366,15 @@ export default function OfferDetailPage() {
         isOpen={showApplicationModal}
         onClose={() => setShowApplicationModal(false)}
         onSuccess={handleApplicationSuccess}
+      />
+
+      {/* Modal de signalement */}
+      <ReportModal
+        isOpen={showReportModal}
+        onClose={() => setShowReportModal(false)}
+        targetType="offer"
+        targetId={id}
+        targetTitle={offer?.title}
       />
     </div>
   );

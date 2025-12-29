@@ -1,13 +1,28 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CiFilter } from 'react-icons/ci';
 import { useAuth } from '../../contexts/AuthContext';
 import { offersApi } from '../../services/api';
 import SimpleHeader from '../../component/common/SimpleHeader';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
-import CustomDropdown from '../../component/common/CustomDropdown';
-import useUnreadMessages from '../../hooks/useUnreadMessages';
-import { Eye, MessageCircle, Copy, Power, Edit3, Trash2, Plus, TrendingUp, Star, Clock, BarChart3, Filter, AlertCircle, TrendingDown, DollarSign, PieChart, Activity, Target, Wallet, Calendar } from 'lucide-react';
+import { Eye, MessageCircle, MoreVertical, Power, Edit3, Trash2, Plus, Package, Copy } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../../components/ui/dropdown-menu';
+import { Skeleton } from '../../components/ui/skeleton';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
+import { Badge } from '../../components/ui/badge';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../../components/ui/table';
 
 export default function MyProducts() {
   const navigate = useNavigate();
@@ -15,17 +30,9 @@ export default function MyProducts() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
-  const [currentView, setCurrentView] = useState('list');
-  const [showMobileFilters, setShowMobileFilters] = useState(false);
-  const [deleteLoading, setDeleteLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
-  
-  // Hook pour les messages non lus
-  const { unreadCount } = useUnreadMessages();
-  
-  // États pour les vues statistics et earnings
-  const [timeRange, setTimeRange] = useState('30');
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
     if (!user || user.role !== 'driver') {
@@ -136,400 +143,175 @@ export default function MyProducts() {
     }
   };
 
+  const stats = {
+    totalViews: products.reduce((sum, p) => sum + (p.views || 0), 0),
+    totalMessages: products.reduce((sum, p) => sum + (p.messagesCount || 0), 0),
+    activeCount: products.filter(p => p.status === 'active').length,
+    pausedCount: products.filter(p => p.status === 'paused').length,
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <SimpleHeader hideSubNav={true} />
 
-      {/* Main Container */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Header avec titre */}
+        {/* Header */}
         <div className="mb-6">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center justify-between w-full lg:block">
-              <h1 className="text-base lg:text-xl text-gray-900">Mes offres marketing</h1>
-              
-              {/* Bouton filtres mobile */}
-              <button
-                onClick={() => setShowMobileFilters(true)}
-                className="sm:hidden p-2 text-orange-500 hover:bg-orange-50 rounded-lg transition-colors"
-              >
-                <CiFilter className="w-6 h-6" />
-              </button>
-            </div>
-            
-            {/* Dropdown filtres/période - Desktop uniquement */}
-            <div className="hidden lg:block">
-              {currentView === 'list' ? (
-                <CustomDropdown
-                  value={filter}
-                  onChange={setFilter}
-                  options={[
-                    { value: 'all', label: `Tous les articles (${products.length})` },
-                    { value: 'active', label: `Articles actifs (${products.filter(p => p.status === 'active').length})` },
-                    { value: 'inactive', label: `Inactives (${products.filter(p => p.status === 'paused').length})` }
-                  ]}
-                  placeholder="Filtrer par statut"
-                  className="w-64"
-                />
-              ) : (
-                <CustomDropdown
-                  value={timeRange}
-                  onChange={setTimeRange}
-                  options={[
-                    { value: '7', label: '7 derniers jours' },
-                    { value: '30', label: '30 derniers jours' },
-                    { value: '90', label: '90 derniers jours' }
-                  ]}
-                  placeholder="Sélectionner période"
-                  className="w-64"
-                />
-              )}
-            </div>
-          </div>
-          <p className="text-gray-600 text-sm lg:text-base">Gérez vos produits et services publiés</p>
+          <h1 className="text-xl lg:text-2xl text-gray-900">Mes offres marketing</h1>
+          <p className="text-sm text-gray-500 mt-1">Gérez vos produits et services en vente</p>
         </div>
-        <div>
-          {/* Main Content */}
-          <div className="flex-1">
-            
-            {/* Content Area */}
-            {currentView === 'list' ? (
-              // Vue Liste des offres
-              loading ? (
-                <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto"></div>
-                  <p className="text-gray-600 mt-4">Chargement de vos offres...</p>
-                </div>
-              ) : filteredProducts.length === 0 ? (
-              <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
-                <h3 className="text-gray-900 mb-2">
-                  {filter === 'all' 
-                    ? "Aucune offre marketing"
-                    : `Aucune offre ${filter === 'active' ? 'active' : 'inactive'}`
-                  }
-                </h3>
-                <p className="text-gray-600 max-w-md mx-auto">
-                  {filter === 'all' 
-                    ? "Vous n'avez pas encore créé d'offres marketing."
-                    : `Aucune offre ${filter === 'active' ? 'active' : 'inactive'} trouvée.`
-                  }
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {/* Header des résultats */}
-                <div className="bg-white rounded-lg border border-gray-200 px-4 py-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <h2 className="text-sm lg:text-lg text-gray-900">
-                        {filter === 'all' ? 'Toutes vos offres' : 
-                         filter === 'active' ? 'Offres actives' : 'Offres inactives'}
-                      </h2>
-                      <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs">
-                        {filteredProducts.length}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs lg:text-sm text-gray-600">
-                      <BarChart3 className="w-3 h-3 lg:w-4 lg:h-4" />
-                      <span><span className="lg:hidden">Perf:</span><span className="hidden lg:inline">Performance:</span> 87%</span>
-                    </div>
-                  </div>
-                </div>
 
-                {/* Grille des offres en cartes */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredProducts.map((product) => (
-                    <div
-                      key={product._id}
-                      className="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 overflow-hidden relative"
-                    >
-                      <div className="relative h-48 w-full">
-                        {product.mainImage ? (
-                          <img 
-                            src={product.mainImage} 
-                            alt={product.title} 
-                            className="w-full h-full object-cover" 
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center">
-                            <TrendingUp className="w-12 h-12 text-orange-500" />
-                          </div>
-                        )}
-
-                        {/* Statistiques en overlay */}
-                        <div className="absolute bottom-2 left-2 flex gap-2">
-                          <div className="bg-black/70 backdrop-blur-sm text-white px-2 py-1 rounded text-xs flex items-center gap-1">
-                            <Eye className="w-3 h-3" />
-                            {product.views || 0}
-                          </div>
-                          <div className="bg-black/70 backdrop-blur-sm text-white px-2 py-1 rounded text-xs flex items-center gap-1">
-                            <MessageCircle className="w-3 h-3" />
-                            {product.messagesCount || 0}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Contenu de la carte */}
-                      <div className="p-4">
-                        {/* Catégorie */}
-                        {product.category && (
-                          <div className="mb-2">
-                            <span className="px-2 py-1 bg-orange-100 text-orange-800 rounded-full text-xs">
-                              {product.category}
-                            </span>
-                          </div>
-                        )}
-                        
-                        {/* Titre et prix */}
-                        <div className="flex items-start justify-between gap-2 mb-2">
-                          <h3 className="text-sm lg:text-lg text-gray-900 line-clamp-2 flex-1">
-                            {product.title}
-                          </h3>
-                          <div className="flex items-baseline gap-1 flex-shrink-0">
-                            <span className="text-base lg:text-xl text-orange-600 whitespace-nowrap">
-                              {(Number(product.conditions?.salary || product.price) || 0).toLocaleString()}
-                            </span>
-                            <span className="text-xs lg:text-sm text-gray-600">F</span>
-                          </div>
-                        </div>
-
-                        {/* Localisation et date */}
-                        <div className="flex items-center justify-between text-xs lg:text-sm text-gray-600 mb-3">
-                          <div className="flex items-center gap-1">
-                            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            <span className="truncate">{product.location?.city || 'Non spécifié'}</span>
-                          </div>
-                          <span className="text-xs">
-                            {new Date(product.createdAt).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })}
-                          </span>
-                        </div>
-
-                        {/* Actions */}
-                        <div className="flex justify-between items-center mt-4 pt-3 border-t border-gray-100">
-                          <div className="flex gap-2">
-                            <button 
-                              onClick={() => navigate(`/produit/${product._id}`)}
-                              className="bg-orange-600 hover:bg-orange-700 text-white px-2 lg:px-3 py-1 lg:py-1.5 rounded text-xs lg:text-sm transition-colors"
-                            >
-                              Voir
-                            </button>
-                          </div>
-                          
-                          <div className="flex gap-1">
-                            <button 
-                              onClick={() => handleToggleStatus(product._id, product.status)}
-                              className="p-1.5 text-orange-600 hover:text-orange-800 hover:bg-orange-50 rounded transition-colors"
-                              title={product.status === 'active' ? 'Désactiver' : 'Activer'}
-                            >
-                              <Power className="w-4 h-4" />
-                            </button>
-                            <button 
-                              onClick={() => handleDuplicate(product)}
-                              className="p-1.5 text-orange-600 hover:text-orange-800 hover:bg-orange-50 rounded transition-colors"
-                              title="Dupliquer"
-                            >
-                              <Copy className="w-4 h-4" />
-                            </button>
-                            <button 
-                              onClick={() => navigate(`/edit-offer/${product._id}`)}
-                              className="p-1.5 text-orange-600 hover:text-orange-800 hover:bg-orange-50 rounded transition-colors"
-                              title="Modifier"
-                            >
-                              <Edit3 className="w-4 h-4" />
-                            </button>
-                            <button 
-                              onClick={() => openDeleteModal(product)}
-                              className="p-1.5 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
-                              title="Supprimer"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )
-            ) : (
-              // Vue Statistiques et Revenus fusionnés
-              <div className="space-y-6">
-
-                {/* Section Statistiques */}
-                <div>
-                  <h2 className="text-lg text-gray-900 mb-4">Statistiques</h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-                    <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-xs lg:text-sm text-gray-600">Vues totales</p>
-                          <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{(products.length * 23).toLocaleString()}</p>
-                          <p className="text-xs lg:text-sm text-orange-600 mt-1">+12% vs période précédente</p>
-                        </div>
-                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                          <Eye className="w-5 h-5 lg:w-6 lg:h-6 text-orange-600" />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-xs lg:text-sm text-gray-600">Messages reçus</p>
-                          <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{products.length * 5}</p>
-                          <p className="text-xs lg:text-sm text-orange-600 mt-1">+8% vs période précédente</p>
-                        </div>
-                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                          <MessageCircle className="w-5 h-5 lg:w-6 lg:h-6 text-orange-600" />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-xs lg:text-sm text-gray-600">Taux de conversion</p>
-                          <p className="text-2xl lg:text-3xl text-gray-900 mt-1">12.5%</p>
-                          <p className="text-xs lg:text-sm text-red-600 mt-1">-2% vs période précédente</p>
-                        </div>
-                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                          <TrendingUp className="w-5 h-5 lg:w-6 lg:h-6 text-purple-600" />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-xs lg:text-sm text-gray-600">Articles actifs</p>
-                          <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{products.filter(p => p.status === 'active').length}</p>
-                          <p className="text-xs lg:text-sm text-gray-600 mt-1">sur {products.length} total</p>
-                        </div>
-                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                          <Activity className="w-5 h-5 lg:w-6 lg:h-6 text-orange-600" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Section Revenus */}
-                <div>
-                  <h2 className="text-lg text-gray-900 mb-4">Revenus</h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-                    <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-xs lg:text-sm text-gray-600">Revenus potentiels</p>
-                          <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{products.reduce((sum, p) => sum + (Number(p.conditions?.salary || p.price) || 0), 0).toLocaleString()} F</p>
-                          <p className="text-xs lg:text-sm text-green-600 mt-1">Toutes vos offres</p>
-                        </div>
-                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-green-100 rounded-full flex items-center justify-center">
-                          <DollarSign className="w-5 h-5 lg:w-6 lg:h-6 text-green-600" />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-xs lg:text-sm text-gray-600">Revenus actifs</p>
-                          <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{products.filter(p => p.status === 'active').reduce((sum, p) => sum + (Number(p.conditions?.salary || p.price) || 0), 0).toLocaleString()} F</p>
-                          <p className="text-xs lg:text-sm text-blue-600 mt-1">Offres en ligne</p>
-                        </div>
-                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                          <Target className="w-5 h-5 lg:w-6 lg:h-6 text-blue-600" />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-xs lg:text-sm text-gray-600">Estimation mensuelle</p>
-                          <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{Math.floor(products.filter(p => p.status === 'active').reduce((sum, p) => sum + (Number(p.conditions?.salary || p.price) || 0), 0) * 0.12).toLocaleString()} F</p>
-                          <p className="text-xs lg:text-sm text-purple-600 mt-1">Basé sur 12% conversion</p>
-                        </div>
-                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                          <Wallet className="w-5 h-5 lg:w-6 lg:h-6 text-purple-600" />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="bg-white rounded-lg border border-gray-200 p-4 lg:p-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-xs lg:text-sm text-gray-600">Moyenne par offre</p>
-                          <p className="text-2xl lg:text-3xl text-gray-900 mt-1">{products.length > 0 ? Math.floor(products.reduce((sum, p) => sum + (Number(p.conditions?.salary || p.price) || 0), 0) / products.length).toLocaleString() : 0} F</p>
-                          <p className="text-xs lg:text-sm text-gray-600 mt-1">Prix moyen</p>
-                        </div>
-                        <div className="w-10 h-10 lg:w-12 lg:h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                          <TrendingUp className="w-5 h-5 lg:w-6 lg:h-6 text-orange-600" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
+        {/* Filters */}
+        <div className="flex gap-2 mb-4">
+          {[
+            { value: 'all', label: 'Toutes' },
+            { value: 'active', label: 'Actives' },
+            { value: 'inactive', label: 'En pause' },
+          ].map((option) => (
+            <button
+              key={option.value}
+              onClick={() => setFilter(option.value)}
+              className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
+                filter === option.value
+                  ? 'bg-gray-900 text-white'
+                  : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              {option.label}
+            </button>
+          ))}
         </div>
-      </div>
 
-      {/* Modal Filtres Mobile */}
-      {showMobileFilters && (
-        <div className="fixed inset-0 z-50 sm:hidden">
-          {/* Overlay */}
-          <div 
-            className="absolute inset-0 bg-black/40"
-            onClick={() => setShowMobileFilters(false)}
-          ></div>
-          
-          {/* Modal Content - Bottom sheet */}
-          <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-xl">
-            {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
-              <span className="text-gray-900">Filtrer par statut</span>
-              <button
-                onClick={() => setShowMobileFilters(false)}
-                className="p-1 hover:bg-gray-100 rounded"
-              >
-                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            {/* Liste des options */}
-            <div className="py-2">
-              {[
-                { value: 'all', label: `Tous les articles (${products.length})` },
-                { value: 'active', label: `Articles actifs (${products.filter(p => p.status === 'active').length})` },
-                { value: 'inactive', label: `Inactifs (${products.filter(p => p.status === 'paused').length})` }
-              ].map((option) => (
+        {/* Data Table */}
+        <Card>
+                    <CardContent className="p-0">
+            {loading ? (
+              <div className="p-6 space-y-4">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="flex items-center gap-4">
+                    <Skeleton className="h-12 w-12 rounded" />
+                    <div className="space-y-2 flex-1">
+                      <Skeleton className="h-4 w-1/3" />
+                      <Skeleton className="h-3 w-1/4" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : filteredProducts.length === 0 ? (
+              <div className="p-12 text-center">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Package className="w-8 h-8 text-gray-400" />
+                </div>
+                <h3 className="text-gray-900 mb-1">Aucune annonce</h3>
+                <p className="text-sm text-gray-500 mb-4">Commencez à vendre en créant votre première annonce</p>
                 <button
-                  key={option.value}
-                  onClick={() => {
-                    setFilter(option.value);
-                    setShowMobileFilters(false);
-                  }}
-                  className={`w-full text-left px-4 py-2.5 text-sm ${
-                    filter === option.value 
-                      ? 'bg-orange-50 text-orange-600' 
-                      : 'text-gray-700 hover:bg-gray-50'
-                  }`}
+                  onClick={() => navigate('/create-offer?type=product')}
+                  className="inline-flex items-center gap-2 bg-orange-500 text-white px-4 py-2 hover:bg-orange-600 transition-colors text-sm"
                 >
-                  {option.label}
+                  <Plus className="w-4 h-4" />
+                  Créer une annonce
                 </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[300px]">Annonce</TableHead>
+                    <TableHead>Prix</TableHead>
+                    <TableHead>Statut</TableHead>
+                    <TableHead className="text-center">Vues</TableHead>
+                    <TableHead className="text-center">Messages</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead className="w-[50px]"></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredProducts.map((product) => (
+                    <TableRow key={product._id}>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 bg-gray-100 rounded overflow-hidden flex-shrink-0">
+                            {product.mainImage ? (
+                              <img src={product.mainImage} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <Package className="w-5 h-5 text-gray-400" />
+                              </div>
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-gray-900 truncate">{product.title}</p>
+                            <p className="text-xs text-gray-500">{product.location?.city || 'Non spécifié'}</p>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <span>{(Number(product.conditions?.salary || product.price) || 0).toLocaleString()}</span>
+                        <span className="text-gray-500 text-xs ml-1">FCFA</span>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={product.status === 'active' ? 'success' : 'secondary'}>
+                          {product.status === 'active' ? 'Active' : 'En pause'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <div className="flex items-center justify-center gap-1 text-gray-600">
+                          <Eye className="w-3.5 h-3.5" />
+                          <span>{product.views || 0}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <div className="flex items-center justify-center gap-1 text-gray-600">
+                          <MessageCircle className="w-3.5 h-3.5" />
+                          <span>{product.messagesCount || 0}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-gray-500 text-sm">
+                        {new Date(product.createdAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
+                      </TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button className="p-1.5 hover:bg-gray-100 rounded transition-colors">
+                              <MoreVertical className="w-4 h-4 text-gray-500" />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuItem onClick={() => navigate(`/produit/${product._id}`)}>
+                              <Eye className="w-4 h-4 mr-2" />
+                              Voir l'annonce
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => navigate(`/edit-offer/${product._id}`)}>
+                              <Edit3 className="w-4 h-4 mr-2" />
+                              Modifier
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleDuplicate(product)}>
+                              <Copy className="w-4 h-4 mr-2" />
+                              Dupliquer
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleToggleStatus(product._id, product.status)}>
+                              <Power className="w-4 h-4 mr-2" />
+                              {product.status === 'active' ? 'Mettre en pause' : 'Activer'}
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem 
+                              onClick={() => openDeleteModal(product)}
+                              variant="destructive"
+                            >
+                              <Trash2 className="w-4 h-4 mr-2" />
+                              Supprimer
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Modal de suppression */}
       <ConfirmDialog

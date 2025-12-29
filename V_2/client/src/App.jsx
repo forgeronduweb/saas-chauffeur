@@ -30,6 +30,7 @@ import ConditionsPage from './pages/ConditionsPage.jsx'
 import ConfidentialitePage from './pages/ConfidentialitePage.jsx'
 import AProposPage from './pages/AProposPage.jsx'
 import ContactPage from './pages/ContactPage.jsx'
+import NotificationsPage from './pages/NotificationsPage.jsx'
 import MyCandidates from './pages/employer/MyCandidates.jsx'
 import MyOffers from './pages/employer/MyOffers.jsx'
 import MyProducts from './pages/employer/MyProducts.jsx'
@@ -183,6 +184,7 @@ function App() {
             <Route path="/confidentialite" element={<ConfidentialitePage />} />
             <Route path="/a-propos" element={<AProposPage />} />
             <Route path="/contact" element={<ContactPage />} />
+            <Route path="/notifications" element={<NotificationsPage />} />
             
             {/* Pages d'inscription spécifiques */}
             <Route path="/inscription-chauffeur" element={<RoleSelection />} />
@@ -190,6 +192,7 @@ function App() {
             
             {/* Pages avec redirections */}
             <Route path="/creer-offre" element={<CreateOfferPage />} />
+            <Route path="/create-offer" element={<CreateOfferPage />} />
             <Route path="/chauffeurs" element={<DriversPage />} />
             
             {/* Pages avec alias pour le footer */}

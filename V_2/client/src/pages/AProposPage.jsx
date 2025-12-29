@@ -38,13 +38,13 @@ export default function AProposPage() {
   return (
     <PublicPageLayout activeTab="a-propos">
       <div className="max-w-4xl mx-auto px-4 lg:px-6 py-12">
-          <h1 className="text-3xl lg:text-4xl text-gray-900 mb-8">
+          <h1 className="text-xl lg:text-2xl font-semibold text-gray-900 mb-4">
             À propos de GoDriver
           </h1>
 
           <div className="bg-white border border-gray-200 p-6 lg:p-8 space-y-6">
             <section>
-              <h2 className="text-xl lg:text-2xl text-gray-900 mb-4">
+              <h2 className="text-base lg:text-lg font-medium text-gray-900 mb-2">
                 Notre mission
               </h2>
               <p className="text-gray-700 leading-relaxed">
@@ -55,7 +55,7 @@ export default function AProposPage() {
             </section>
 
             <section>
-              <h2 className="text-xl lg:text-2xl text-gray-900 mb-4">
+              <h2 className="text-base lg:text-lg font-medium text-gray-900 mb-2">
                 Notre vision
               </h2>
               <p className="text-gray-700 leading-relaxed">
@@ -65,7 +65,7 @@ export default function AProposPage() {
             </section>
 
             <section>
-              <h2 className="text-xl lg:text-2xl text-gray-900 mb-4">
+              <h2 className="text-base lg:text-lg font-medium text-gray-900 mb-2">
                 Nos valeurs
               </h2>
               <div className="text-gray-700 leading-relaxed space-y-3">
@@ -89,7 +89,7 @@ export default function AProposPage() {
             </section>
 
             <section>
-              <h2 className="text-xl lg:text-2xl text-gray-900 mb-4">
+              <h2 className="text-base lg:text-lg font-medium text-gray-900 mb-2">
                 Notre équipe
               </h2>
               <p className="text-gray-700 leading-relaxed">
@@ -100,7 +100,7 @@ export default function AProposPage() {
             </section>
 
             <section>
-              <h2 className="text-xl lg:text-2xl text-gray-900 mb-4">
+              <h2 className="text-base lg:text-lg font-medium text-gray-900 mb-2">
                 Nos chiffres
               </h2>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
@@ -132,7 +132,7 @@ export default function AProposPage() {
             </section>
 
             <section>
-              <h2 className="text-xl lg:text-2xl text-gray-900 mb-4">
+              <h2 className="text-base lg:text-lg font-medium text-gray-900 mb-2">
                 Nous contacter
               </h2>
               <div className="text-gray-700 leading-relaxed space-y-2">
