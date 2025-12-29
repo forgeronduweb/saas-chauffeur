@@ -410,10 +410,183 @@ const sendVerificationEmail = async (user, code) => {
   }
 };
 
+/**
+ * Envoyer un email de notification de nouveau signalement aux admins
+ */
+const sendNewReportEmail = async (adminEmail, report, reporter) => {
+  const reasonLabels = {
+    spam: 'Spam ou publicité',
+    inappropriate: 'Contenu inapproprié',
+    fraud: 'Fraude ou arnaque',
+    misleading: 'Information trompeuse',
+    harassment: 'Harcèlement',
+    other: 'Autre raison'
+  };
+
+  const targetLabels = {
+    offer: 'Offre d\'emploi',
+    product: 'Offre marketing',
+    driver: 'Profil chauffeur',
+    employer: 'Profil employeur'
+  };
+
+  try {
+    const mailOptions = {
+      from: `"GoDriver Admin" <${process.env.EMAIL_USER}>`,
+      to: adminEmail,
+      subject: `⚠️ Nouveau signalement - ${targetLabels[report.targetType] || report.targetType}`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background-color: #dc2626; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+            .content { background-color: #f9fafb; padding: 30px; border-radius: 0 0 8px 8px; }
+            .info-box { background-color: white; border: 1px solid #e5e7eb; padding: 15px; margin: 20px 0; border-radius: 6px; }
+            .button { display: inline-block; background-color: #dc2626; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+            .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>⚠️ Nouveau signalement</h1>
+            </div>
+            <div class="content">
+              <p>Un nouveau signalement a été soumis sur la plateforme et nécessite votre attention.</p>
+              
+              <div class="info-box">
+                <h3 style="margin-top: 0;">📋 Détails du signalement</h3>
+                <p><strong>Type de contenu :</strong> ${targetLabels[report.targetType] || report.targetType}</p>
+                <p><strong>Raison :</strong> ${reasonLabels[report.reason] || report.reason}</p>
+                ${report.description ? `<p><strong>Description :</strong> ${report.description}</p>` : ''}
+              </div>
+
+              <div class="info-box">
+                <h3 style="margin-top: 0;">👤 Signalé par</h3>
+                <p><strong>${reporter.firstName} ${reporter.lastName}</strong></p>
+                <p>📧 ${reporter.email}</p>
+              </div>
+
+              <div style="text-align: center;">
+                <a href="${process.env.ADMIN_URL || 'http://localhost:3001'}/reports" class="button">
+                  Traiter le signalement
+                </a>
+              </div>
+
+              <p>Connectez-vous à l'interface d'administration pour traiter ce signalement.</p>
+            </div>
+            <div class="footer">
+              <p>Cet email a été envoyé automatiquement par le système GoDriver.</p>
+              <p>&copy; ${new Date().getFullYear()} GoDriver - Administration</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log('✅ Email de signalement envoyé aux admins:', info.messageId);
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error('❌ Erreur lors de l\'envoi de l\'email de signalement:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+/**
+ * Envoyer un email au signaleur quand son signalement est traité
+ */
+const sendReportResolvedEmail = async (userEmail, userName, report, status, actionTaken) => {
+  const statusLabels = {
+    resolved: 'traité et résolu',
+    dismissed: 'examiné et classé sans suite'
+  };
+
+  const targetLabels = {
+    offer: 'l\'offre d\'emploi',
+    product: 'l\'offre marketing',
+    driver: 'le profil chauffeur',
+    employer: 'le profil employeur'
+  };
+
+  const actionLabels = {
+    none: 'Aucune action spécifique n\'a été prise.',
+    warn: 'Un avertissement a été envoyé au propriétaire du contenu.',
+    disable: 'Le contenu a été suspendu.',
+    delete: 'Le contenu a été supprimé de la plateforme.'
+  };
+
+  try {
+    const mailOptions = {
+      from: `"GoDriver" <${process.env.EMAIL_USER}>`,
+      to: userEmail,
+      subject: `Votre signalement a été ${statusLabels[status] || 'traité'}`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background-color: ${status === 'resolved' ? '#16a34a' : '#6b7280'}; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+            .content { background-color: #f9fafb; padding: 30px; border-radius: 0 0 8px 8px; }
+            .info-box { background-color: white; border: 1px solid #e5e7eb; padding: 15px; margin: 20px 0; border-radius: 6px; }
+            .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>${status === 'resolved' ? '✅' : 'ℹ️'} Signalement traité</h1>
+            </div>
+            <div class="content">
+              <p>Bonjour ${userName},</p>
+              
+              <p>Nous vous informons que votre signalement concernant <strong>${targetLabels[report.targetType] || 'le contenu'}</strong> a été <strong>${statusLabels[status] || 'traité'}</strong> par notre équipe de modération.</p>
+              
+              <div class="info-box">
+                <h3 style="margin-top: 0;">📋 Résumé</h3>
+                <p><strong>Statut :</strong> ${status === 'resolved' ? 'Résolu' : 'Classé sans suite'}</p>
+                ${actionTaken && actionTaken !== 'none' ? `<p><strong>Action prise :</strong> ${actionLabels[actionTaken]}</p>` : ''}
+              </div>
+
+              <p>Nous vous remercions d'avoir contribué à maintenir la qualité et la sécurité de notre plateforme. Votre vigilance nous aide à offrir une meilleure expérience à tous nos utilisateurs.</p>
+
+              <p>Si vous avez d'autres préoccupations, n'hésitez pas à nous contacter.</p>
+
+              <p>Cordialement,<br>L'équipe GoDriver</p>
+            </div>
+            <div class="footer">
+              <p>Cet email a été envoyé automatiquement par GoDriver.</p>
+              <p>&copy; ${new Date().getFullYear()} GoDriver</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log('✅ Email de résolution envoyé au signaleur:', info.messageId);
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error('❌ Erreur lors de l\'envoi de l\'email de résolution:', error);
+    return { success: false, error: error.message };
+  }
+};
+
 module.exports = {
   sendDriverValidationEmail,
   sendDriverRejectionEmail,
   sendWelcomeEmail,
   sendNewApplicationEmail,
-  sendVerificationEmail
+  sendVerificationEmail,
+  sendNewReportEmail,
+  sendReportResolvedEmail
 };

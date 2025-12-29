@@ -247,6 +247,31 @@ const notificationConfig = {
     getMessage: (data) => data.message,
     getActionText: (data) => data.actionText,
     getActionUrl: (data) => data.actionUrl
+  },
+
+  // SIGNALEMENTS (ADMIN)
+  new_report: {
+    priority: 'urgent',
+    getTitle: () => 'Nouveau signalement',
+    getMessage: (data) => `Nouveau signalement: ${data.reason} sur ${data.targetType}`,
+    getActionText: () => 'Traiter',
+    getActionUrl: () => '/reports'
+  },
+
+  report_resolved: {
+    priority: 'info',
+    getTitle: () => 'Signalement traité',
+    getMessage: (data) => `Votre signalement a été traité: ${data.status}`,
+    getActionText: () => 'Voir',
+    getActionUrl: () => '/'
+  },
+
+  content_action: {
+    priority: 'urgent',
+    getTitle: () => 'Action sur votre contenu',
+    getMessage: (data) => data.message || `Une action a été prise sur votre ${data.targetType}`,
+    getActionText: () => 'Voir',
+    getActionUrl: () => '/'
   }
 };
 
