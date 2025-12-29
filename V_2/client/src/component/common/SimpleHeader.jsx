@@ -6,7 +6,8 @@ import SearchResults from './SearchResults';
 import MessagingSystem from '../messaging/MessagingSystem';
 import FloatingMessagingButton from '../messaging/FloatingMessagingButton';
 import { searchService, messagesApi } from '../../services/api';
-import { User, ShoppingCart, FileText, Briefcase, LogOut } from 'lucide-react';
+import { User, ShoppingCart, FileText, Briefcase, LogOut, Bell } from 'lucide-react';
+import NotificationBell from './NotificationBell';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -235,7 +236,11 @@ export default function SimpleHeader({ activeTab = '', searchQuery = '', onSearc
               <span className="hidden lg:inline text-sm">Publier une offre</span>
             </Link>
             {user ? (
-              <DropdownMenu>
+              <>
+                {/* Notifications */}
+                <NotificationBell />
+                
+                <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button className="flex items-center gap-2 outline-none">
                     {/* Avatar sur mobile */}
@@ -324,6 +329,7 @@ export default function SimpleHeader({ activeTab = '', searchQuery = '', onSearc
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+              </>
             ) : (
               <Link
                 to="/auth?mode=login"

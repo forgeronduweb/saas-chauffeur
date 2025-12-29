@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useState } from 'react';
+import NotificationBell from './NotificationBell';
 
 export default function PublicHeader() {
   const { user, logout } = useAuth();
@@ -27,15 +28,20 @@ export default function PublicHeader() {
           {/* Boutons d'action ou Avatar - Desktop */}
           <div className="hidden md:flex items-center gap-3">
             {user ? (
-              <div className="relative">
-                <button
-                  onClick={() => setShowMenu(!showMenu)}
-                  className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-                >
-                  <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white font-semibold">
-                    {user.firstName ? user.firstName.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}
-                  </div>
-                </button>
+              <>
+                {/* Notifications */}
+                <NotificationBell />
+
+                {/* Avatar */}
+                <div className="relative">
+                  <button
+                    onClick={() => setShowMenu(!showMenu)}
+                    className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+                  >
+                    <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white font-semibold">
+                      {user.firstName ? user.firstName.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}
+                    </div>
+                  </button>
 
                 {/* Menu dropdown */}
                 {showMenu && (
@@ -60,7 +66,8 @@ export default function PublicHeader() {
                     </div>
                   </>
                 )}
-              </div>
+                </div>
+              </>
             ) : (
               <>
                 <Link
