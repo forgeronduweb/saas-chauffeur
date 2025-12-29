@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
-/* Global font */
+/* Global font - Inter (shadcn/ui) */
 :root {
-  --font-poppins: "Poppins", system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+  --font-inter: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", sans-serif;
 }
 
 html {
@@ -18,7 +18,7 @@ html {
 }
 
 html, body, #root {
-  font-family: var(--font-poppins);
+  font-family: var(--font-inter);
 }
 
 /* Masquer les barres de défilement globalement */

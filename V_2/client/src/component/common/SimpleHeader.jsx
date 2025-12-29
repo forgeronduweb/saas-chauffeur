@@ -6,6 +6,15 @@ import SearchResults from './SearchResults';
 import MessagingSystem from '../messaging/MessagingSystem';
 import FloatingMessagingButton from '../messaging/FloatingMessagingButton';
 import { searchService, messagesApi } from '../../services/api';
+import { User, ShoppingCart, FileText, Briefcase, LogOut } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuLabel,
+} from '../../components/ui/dropdown-menu';
 
 export default function SimpleHeader({ activeTab = '', searchQuery = '', onSearchChange = () => {}, readOnly = false, hideSubNav = false }) {
   const { user, logout } = useAuth();
@@ -226,172 +235,95 @@ export default function SimpleHeader({ activeTab = '', searchQuery = '', onSearc
               <span className="hidden lg:inline text-sm">Publier une offre</span>
             </Link>
             {user ? (
-              <div className="relative">
-                <button
-                  onClick={() => setShowMenu(!showMenu)}
-                  className="flex items-center gap-2"
-                >
-                  {/* Avatar sur mobile */}
-                  <div className="lg:hidden w-9 h-9 rounded-full bg-orange-500 flex items-center justify-center text-white font-semibold text-sm overflow-hidden">
-                    {user.profilePhotoUrl ? (
-                      <img 
-                        src={user.profilePhotoUrl} 
-                        alt={`${user.firstName} ${user.lastName}`}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span>{user.firstName?.[0]}{user.lastName?.[0]}</span>
-                    )}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center gap-2 outline-none">
+                    {/* Avatar sur mobile */}
+                    <div className="lg:hidden w-9 h-9 rounded-full bg-orange-500 flex items-center justify-center text-white font-semibold text-sm overflow-hidden">
+                      {user.profilePhotoUrl ? (
+                        <img 
+                          src={user.profilePhotoUrl} 
+                          alt={`${user.firstName} ${user.lastName}`}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span>{user.firstName?.[0]}{user.lastName?.[0]}</span>
+                      )}
+                    </div>
+                    {/* Bouton Mon espace sur desktop */}
+                    <span className="hidden lg:inline px-4 py-2 bg-orange-500 text-white text-base rounded hover:bg-orange-600 transition-colors">
+                      Mon espace
+                    </span>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-64">
+                  {/* Informations utilisateur */}
+                  <div className="px-3 py-3 mb-1">
+                    <p className="text-sm font-medium text-gray-900">
+                      {user.firstName} {user.lastName}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-0.5">{user.email}</p>
+                    <span className="inline-block mt-2 px-2 py-0.5 text-xs rounded-full bg-orange-100 text-orange-600">
+                      {user.role === 'driver' ? 'Chauffeur' : 'Employeur'}
+                    </span>
                   </div>
-                  {/* Bouton Mon espace sur desktop */}
-                  <span className="hidden lg:inline px-4 py-2 bg-orange-500 text-white text-base rounded hover:bg-orange-600 transition-colors">
-                    Mon espace
-                  </span>
-                </button>
-
-                {/* Menu dropdown */}
-                {showMenu && (
-                  <>
-                    <div 
-                      className="fixed inset-0 z-10" 
-                      onClick={() => setShowMenu(false)}
-                    />
-                    {/* Menu mobile - texte réduit */}
-                    <div className="lg:hidden absolute right-0 mt-2 text-sm w-64 p-3 bg-white border border-gray-500/30 text-gray-800/80 rounded-md z-20">
-                      {/* Informations utilisateur */}
-                      <div className="px-3 py-3 mb-2 bg-gray-50 rounded-lg border border-gray-200">
-                        <p className="text-sm text-gray-900">
-                          {user.firstName} {user.lastName}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-0.5">{user.email}</p>
-                        <span className="inline-block mt-2 px-2 py-0.5 text-xs rounded-full bg-orange-100 text-orange-600">
-                          {user.role === 'driver' ? 'Chauffeur' : 'Employeur'}
-                        </span>
-                      </div>
-                      <ul className="flex flex-col gap-px">
-                        <li className="flex items-center justify-between gap-2 cursor-pointer px-3 py-2 rounded hover:bg-gray-500/20 transition">
-                          <Link to="/profile" onClick={() => setShowMenu(false)} className="-mr-px">Mon profil</Link>
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="#1F2937" fillOpacity=".8"/>
-                          </svg>
-                        </li>
-                        {user.role === 'employer' && (
-                          <>
-                            <li className="flex items-center justify-between gap-3 cursor-pointer px-3 py-2 rounded hover:bg-gray-500/20 transition">
-                              <Link to="/employer/candidates" onClick={() => setShowMenu(false)}>Mes candidatures</Link>
-                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" fill="#1F2937" fillOpacity=".8"/>
-                              </svg>
-                            </li>
-                            <li className="flex items-center justify-between gap-3 cursor-pointer px-3 py-2 rounded hover:bg-gray-500/20 transition">
-                              <Link to="/employer/offers" onClick={() => setShowMenu(false)}>Mes annonces</Link>
-                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" fill="#1F2937" fillOpacity=".8"/>
-                              </svg>
-                            </li>
-                            <li className="flex items-center justify-between gap-3 cursor-pointer px-3 py-2 rounded hover:bg-gray-500/20 transition">
-                              <Link to="/employer/my-products" onClick={() => setShowMenu(false)}>Mes offres marketing</Link>
-                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" fill="#1F2937" fillOpacity=".8"/>
-                              </svg>
-                            </li>
-                          </>
-                        )}
-                        {user.role === 'driver' && (
-                          <>
-                            <li className="flex items-center justify-between gap-3 cursor-pointer px-3 py-2 rounded hover:bg-gray-500/20 transition">
-                              <Link to="/driver/my-products" onClick={() => setShowMenu(false)}>Mes offres marketing</Link>
-                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" fill="#1F2937" fillOpacity=".8"/>
-                              </svg>
-                            </li>
-                            <li className="flex items-center justify-between gap-3 cursor-pointer px-3 py-2 rounded hover:bg-gray-500/20 transition">
-                              <Link to="/driver/applications" onClick={() => setShowMenu(false)}>Mes candidatures</Link>
-                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" fill="#1F2937" fillOpacity=".8"/>
-                              </svg>
-                            </li>
-                          </>
-                        )}
-                        <div className="w-full h-px bg-gray-300/50 my-2"></div>
-                        <li className="flex items-center text-red-600/80 justify-between gap-3 cursor-pointer px-3 py-2 rounded hover:bg-red-600/20 transition">
-                          <button onClick={() => { logout(); setShowMenu(false); }} className="text-left w-full">Déconnexion</button>
-                          <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M1 3.833h17m-4.25 0-.287-.766c-.28-.744-.419-1.115-.677-1.39a2.1 2.1 0 0 0-.852-.546C11.559 1 11.118 1 10.237 1H8.763c-.881 0-1.322 0-1.697.131a2.1 2.1 0 0 0-.852.546c-.258.275-.398.646-.676 1.39l-.288.766m10.625 0v9.634c0 1.586 0 2.38-.347 2.986a3.04 3.04 0 0 1-1.393 1.238c-.682.309-1.575.309-3.36.309h-2.55c-1.785 0-2.678 0-3.36-.309a3.04 3.04 0 0 1-1.393-1.238c-.347-.606-.347-1.4-.347-2.986V3.833m8.5 3.778v6.611m-4.25-6.61v6.61" stroke="#DC2626" strokeOpacity=".8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                        </li>
-                      </ul>
-                    </div>
-                    
-                    {/* Menu desktop - texte normal */}
-                    <div className="hidden lg:block absolute right-0 mt-2 text-lg w-64 p-3 bg-white border border-gray-500/30 text-gray-800/80 rounded-md z-20">
-                      {/* Informations utilisateur */}
-                      <div className="px-3 py-3 mb-2 bg-gray-50 rounded-lg border border-gray-200">
-                        <p className="text-lg text-gray-900">
-                          {user.firstName} {user.lastName}
-                        </p>
-                        <p className="text-base text-gray-500 mt-0.5">{user.email}</p>
-                        <span className="inline-block mt-2 px-2 py-0.5 text-xs rounded-full bg-orange-100 text-orange-600">
-                          {user.role === 'driver' ? 'Chauffeur' : 'Employeur'}
-                        </span>
-                      </div>
-                      <ul className="flex flex-col gap-px">
-                        <li className="flex items-center justify-between gap-2 cursor-pointer px-3 py-2 rounded hover:bg-gray-500/20 transition">
-                          <Link to="/profile" onClick={() => setShowMenu(false)} className="-mr-px">Mon profil</Link>
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="#1F2937" fillOpacity=".8"/>
-                          </svg>
-                        </li>
-                        {user.role === 'employer' && (
-                          <>
-                            <li className="flex items-center justify-between gap-3 cursor-pointer px-3 py-2 rounded hover:bg-gray-500/20 transition">
-                              <Link to="/employer/candidates" onClick={() => setShowMenu(false)}>Mes candidatures</Link>
-                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" fill="#1F2937" fillOpacity=".8"/>
-                              </svg>
-                            </li>
-                            <li className="flex items-center justify-between gap-3 cursor-pointer px-3 py-2 rounded hover:bg-gray-500/20 transition">
-                              <Link to="/employer/offers" onClick={() => setShowMenu(false)}>Mes annonces</Link>
-                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" fill="#1F2937" fillOpacity=".8"/>
-                              </svg>
-                            </li>
-                            <li className="flex items-center justify-between gap-3 cursor-pointer px-3 py-2 rounded hover:bg-gray-500/20 transition">
-                              <Link to="/employer/my-products" onClick={() => setShowMenu(false)}>Mes offres marketing</Link>
-                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" fill="#1F2937" fillOpacity=".8"/>
-                              </svg>
-                            </li>
-                          </>
-                        )}
-                        {user.role === 'driver' && (
-                          <>
-                            <li className="flex items-center justify-between gap-3 cursor-pointer px-3 py-2 rounded hover:bg-gray-500/20 transition">
-                              <Link to="/driver/my-products" onClick={() => setShowMenu(false)}>Mes offres marketing</Link>
-                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" fill="#1F2937" fillOpacity=".8"/>
-                              </svg>
-                            </li>
-                            <li className="flex items-center justify-between gap-3 cursor-pointer px-3 py-2 rounded hover:bg-gray-500/20 transition">
-                              <Link to="/driver/applications" onClick={() => setShowMenu(false)}>Mes candidatures</Link>
-                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" fill="#1F2937" fillOpacity=".8"/>
-                              </svg>
-                            </li>
-                          </>
-                        )}
-                        <div className="w-full h-px bg-gray-300/50 my-2"></div>
-                        <li className="flex items-center text-red-600/80 justify-between gap-3 cursor-pointer px-3 py-2 rounded hover:bg-red-600/20 transition">
-                          <button onClick={() => { logout(); setShowMenu(false); }} className="text-left w-full">Déconnexion</button>
-                          <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M1 3.833h17m-4.25 0-.287-.766c-.28-.744-.419-1.115-.677-1.39a2.1 2.1 0 0 0-.852-.546C11.559 1 11.118 1 10.237 1H8.763c-.881 0-1.322 0-1.697.131a2.1 2.1 0 0 0-.852.546c-.258.275-.398.646-.676 1.39l-.288.766m10.625 0v9.634c0 1.586 0 2.38-.347 2.986a3.04 3.04 0 0 1-1.393 1.238c-.682.309-1.575.309-3.36.309h-2.55c-1.785 0-2.678 0-3.36-.309a3.04 3.04 0 0 1-1.393-1.238c-.347-.606-.347-1.4-.347-2.986V3.833m8.5 3.778v6.611m-4.25-6.61v6.61" stroke="#DC2626" strokeOpacity=".8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                        </li>
-                      </ul>
-                    </div>
-                  </>
-                )}
-              </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile" className="flex items-center justify-between cursor-pointer">
+                      Mon profil
+                      <User className="w-4 h-4 text-gray-500" />
+                    </Link>
+                  </DropdownMenuItem>
+                  {user.role === 'employer' && (
+                    <>
+                      <DropdownMenuItem asChild>
+                        <Link to="/employer/candidates" className="flex items-center justify-between cursor-pointer">
+                          Mes candidatures
+                          <FileText className="w-4 h-4 text-gray-500" />
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/employer/offers" className="flex items-center justify-between cursor-pointer">
+                          Mes annonces
+                          <Briefcase className="w-4 h-4 text-gray-500" />
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/employer/my-products" className="flex items-center justify-between cursor-pointer">
+                          Mes offres marketing
+                          <ShoppingCart className="w-4 h-4 text-gray-500" />
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                  {user.role === 'driver' && (
+                    <>
+                      <DropdownMenuItem asChild>
+                        <Link to="/driver/my-products" className="flex items-center justify-between cursor-pointer">
+                          Mes offres marketing
+                          <ShoppingCart className="w-4 h-4 text-gray-500" />
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/driver/applications" className="flex items-center justify-between cursor-pointer">
+                          Mes candidatures
+                          <FileText className="w-4 h-4 text-gray-500" />
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                    onClick={logout}
+                    className="text-red-600 focus:text-red-600 cursor-pointer"
+                  >
+                    <span className="flex items-center justify-between w-full">
+                      Déconnexion
+                      <LogOut className="w-4 h-4" />
+                    </span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <Link
                 to="/auth?mode=login"

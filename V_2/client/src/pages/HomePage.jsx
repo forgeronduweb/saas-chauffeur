@@ -20,32 +20,51 @@ export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentSlide, setCurrentSlide] = useState(0);
   const [currentDriverProfile, setCurrentDriverProfile] = useState(null);
+  const [banners, setBanners] = useState([]);
   const navigate = useNavigate();
 
-  // Bannières publicitaires
-  const banners = [
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+
+  // Bannières par défaut si aucune n'est configurée
+  const defaultBanners = [
     {
-      id: 1,
+      _id: 1,
       image: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=1200&h=400&fit=crop',
       title: 'Recrutez en toute confiance',
-      subtitle: 'Des chauffeurs professionnels vérifiés',
       link: '/auth'
     },
     {
-      id: 2,
+      _id: 2,
       image: 'https://images.unsplash.com/photo-1485291571150-772bcfc10da5?w=1200&h=400&fit=crop',
       title: 'Trouvez votre chauffeur idéal',
-      subtitle: 'Disponible 24/7 à Abidjan',
       link: '/auth'
     },
     {
-      id: 3,
+      _id: 3,
       image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=1200&h=400&fit=crop',
       title: 'Service premium garanti',
-      subtitle: 'Plus de 100 chauffeurs expérimentés',
       link: '/chauffeurs'
     }
   ];
+
+  // Charger les bannières depuis l'API
+  useEffect(() => {
+    const fetchBanners = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/banners?location=home&active=true`);
+        const data = await response.json();
+        if (data && data.length > 0) {
+          setBanners(data);
+        } else {
+          setBanners(defaultBanners);
+        }
+      } catch (error) {
+        console.error('Erreur chargement bannières:', error);
+        setBanners(defaultBanners);
+      }
+    };
+    fetchBanners();
+  }, []);
 
 
   // Récupérer le profil du chauffeur connecté si c'est un chauffeur

@@ -62,18 +62,18 @@ export default function DriverCard({ driver }) {
       onMouseLeave={() => setTilt({ x: 0, y: 0 })}
       style={{ transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)` }}
     >
-      {/* Image de couverture / Photo de profil */}
+      {/* Photo de profil */}
       {driver.profilePhotoUrl ? (
         <img 
           src={driver.profilePhotoUrl} 
           alt={`${driver.firstName} ${driver.lastName}`}
-          className="w-full h-32 lg:h-40 object-cover"
+          className="w-full h-44 lg:h-52 object-cover"
         />
       ) : (
-        <div className="w-full h-32 lg:h-40 bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
-          <div className="text-white text-3xl lg:text-4xl font-bold">
+        <div className="w-full h-44 lg:h-52 bg-gray-100 flex items-center justify-center">
+          <span className="text-gray-400 text-4xl lg:text-5xl font-medium">
             {initials}
-          </div>
+          </span>
         </div>
       )}
 
@@ -88,8 +88,8 @@ export default function DriverCard({ driver }) {
           {experienceText}
         </p>
 
-        {/* Localité - toujours 1 ligne avec icône */}
-        <div className="flex items-center gap-1 text-xs text-gray-600 mb-3 h-4">
+        {/* Localité */}
+        <div className="flex items-center gap-1 text-xs text-gray-600">
           <svg className="w-3.5 h-3.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd"/>
           </svg>
@@ -97,20 +97,6 @@ export default function DriverCard({ driver }) {
             {driver.workZone || 'Non spécifié'}
           </span>
         </div>
-
-        {/* Badge Disponibilité - toujours affiché */}
-        {driver.isAvailable ? (
-          <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-50 text-green-700 text-xs rounded-md font-medium w-fit">
-            <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
-            </svg>
-            Disponible
-          </span>
-        ) : (
-          <span className="inline-flex items-center gap-1 px-2 py-1 bg-gray-50 text-gray-500 text-xs rounded-md font-medium w-fit">
-            Non disponible
-          </span>
-        )}
       </div>
     </div>
   );

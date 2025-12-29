@@ -7,7 +7,15 @@ import SimpleHeader from '../../component/common/SimpleHeader';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
 import CustomDropdown from '../../component/common/CustomDropdown';
 import useUnreadMessages from '../../hooks/useUnreadMessages';
-import { Eye, MessageCircle, Copy, Power, Edit3, Trash2, Plus, TrendingUp, Star, Clock, BarChart3, Filter, AlertCircle, TrendingDown, DollarSign, PieChart, Activity, Target, Wallet, Calendar } from 'lucide-react';
+import { Eye, MessageCircle, MoreVertical, Power, Edit3, Trash2, Plus, TrendingUp, Star, Clock, BarChart3, Filter, AlertCircle, TrendingDown, DollarSign, PieChart, Activity, Target, Wallet, Calendar, Copy, Package } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../../components/ui/dropdown-menu';
+import { Skeleton } from '../../components/ui/skeleton';
 
 export default function MyProducts() {
   const navigate = useNavigate();
@@ -194,9 +202,17 @@ export default function MyProducts() {
             {currentView === 'list' ? (
               // Vue Liste des offres
               loading ? (
-                <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto"></div>
-                  <p className="text-gray-600 mt-4">Chargement de vos offres...</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                      <Skeleton className="h-48 w-full" />
+                      <div className="p-4 space-y-3">
+                        <Skeleton className="h-4 w-20" />
+                        <Skeleton className="h-5 w-3/4" />
+                        <Skeleton className="h-4 w-1/2" />
+                      </div>
+                    </div>
+                  ))}
                 </div>
               ) : filteredProducts.length === 0 ? (
               <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
@@ -239,134 +255,126 @@ export default function MyProducts() {
                   {filteredProducts.map((product) => (
                     <div
                       key={product._id}
-                      className="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 overflow-hidden"
+                      className="bg-white rounded-lg border border-gray-200 hover:shadow-md transition-all duration-200 overflow-hidden group"
                     >
-                      {/* Image en haut */}
-                      <figure className="relative h-48 overflow-hidden">
-                        {/* Statut */}
-                        <div className="absolute top-2 right-2">
-                          <span className={`px-2 py-1 rounded-full text-xs ${
+                      {/* Image */}
+                      <div className="relative aspect-square overflow-hidden">
+                        {product.mainImage ? (
+                          <img 
+                            src={product.mainImage} 
+                            alt={product.title} 
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                            <Package className="w-16 h-16 text-gray-300" />
+                          </div>
+                        )}
+
+                        {/* Badge statut */}
+                        <div className="absolute top-3 left-3">
+                          <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${
                             product.status === 'active' 
-                              ? 'bg-orange-500 text-white' 
-                              : 'bg-gray-600 text-white'
+                              ? 'bg-green-500 text-white' 
+                              : 'bg-gray-500 text-white'
                           }`}>
                             {product.status === 'active' ? 'Active' : 'Inactive'}
                           </span>
                         </div>
 
-                        {product.mainImage ? (
-                          <img 
-                            src={product.mainImage} 
-                            alt={product.title} 
-                            className="w-full h-full object-cover" 
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center">
-                            <TrendingUp className="w-12 h-12 text-orange-500" />
-                          </div>
-                        )}
+                        {/* Menu actions */}
+                        <div className="absolute top-3 right-3">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <button className="p-1.5 bg-white/90 hover:bg-white rounded-full shadow-sm transition-colors">
+                                <MoreVertical className="w-4 h-4 text-gray-600" />
+                              </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-48">
+                              <DropdownMenuItem onClick={() => navigate(`/produit/${product._id}`)}>
+                                <Eye className="w-4 h-4 mr-2" />
+                                Voir l'annonce
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => navigate(`/edit-offer/${product._id}`)}>
+                                <Edit3 className="w-4 h-4 mr-2" />
+                                Modifier
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleDuplicate(product)}>
+                                <Copy className="w-4 h-4 mr-2" />
+                                Dupliquer
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleToggleStatus(product._id, product.status)}>
+                                <Power className="w-4 h-4 mr-2" />
+                                {product.status === 'active' ? 'Désactiver' : 'Activer'}
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem 
+                                onClick={() => openDeleteModal(product)}
+                                className="text-red-600 focus:text-red-600"
+                              >
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                Supprimer
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
 
-                        {/* Statistiques en overlay */}
-                        <div className="absolute bottom-2 left-2 flex gap-2">
-                          <div className="bg-black/70 backdrop-blur-sm text-white px-2 py-1 rounded text-xs flex items-center gap-1">
-                            <Eye className="w-3 h-3" />
-                            {product.views || 0}
-                          </div>
-                          <div className="bg-black/70 backdrop-blur-sm text-white px-2 py-1 rounded text-xs flex items-center gap-1">
-                            <MessageCircle className="w-3 h-3" />
-                            {product.messagesCount || 0}
+                        {/* Stats en bas de l'image */}
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3">
+                          <div className="flex gap-3 text-white text-xs">
+                            <span className="flex items-center gap-1">
+                              <Eye className="w-3.5 h-3.5" />
+                              {product.views || 0} vues
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <MessageCircle className="w-3.5 h-3.5" />
+                              {product.messagesCount || 0}
+                            </span>
                           </div>
                         </div>
-                      </figure>
+                      </div>
 
-                      {/* Contenu de la carte */}
+                      {/* Contenu */}
                       <div className="p-4">
                         {/* Catégorie */}
                         {product.category && (
-                          <div className="mb-2">
-                            <span className="px-2 py-1 bg-orange-100 text-orange-800 rounded-full text-xs">
-                              {product.category}
-                            </span>
-                          </div>
+                          <span className="inline-block px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs mb-2">
+                            {product.category}
+                          </span>
                         )}
                         
-                        {/* Titre et prix */}
-                        <div className="flex items-start justify-between gap-2 mb-2">
-                          <h3 className="text-sm lg:text-lg text-gray-900 line-clamp-2 flex-1">
-                            {product.title}
-                          </h3>
-                          <div className="flex items-baseline gap-1 flex-shrink-0">
-                            <span className="text-base lg:text-xl text-orange-600 whitespace-nowrap">
-                              {(Number(product.conditions?.salary || product.price) || 0).toLocaleString()}
-                            </span>
-                            <span className="text-xs lg:text-sm text-gray-600">F</span>
-                          </div>
+                        {/* Titre */}
+                        <h3 className="text-sm lg:text-base text-gray-900 font-medium line-clamp-2 mb-2">
+                          {product.title}
+                        </h3>
+
+                        {/* Prix */}
+                        <div className="flex items-baseline gap-1 mb-3">
+                          <span className="text-lg lg:text-xl font-semibold text-gray-900">
+                            {(Number(product.conditions?.salary || product.price) || 0).toLocaleString()}
+                          </span>
+                          <span className="text-sm text-gray-500">FCFA</span>
                         </div>
 
                         {/* Localisation et date */}
-                        <div className="flex items-center justify-between text-xs lg:text-sm text-gray-600 mb-3">
+                        <div className="flex items-center justify-between text-xs text-gray-500 pt-3 border-t border-gray-100">
                           <div className="flex items-center gap-1">
-                            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
                             <span className="truncate">{product.location?.city || 'Non spécifié'}</span>
                           </div>
-                          <span className="text-xs">
-                            {new Date(product.createdAt).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })}
+                          <span>
+                            {new Date(product.createdAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}
                           </span>
-                        </div>
-
-                        {/* Actions */}
-                        <div className="flex justify-between items-center mt-4 pt-3 border-t border-gray-100">
-                          <div className="flex gap-2">
-                            <button 
-                              onClick={() => navigate(`/produit/${product._id}`)}
-                              className="bg-orange-600 hover:bg-orange-700 text-white px-2 lg:px-3 py-1 lg:py-1.5 rounded text-xs lg:text-sm transition-colors"
-                            >
-                              Voir
-                            </button>
-                          </div>
-                          
-                          <div className="flex gap-1">
-                            <button 
-                              onClick={() => handleToggleStatus(product._id, product.status)}
-                              className="p-1.5 text-orange-600 hover:text-orange-800 hover:bg-orange-50 rounded transition-colors"
-                              title={product.status === 'active' ? 'Désactiver' : 'Activer'}
-                            >
-                              <Power className="w-4 h-4" />
-                            </button>
-                            <button 
-                              onClick={() => handleDuplicate(product)}
-                              className="p-1.5 text-orange-600 hover:text-orange-800 hover:bg-orange-50 rounded transition-colors"
-                              title="Dupliquer"
-                            >
-                              <Copy className="w-4 h-4" />
-                            </button>
-                            <button 
-                              onClick={() => navigate(`/edit-offer/${product._id}`)}
-                              className="p-1.5 text-orange-600 hover:text-orange-800 hover:bg-orange-50 rounded transition-colors"
-                              title="Modifier"
-                            >
-                              <Edit3 className="w-4 h-4" />
-                            </button>
-                            <button 
-                              onClick={() => openDeleteModal(product)}
-                              className="p-1.5 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
-                              title="Supprimer"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
                         </div>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
-            )
-            ) : (
-              // Vue Statistiques et Revenus fusionnés
+            )) : (
+              // Vue Statistiques et Revenus
               <div className="space-y-6">
 
                 {/* Section Statistiques */}

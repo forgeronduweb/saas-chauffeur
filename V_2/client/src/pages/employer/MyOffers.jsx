@@ -32,8 +32,13 @@ export default function MyOffers() {
       const response = await offersApi.myOffers();
       console.log('Mes offres:', response.data);
       
+      // Filtrer uniquement les offres d'emploi (exclure les offres marketing)
+      const jobOffers = response.data.filter(offer => 
+        offer.type !== 'product' && offer.type !== 'Autre'
+      );
+      
       // Transformer les données de l'API
-      const formattedOffers = response.data.map(offer => ({
+      const formattedOffers = jobOffers.map(offer => ({
         id: offer._id,
         title: offer.title,
         type: offer.type,

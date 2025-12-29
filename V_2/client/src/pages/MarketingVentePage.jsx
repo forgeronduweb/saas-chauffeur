@@ -311,12 +311,6 @@ export default function MarketingVentePage() {
               </div>
             )}
 
-            {/* Liste des produits normaux */}
-            <div className="mb-4">
-              <h2 className="text-xl text-gray-900 mb-4">
-                Toutes les offres {filteredProducts.length > 0 && `(${filteredProducts.length})`}
-              </h2>
-            </div>
             
         {loading ? (
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
