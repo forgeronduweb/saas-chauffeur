@@ -22,7 +22,10 @@ const notificationSchema = new mongoose.Schema(
         'mission_completed',
         'rating_received',
         'driver_profile_updated',
-        'admin_message'
+        'admin_message',
+        'new_report',
+        'report_resolved',
+        'content_action'
       ],
       required: true
     },
