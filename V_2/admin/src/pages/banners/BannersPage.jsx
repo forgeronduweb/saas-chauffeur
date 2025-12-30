@@ -8,7 +8,7 @@ import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from '.
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog'
 import { DataTable } from '../../components/ui/data-table'
 import { cn } from '../../lib/utils'
-import { Plus, Trash2, Image, Eye, EyeOff, Save, Rocket, Share2, Star, Users, TrendingUp, Pencil, Check, ChevronsUpDown } from 'lucide-react'
+import { Plus, Trash2, Image, Eye, EyeOff, Save, Rocket, Share2, Star, Users, TrendingUp, Pencil, Check, ChevronsUpDown, Clock } from 'lucide-react'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000'
 
@@ -24,7 +24,9 @@ function BannersPage() {
     image: '',
     link: '',
     location: 'home',
-    isActive: true
+    isActive: true,
+    startDate: '',
+    endDate: ''
   })
   const [imagePreview, setImagePreview] = useState('')
   const [open, setOpen] = useState(false)
@@ -122,7 +124,7 @@ function BannersPage() {
   }
 
   const resetForm = () => {
-    setFormData({ title: '', image: '', link: '', location: 'home', isActive: true })
+    setFormData({ title: '', image: '', link: '', location: 'home', isActive: true, startDate: '', endDate: '' })
     setImagePreview('')
     setEditingBanner(null)
     setShowForm(false)
@@ -134,7 +136,9 @@ function BannersPage() {
       image: banner.image,
       link: banner.link || '',
       location: banner.location,
-      isActive: banner.isActive
+      isActive: banner.isActive,
+      startDate: banner.startDate ? new Date(banner.startDate).toISOString().split('T')[0] : '',
+      endDate: banner.endDate ? new Date(banner.endDate).toISOString().split('T')[0] : ''
     })
     setImagePreview(banner.image)
     setEditingBanner(banner)
@@ -148,6 +152,24 @@ function BannersPage() {
       marketplace: 'Marketplace'
     }
     return labels[location] || location
+  }
+
+  const getCountdown = (endDate) => {
+    if (!endDate) return null
+    
+    const now = new Date()
+    const end = new Date(endDate)
+    const diff = end - now
+    
+    if (diff <= 0) return { text: 'Expirée', expired: true }
+    
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+    
+    if (days > 0) return { text: `${days}j ${hours}h`, expired: false }
+    if (hours > 0) return { text: `${hours}h ${minutes}m`, expired: false }
+    return { text: `${minutes}m`, expired: false }
   }
 
   if (loading) {
@@ -415,6 +437,20 @@ function BannersPage() {
       ),
     },
     {
+      id: 'countdown',
+      header: 'Temps restant',
+      cell: ({ row }) => {
+        const countdown = getCountdown(row.original.endDate)
+        if (!countdown) return <span className="text-gray-400 text-sm">-</span>
+        return (
+          <div className={`flex items-center gap-1 text-sm ${countdown.expired ? 'text-red-500' : 'text-orange-500'}`}>
+            <Clock className="h-3.5 w-3.5" />
+            <span className="font-medium">{countdown.text}</span>
+          </div>
+        )
+      },
+    },
+    {
       id: 'actions',
       header: 'Actions',
       cell: ({ row }) => (
@@ -436,92 +472,6 @@ function BannersPage() {
   // Composant pour la section Bannières
   const BannersSection = () => (
     <>
-      <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>{editingBanner ? 'Modifier la bannière' : 'Nouvelle bannière'}</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Titre (optionnel)</label>
-                <Input
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  placeholder="Titre de la bannière"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Emplacement</label>
-                <select
-                  value={formData.location}
-                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                  className="w-full h-10 px-3 border border-gray-300 bg-transparent text-gray-900 text-sm"
-                >
-                  <option value="home">Page d'accueil</option>
-                  <option value="offers">Page offres</option>
-                  <option value="marketplace">Marketplace</option>
-                </select>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">Lien (optionnel)</label>
-              <Input
-                value={formData.link}
-                onChange={(e) => setFormData({ ...formData, link: e.target.value })}
-                placeholder="https://..."
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">Image</label>
-              <div className="p-3 bg-gray-50 border border-gray-200 mb-3 text-xs text-gray-600">
-                <strong>Taille :</strong> 1920 × 600 px • <strong>Format :</strong> JPG, PNG, WebP • <strong>Max :</strong> 500 Ko
-              </div>
-              <label className="cursor-pointer inline-block">
-                <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 transition-colors text-sm">
-                  <Image className="h-4 w-4" />
-                  <span>Choisir une image</span>
-                </div>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                />
-              </label>
-              {imagePreview && (
-                <div className="mt-4">
-                  <img src={imagePreview} alt="Aperçu" className="max-h-40 border" />
-                </div>
-              )}
-            </div>
-
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="isActive"
-                checked={formData.isActive}
-                onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                className="w-4 h-4"
-              />
-              <label htmlFor="isActive" className="text-sm">Activer cette bannière</label>
-            </div>
-
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={resetForm}>
-                Annuler
-              </Button>
-              <Button type="submit" className="bg-gray-900 hover:bg-gray-800">
-                <Save className="h-4 w-4 mr-2" />
-                {editingBanner ? 'Mettre à jour' : 'Enregistrer'}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
-
       {banners.length === 0 ? (
         <Card>
           <CardContent className="py-8">
@@ -634,6 +584,118 @@ function BannersPage() {
       {activeSection === 'boost' && <BoostSection />}
       {activeSection === 'social' && <SocialSection />}
       {activeSection === 'premium' && <PremiumSection />}
+
+      {/* Dialog Bannière */}
+      <Dialog open={showForm} onOpenChange={setShowForm}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{editingBanner ? 'Modifier la bannière' : 'Nouvelle bannière'}</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Titre (optionnel)</label>
+                <input
+                  type="text"
+                  value={formData.title}
+                  onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                  placeholder="Titre de la bannière"
+                  className="w-full h-10 px-3 border border-gray-300 bg-white text-gray-900 text-sm focus:outline-none focus:border-gray-900"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Emplacement</label>
+                <select
+                  value={formData.location}
+                  onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
+                  className="w-full h-10 px-3 border border-gray-300 bg-white text-gray-900 text-sm"
+                >
+                  <option value="home">Page d'accueil</option>
+                  <option value="offers">Page offres</option>
+                  <option value="marketplace">Marketplace</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Lien (optionnel)</label>
+              <input
+                type="text"
+                value={formData.link}
+                onChange={(e) => setFormData(prev => ({ ...prev, link: e.target.value }))}
+                placeholder="https://..."
+                className="w-full h-10 px-3 border border-gray-300 bg-white text-gray-900 text-sm focus:outline-none focus:border-gray-900"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Image</label>
+              <div className="p-3 bg-gray-50 border border-gray-200 mb-3 text-xs text-gray-600">
+                <strong>Taille :</strong> 1920 × 600 px • <strong>Format :</strong> JPG, PNG, WebP • <strong>Max :</strong> 500 Ko
+              </div>
+              <label className="cursor-pointer inline-block">
+                <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 transition-colors text-sm">
+                  <Image className="h-4 w-4" />
+                  <span>Choisir une image</span>
+                </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+              </label>
+              {imagePreview && (
+                <div className="mt-4">
+                  <img src={imagePreview} alt="Aperçu" className="max-h-40 border" />
+                </div>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Date de début (optionnel)</label>
+                <input
+                  type="date"
+                  value={formData.startDate}
+                  onChange={(e) => setFormData(prev => ({ ...prev, startDate: e.target.value }))}
+                  className="w-full h-10 px-3 border border-gray-300 bg-white text-gray-900 text-sm focus:outline-none focus:border-gray-900"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Date de fin (optionnel)</label>
+                <input
+                  type="date"
+                  value={formData.endDate}
+                  onChange={(e) => setFormData(prev => ({ ...prev, endDate: e.target.value }))}
+                  className="w-full h-10 px-3 border border-gray-300 bg-white text-gray-900 text-sm focus:outline-none focus:border-gray-900"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="isActive"
+                checked={formData.isActive}
+                onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
+                className="w-4 h-4"
+              />
+              <label htmlFor="isActive" className="text-sm">Activer cette bannière</label>
+            </div>
+
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={resetForm}>
+                Annuler
+              </Button>
+              <Button type="submit" className="bg-gray-900 hover:bg-gray-800">
+                <Save className="h-4 w-4 mr-2" />
+                {editingBanner ? 'Mettre à jour' : 'Enregistrer'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* Dialog Boost */}
       <Dialog open={showBoostDialog} onOpenChange={setShowBoostDialog}>
