@@ -152,6 +152,78 @@ router.post('/debug/reset-role', requireAuth, async (req, res) => {
   }
 });
 
+// Vérifier si un admin existe (pour le setup initial)
+router.get('/admin-exists', async (req, res) => {
+  try {
+    const User = require('../models/User');
+    const adminCount = await User.countDocuments({ role: 'admin' });
+    res.json({ exists: adminCount > 0 });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Créer le premier admin (seulement si aucun admin n'existe)
+router.post('/setup-first-admin', async (req, res) => {
+  try {
+    const User = require('../models/User');
+    const bcrypt = require('bcrypt');
+    
+    // Vérifier qu'aucun admin n'existe
+    const adminCount = await User.countDocuments({ role: 'admin' });
+    if (adminCount > 0) {
+      return res.status(403).json({ error: 'Un administrateur existe déjà' });
+    }
+    
+    const { email, password, confirmPassword } = req.body;
+    
+    // Validations
+    if (!email || !password || !confirmPassword) {
+      return res.status(400).json({ error: 'Tous les champs sont requis' });
+    }
+    
+    if (password !== confirmPassword) {
+      return res.status(400).json({ error: 'Les mots de passe ne correspondent pas' });
+    }
+    
+    if (password.length < 6) {
+      return res.status(400).json({ error: 'Le mot de passe doit contenir au moins 6 caractères' });
+    }
+    
+    // Vérifier si l'email existe déjà
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    if (existingUser) {
+      // Mettre à jour le compte existant en admin
+      const passwordHash = await bcrypt.hash(password, 12);
+      existingUser.passwordHash = passwordHash;
+      existingUser.role = 'admin';
+      existingUser.isEmailVerified = true;
+      existingUser.isActive = true;
+      await existingUser.save();
+      
+      return res.json({ message: 'Compte admin créé avec succès', email: existingUser.email });
+    }
+    
+    // Créer un nouveau compte admin
+    const passwordHash = await bcrypt.hash(password, 12);
+    const admin = await User.create({
+      email: email.toLowerCase(),
+      passwordHash,
+      role: 'admin',
+      firstName: 'Admin',
+      lastName: 'GoDriver',
+      isEmailVerified: true,
+      isActive: true
+    });
+    
+    res.json({ message: 'Compte admin créé avec succès', email: admin.email });
+    
+  } catch (error) {
+    console.error('Erreur création admin:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;
 
 
