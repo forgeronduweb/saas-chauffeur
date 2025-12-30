@@ -10,7 +10,15 @@ router.get('/', async (req, res) => {
     const filter = {};
     
     if (location) filter.location = location;
-    if (active === 'true') filter.isActive = true;
+    if (active === 'true') {
+      filter.isActive = true;
+      // Filtrer aussi par dates de programmation
+      const now = new Date();
+      filter.$and = [
+        { $or: [{ startDate: null }, { startDate: { $lte: now } }] },
+        { $or: [{ endDate: null }, { endDate: { $gte: now } }] }
+      ];
+    }
     
     const banners = await Banner.find(filter).sort({ order: 1 });
     res.json(banners);
@@ -35,7 +43,7 @@ router.get('/:id', async (req, res) => {
 // POST create banner (admin only)
 router.post('/', requireAuth, async (req, res) => {
   try {
-    const { title, image, link, order, isActive, location } = req.body;
+    const { title, image, link, order, isActive, location, startDate, endDate } = req.body;
     
     const banner = new Banner({
       title,
@@ -43,7 +51,9 @@ router.post('/', requireAuth, async (req, res) => {
       link,
       order: order || 0,
       isActive: isActive !== false,
-      location: location || 'home'
+      location: location || 'home',
+      startDate: startDate || null,
+      endDate: endDate || null
     });
     
     const savedBanner = await banner.save();
@@ -56,11 +66,11 @@ router.post('/', requireAuth, async (req, res) => {
 // PUT update banner (admin only)
 router.put('/:id', requireAuth, async (req, res) => {
   try {
-    const { title, image, link, order, isActive, location } = req.body;
+    const { title, image, link, order, isActive, location, startDate, endDate } = req.body;
     
     const banner = await Banner.findByIdAndUpdate(
       req.params.id,
-      { title, image, link, order, isActive, location },
+      { title, image, link, order, isActive, location, startDate: startDate || null, endDate: endDate || null },
       { new: true }
     );
     
