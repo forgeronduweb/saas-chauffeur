@@ -8,7 +8,7 @@ exports.getNotifications = async (req, res) => {
 
     const filter = { userId };
     if (unread === 'true') {
-      filter.read = false;
+      filter.isRead = false;
     }
 
     const notifications = await Notification.find(filter)
@@ -17,7 +17,7 @@ exports.getNotifications = async (req, res) => {
       .limit(parseInt(limit));
 
     const total = await Notification.countDocuments(filter);
-    const unreadCount = await Notification.countDocuments({ userId, read: false });
+    const unreadCount = await Notification.countDocuments({ userId, isRead: false });
 
     res.json({
       notifications: notifications.map(n => ({
@@ -26,7 +26,7 @@ exports.getNotifications = async (req, res) => {
         title: n.title,
         message: n.message,
         priority: n.priority || 'normal',
-        unread: !n.read,
+        unread: !n.isRead,
         actionText: n.actionText,
         actionUrl: n.actionUrl,
         data: n.data,
@@ -53,13 +53,15 @@ exports.markAsRead = async (req, res) => {
 
     const notification = await Notification.findOneAndUpdate(
       { _id: id, userId },
-      { read: true },
+      { isRead: true, readAt: new Date() },
       { new: true }
     );
 
     if (!notification) {
       return res.status(404).json({ error: 'Notification non trouvée' });
     }
+
+    console.log(`✅ Notification ${id} marquée comme lue pour user ${userId}`);
 
     res.json({ success: true, notification });
   } catch (error) {
@@ -73,12 +75,14 @@ exports.markAllAsRead = async (req, res) => {
   try {
     const userId = req.user.sub;
 
-    await Notification.updateMany(
-      { userId, read: false },
-      { read: true }
+    const result = await Notification.updateMany(
+      { userId, isRead: false },
+      { isRead: true, readAt: new Date() }
     );
 
-    res.json({ success: true });
+    console.log(`✅ ${result.modifiedCount} notifications marquées comme lues pour user ${userId}`);
+
+    res.json({ success: true, modifiedCount: result.modifiedCount });
   } catch (error) {
     console.error('Erreur marquage toutes notifications:', error);
     res.status(500).json({ error: 'Erreur serveur' });
@@ -89,7 +93,7 @@ exports.markAllAsRead = async (req, res) => {
 exports.getUnreadCount = async (req, res) => {
   try {
     const userId = req.user.sub;
-    const count = await Notification.countDocuments({ userId, read: false });
+    const count = await Notification.countDocuments({ userId, isRead: false });
     res.json({ count });
   } catch (error) {
     console.error('Erreur comptage notifications:', error);

@@ -3,6 +3,7 @@ const User = require('../models/User');
 const Offer = require('../models/Offer');
 const Driver = require('../models/Driver');
 const Employer = require('../models/Employer');
+const ActivityLog = require('../models/ActivityLog');
 const { createNotification } = require('../services/notificationService');
 const { sendNewReportEmail, sendReportResolvedEmail } = require('../services/emailService');
 
@@ -50,6 +51,15 @@ exports.createReport = async (req, res) => {
     });
 
     await report.save();
+
+    // Logger l'activité de signalement
+    await ActivityLog.logActivity({
+      userId: reporterId,
+      activityType: 'signalement',
+      description: `Signalement: ${REASON_LABELS[reason] || reason} - ${TARGET_LABELS[targetType] || targetType}`,
+      details: { reportId: report._id, targetType, targetId, reason },
+      relatedResource: { resourceType: 'report', resourceId: report._id }
+    });
 
     // Récupérer les infos du reporter pour les notifications
     const reporter = await User.findById(reporterId);

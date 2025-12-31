@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const Driver = require('../models/Driver');
 const Employer = require('../models/Employer');
+const ActivityLog = require('../models/ActivityLog');
 const { sendVerificationEmail } = require('../services/emailService');
 
 // Générer un token JWT
@@ -223,9 +224,22 @@ const login = async (req, res) => {
     // Générer le token
     const token = generateToken(user);
 
-    // Mettre à jour la dernière connexion
+    // Mettre à jour la dernière connexion et les stats de session
     user.lastLogin = new Date();
+    user.currentSessionStart = new Date();
+    user.loginCount = (user.loginCount || 0) + 1;
+    user.lastIpAddress = req.ip || req.connection?.remoteAddress;
+    user.lastUserAgent = req.headers['user-agent'];
     await user.save();
+
+    // Logger l'activité de connexion
+    await ActivityLog.logActivity({
+      userId: user._id,
+      activityType: 'login',
+      description: 'Connexion au compte',
+      ipAddress: req.ip || req.connection?.remoteAddress,
+      userAgent: req.headers['user-agent']
+    });
 
     res.json({
       message: 'Connexion réussie',
@@ -321,6 +335,14 @@ const updateProfile = async (req, res) => {
     }
 
     await user.save();
+
+    // Logger l'activité de mise à jour du profil
+    await ActivityLog.logActivity({
+      userId: userId,
+      activityType: 'profile_updated',
+      description: 'Profil mis à jour',
+      details: { updatedFields: Object.keys(req.body).filter(k => req.body[k] !== undefined) }
+    });
 
     res.json({
       message: 'Profil mis à jour avec succès',

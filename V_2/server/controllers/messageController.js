@@ -1,6 +1,7 @@
 const Conversation = require('../models/Conversation');
 const Message = require('../models/Message');
 const User = require('../models/User');
+const ActivityLog = require('../models/ActivityLog');
 
 // Créer ou récupérer une conversation
 exports.createOrGetConversation = async (req, res) => {
@@ -334,6 +335,16 @@ exports.sendMessage = async (req, res) => {
 
     await message.save();
     await message.populate('senderId', 'firstName lastName profilePhotoUrl');
+
+    // Logger l'activité de conversation
+    const otherUser = await User.findById(conversation.getOtherParticipant(senderId));
+    await ActivityLog.logActivity({
+      userId: senderId,
+      activityType: 'conversation',
+      description: `Message envoyé à ${otherUser?.firstName || 'utilisateur'} ${otherUser?.lastName || ''}`,
+      details: { conversationId, messageId: message._id, recipientId: otherUser?._id },
+      relatedResource: { resourceType: 'message', resourceId: message._id }
+    });
 
     // Si la conversation concerne une offre, incrémenter le compteur de messages
     if (conversation.context?.type === 'product_inquiry' && conversation.context?.offerId) {

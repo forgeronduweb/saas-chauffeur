@@ -1,6 +1,7 @@
 const Offer = require('../models/Offer');
 const User = require('../models/User');
 const Application = require('../models/Application');
+const ActivityLog = require('../models/ActivityLog');
 
 // Récupérer toutes les offres actives
 const getAllOffers = async (req, res) => {
@@ -195,6 +196,22 @@ const createOffer = async (req, res) => {
       mainImage: offer.mainImage ? 'Oui' : 'Non',
       additionalImages: offer.additionalImages?.length || 0
     });
+
+    // Logger l'activité de création d'offre
+    await ActivityLog.logActivity({
+      userId: userId,
+      activityType: 'offer_created',
+      description: `Offre créée: ${offer.title}`,
+      details: { 
+        offerId: offer._id, 
+        offerType: type || 'job',
+        title: offer.title 
+      },
+      relatedResource: {
+        resourceType: 'offer',
+        resourceId: offer._id
+      }
+    });
     
     // Populer les informations de l'employeur
     await offer.populate('employer', 'firstName lastName email');
@@ -343,6 +360,15 @@ const updateOffer = async (req, res) => {
     
     console.log('💰 Prix après save:', offer.price);
 
+    // Logger l'activité de mise à jour
+    await ActivityLog.logActivity({
+      userId: userId,
+      activityType: 'offer_updated',
+      description: `Offre modifiée: ${offer.title}`,
+      details: { offerId: offer._id, title: offer.title },
+      relatedResource: { resourceType: 'offer', resourceId: offer._id }
+    });
+
     await offer.populate('employer', 'firstName lastName email');
 
     console.log('✅ Offre mise à jour avec succès');
@@ -385,10 +411,20 @@ const deleteOffer = async (req, res) => {
       });
     }
 
+    const offerTitle = offer.title;
+    
     // Supprimer aussi toutes les candidatures associées
     await Application.deleteMany({ offerId: offer._id });
     
     await Offer.findByIdAndDelete(offerId);
+
+    // Logger l'activité de suppression
+    await ActivityLog.logActivity({
+      userId: userId,
+      activityType: 'offer_deleted',
+      description: `Offre supprimée: ${offerTitle}`,
+      details: { offerId: offerId, title: offerTitle }
+    });
 
     res.json({
       message: 'Offre supprimée avec succès'
@@ -462,6 +498,24 @@ const applyToOffer = async (req, res) => {
     
     // Incrémenter le compteur de candidatures
     await offer.incrementApplicationCount();
+
+    // Logger l'activité de candidature pour le chauffeur
+    await ActivityLog.logActivity({
+      userId: userId,
+      activityType: 'application_sent',
+      description: `Candidature envoyée pour: ${offer.title}`,
+      details: { applicationId: application._id, offerId: offerId, offerTitle: offer.title },
+      relatedResource: { resourceType: 'application', resourceId: application._id }
+    });
+
+    // Logger l'activité pour l'employeur (candidature reçue)
+    await ActivityLog.logActivity({
+      userId: offer.employerId,
+      activityType: 'application_received',
+      description: `Nouvelle candidature reçue pour: ${offer.title}`,
+      details: { applicationId: application._id, offerId: offerId, driverName: `${user.firstName} ${user.lastName}` },
+      relatedResource: { resourceType: 'application', resourceId: application._id }
+    });
 
     await application.populate([
       { path: 'offerId', select: 'title type' },

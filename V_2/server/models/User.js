@@ -65,6 +65,36 @@ const userSchema = new mongoose.Schema(
     lastLogin: { 
       type: Date 
     },
+    lastLogout: {
+      type: Date
+    },
+    currentSessionStart: {
+      type: Date
+    },
+    totalSessionDuration: {
+      type: Number, // en minutes
+      default: 0
+    },
+    loginCount: {
+      type: Number,
+      default: 0
+    },
+    lastIpAddress: {
+      type: String
+    },
+    lastUserAgent: {
+      type: String
+    },
+    suspendedAt: {
+      type: Date
+    },
+    suspendedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
+    suspensionReason: {
+      type: String
+    },
     profilePicture: { 
       type: String 
     },

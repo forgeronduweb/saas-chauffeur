@@ -11,12 +11,21 @@ router.get('/dashboard/stats', adminController.getDashboardStats);
 
 // Gestion des chauffeurs
 router.get('/drivers', adminController.getDrivers);
+router.get('/drivers/:driverId', adminController.getDriverById);
 router.put('/drivers/:driverId/status', adminController.updateDriverStatus);
 router.post('/drivers/:driverId/notify', adminController.sendNotificationToDriver);
 
 // Gestion des employeurs
 router.get('/employers', adminController.getEmployers);
+router.get('/employers/:employerId', adminController.getEmployerById);
 router.put('/employers/:employerId/status', adminController.updateEmployerStatus);
+
+// Actions sur les comptes utilisateurs
+router.put('/users/:userId/suspend', adminController.suspendAccount);
+router.put('/users/:userId/reactivate', adminController.reactivateAccount);
+router.post('/users/:userId/message', adminController.sendMessageToUser);
+router.post('/users/:userId/notify', adminController.sendNotificationToUser);
+router.get('/users/:userId/activities', adminController.getUserActivities);
 
 // Gestion des candidatures
 router.get('/applications', adminController.getApplications);

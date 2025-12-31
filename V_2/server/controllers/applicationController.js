@@ -4,6 +4,7 @@ const Driver = require('../models/Driver');
 const User = require('../models/User');
 const Conversation = require('../models/Conversation');
 const Message = require('../models/Message');
+const ActivityLog = require('../models/ActivityLog');
 
 /**
  * Contrôleur pour la gestion intelligente des candidatures
@@ -224,6 +225,25 @@ exports.updateStatus = async (req, res) => {
     }
 
     await application.save();
+
+    // Logger l'activité de changement de statut
+    const activityType = status === 'accepted' ? 'application_accepted' : 
+                         status === 'rejected' ? 'application_rejected' : 
+                         'application_status_changed';
+    const statusLabels = {
+      accepted: 'acceptée',
+      rejected: 'refusée',
+      in_negotiation: 'en négociation',
+      pending: 'en attente'
+    };
+    
+    await ActivityLog.logActivity({
+      userId: userId,
+      activityType: activityType,
+      description: `Candidature ${statusLabels[status] || status}: ${application.offerId?.title || 'Offre'}`,
+      details: { applicationId, oldStatus, newStatus: status, offerId: application.offerId?._id },
+      relatedResource: { resourceType: 'application', resourceId: applicationId }
+    });
 
     console.log('✅ Statut mis à jour:', `${oldStatus} → ${status}`);
 

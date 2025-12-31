@@ -2,6 +2,10 @@ const Driver = require('../models/Driver');
 const User = require('../models/User');
 const Offer = require('../models/Offer');
 const Application = require('../models/Application');
+const Notification = require('../models/Notification');
+const Conversation = require('../models/Conversation');
+const Message = require('../models/Message');
+const ActivityLog = require('../models/ActivityLog');
 const { sendDriverValidationEmail, sendDriverRejectionEmail } = require('../services/emailService');
 
 // Récupérer les statistiques du dashboard admin
@@ -489,6 +493,14 @@ exports.sendNotificationToDriver = async (req, res) => {
       }
     });
 
+    // Logger l'activité
+    await ActivityLog.logActivity({
+      userId: driver.userId,
+      activityType: 'notification_sent',
+      description: `Notification admin: ${title}`,
+      details: { notificationId: notification._id, title, message }
+    });
+
     res.json({ 
       message: 'Notification envoyée avec succès',
       notification 
@@ -496,5 +508,386 @@ exports.sendNotificationToDriver = async (req, res) => {
   } catch (error) {
     console.error('Erreur sendNotificationToDriver:', error);
     res.status(500).json({ error: 'Erreur lors de l\'envoi de la notification' });
+  }
+};
+
+// Récupérer les détails complets d'un chauffeur par ID
+exports.getDriverById = async (req, res) => {
+  try {
+    const { driverId } = req.params;
+    
+    const driver = await Driver.findById(driverId);
+    if (!driver) {
+      return res.status(404).json({ error: 'Chauffeur non trouvé' });
+    }
+
+    // Récupérer l'utilisateur associé pour les infos de connexion
+    const user = await User.findById(driver.userId)
+      .select('email lastLogin lastLogout currentSessionStart totalSessionDuration loginCount lastIpAddress lastUserAgent isActive suspendedAt suspendedBy suspensionReason createdAt profilePhotoUrl profilePicture');
+
+    // Récupérer les statistiques
+    const applicationsCount = await Application.countDocuments({ driverId: driver.userId });
+    const acceptedApplications = await Application.countDocuments({ driverId: driver.userId, status: 'accepted' });
+
+    // Récupérer les activités récentes
+    const recentActivities = await ActivityLog.find({ userId: driver.userId })
+      .sort({ createdAt: -1 })
+      .limit(20);
+
+    // Calculer la durée de connexion actuelle si connecté
+    let currentSessionDuration = null;
+    if (user?.currentSessionStart && !user?.lastLogout) {
+      currentSessionDuration = Math.round((new Date() - new Date(user.currentSessionStart)) / 60000);
+    }
+
+    res.json({
+      driver,
+      user: user ? {
+        email: user.email,
+        lastLogin: user.lastLogin,
+        lastLogout: user.lastLogout,
+        currentSessionStart: user.currentSessionStart,
+        totalSessionDuration: user.totalSessionDuration,
+        currentSessionDuration,
+        loginCount: user.loginCount,
+        lastIpAddress: user.lastIpAddress,
+        lastUserAgent: user.lastUserAgent,
+        isActive: user.isActive,
+        suspendedAt: user.suspendedAt,
+        suspensionReason: user.suspensionReason,
+        createdAt: user.createdAt,
+        profilePhotoUrl: user.profilePhotoUrl || user.profilePicture
+      } : null,
+      statistics: {
+        applicationsCount,
+        acceptedApplications,
+        acceptanceRate: applicationsCount > 0 ? Math.round((acceptedApplications / applicationsCount) * 100) : 0
+      },
+      recentActivities
+    });
+  } catch (error) {
+    console.error('Erreur getDriverById:', error);
+    res.status(500).json({ error: 'Erreur lors de la récupération du chauffeur' });
+  }
+};
+
+// Récupérer les détails complets d'un employeur par ID
+exports.getEmployerById = async (req, res) => {
+  try {
+    const { employerId } = req.params;
+    
+    const employer = await User.findById(employerId)
+      .select('-passwordHash -resetPasswordToken -resetPasswordExpires -emailVerificationCode -emailVerificationExpires');
+    
+    if (!employer || employer.role !== 'employer') {
+      return res.status(404).json({ error: 'Employeur non trouvé' });
+    }
+
+    // Récupérer le profil employeur s'il existe
+    const Employer = require('../models/Employer');
+    const employerProfile = await Employer.findOne({ userId: employerId });
+
+    // Récupérer les statistiques
+    const offersCount = await Offer.countDocuments({ employerId: employerId });
+    const activeOffers = await Offer.countDocuments({ employerId: employerId, status: 'active' });
+    const applicationsReceived = await Application.countDocuments({ 
+      offerId: { $in: await Offer.find({ employerId: employerId }).distinct('_id') }
+    });
+
+    // Récupérer les activités récentes
+    const recentActivities = await ActivityLog.find({ userId: employerId })
+      .sort({ createdAt: -1 })
+      .limit(20);
+
+    // Calculer la durée de connexion actuelle si connecté
+    let currentSessionDuration = null;
+    if (employer.currentSessionStart && !employer.lastLogout) {
+      currentSessionDuration = Math.round((new Date() - new Date(employer.currentSessionStart)) / 60000);
+    }
+
+    res.json({
+      employer: {
+        _id: employer._id,
+        email: employer.email,
+        firstName: employer.firstName,
+        lastName: employer.lastName,
+        phone: employer.phone,
+        role: employer.role,
+        isActive: employer.isActive,
+        lastLogin: employer.lastLogin,
+        lastLogout: employer.lastLogout,
+        currentSessionStart: employer.currentSessionStart,
+        totalSessionDuration: employer.totalSessionDuration,
+        currentSessionDuration,
+        loginCount: employer.loginCount,
+        lastIpAddress: employer.lastIpAddress,
+        lastUserAgent: employer.lastUserAgent,
+        suspendedAt: employer.suspendedAt,
+        suspensionReason: employer.suspensionReason,
+        createdAt: employer.createdAt,
+        profilePhotoUrl: employer.profilePhotoUrl || employer.profilePicture
+      },
+      employerProfile,
+      statistics: {
+        offersCount,
+        activeOffers,
+        applicationsReceived
+      },
+      recentActivities
+    });
+  } catch (error) {
+    console.error('Erreur getEmployerById:', error);
+    res.status(500).json({ error: 'Erreur lors de la récupération de l\'employeur' });
+  }
+};
+
+// Suspendre un compte (chauffeur ou employeur)
+exports.suspendAccount = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { reason } = req.body;
+    const adminId = req.user.sub;
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      {
+        isActive: false,
+        suspendedAt: new Date(),
+        suspendedBy: adminId,
+        suspensionReason: reason || 'Suspendu par l\'administrateur'
+      },
+      { new: true }
+    ).select('-passwordHash');
+
+    if (!user) {
+      return res.status(404).json({ error: 'Utilisateur non trouvé' });
+    }
+
+    // Si c'est un chauffeur, mettre à jour aussi le statut Driver
+    if (user.role === 'driver') {
+      await Driver.findOneAndUpdate(
+        { userId: userId },
+        { status: 'suspended', statusReason: reason }
+      );
+    }
+
+    // Logger l'activité
+    await ActivityLog.logActivity({
+      userId: userId,
+      activityType: 'account_suspended',
+      description: `Compte suspendu par l'administrateur`,
+      details: { reason, suspendedBy: adminId }
+    });
+
+    // Envoyer une notification à l'utilisateur
+    await Notification.create({
+      userId: userId,
+      type: 'admin_message',
+      title: '⚠️ Compte suspendu',
+      message: reason || 'Votre compte a été suspendu par l\'administrateur. Contactez le support pour plus d\'informations.',
+      data: { action: 'account_suspended' }
+    });
+
+    res.json({ message: 'Compte suspendu avec succès', user });
+  } catch (error) {
+    console.error('Erreur suspendAccount:', error);
+    res.status(500).json({ error: 'Erreur lors de la suspension du compte' });
+  }
+};
+
+// Réactiver un compte
+exports.reactivateAccount = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const adminId = req.user.sub;
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      {
+        isActive: true,
+        suspendedAt: null,
+        suspendedBy: null,
+        suspensionReason: null
+      },
+      { new: true }
+    ).select('-passwordHash');
+
+    if (!user) {
+      return res.status(404).json({ error: 'Utilisateur non trouvé' });
+    }
+
+    // Si c'est un chauffeur, réactiver aussi le statut Driver
+    if (user.role === 'driver') {
+      await Driver.findOneAndUpdate(
+        { userId: userId },
+        { status: 'approved', statusReason: 'Réactivé par l\'administrateur' }
+      );
+    }
+
+    // Logger l'activité
+    await ActivityLog.logActivity({
+      userId: userId,
+      activityType: 'account_reactivated',
+      description: `Compte réactivé par l'administrateur`,
+      details: { reactivatedBy: adminId }
+    });
+
+    // Envoyer une notification à l'utilisateur
+    await Notification.create({
+      userId: userId,
+      type: 'admin_message',
+      title: '✅ Compte réactivé',
+      message: 'Votre compte a été réactivé. Vous pouvez à nouveau utiliser tous les services de la plateforme.',
+      data: { action: 'account_reactivated' }
+    });
+
+    res.json({ message: 'Compte réactivé avec succès', user });
+  } catch (error) {
+    console.error('Erreur reactivateAccount:', error);
+    res.status(500).json({ error: 'Erreur lors de la réactivation du compte' });
+  }
+};
+
+// Envoyer un message à un utilisateur (via la messagerie interne)
+exports.sendMessageToUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { message } = req.body;
+    const adminId = req.user.sub;
+
+    if (!message) {
+      return res.status(400).json({ error: 'Message requis' });
+    }
+
+    const targetUser = await User.findById(userId);
+    if (!targetUser) {
+      return res.status(404).json({ error: 'Utilisateur non trouvé' });
+    }
+
+    // Trouver ou créer une conversation admin-utilisateur
+    let conversation = await Conversation.findOne({
+      participants: { $all: [adminId, userId] },
+      'context.type': 'direct_contact'
+    });
+
+    if (!conversation) {
+      conversation = await Conversation.create({
+        participants: [adminId, userId],
+        context: { type: 'direct_contact' },
+        metadata: { isAdminConversation: true }
+      });
+    }
+
+    // Créer le message
+    const newMessage = await Message.create({
+      conversationId: conversation._id,
+      senderId: adminId,
+      content: message,
+      type: 'text',
+      metadata: { isAdminMessage: true }
+    });
+
+    // Mettre à jour la conversation
+    conversation.lastMessage = {
+      content: message,
+      senderId: adminId,
+      timestamp: new Date(),
+      type: 'text'
+    };
+    const currentUnread = conversation.unreadCount.get(userId.toString()) || 0;
+    conversation.unreadCount.set(userId.toString(), currentUnread + 1);
+    await conversation.save();
+
+    // Logger l'activité
+    await ActivityLog.logActivity({
+      userId: userId,
+      activityType: 'message_received',
+      description: 'Message reçu de l\'administrateur',
+      details: { conversationId: conversation._id, messageId: newMessage._id }
+    });
+
+    // Envoyer aussi une notification
+    await Notification.create({
+      userId: userId,
+      type: 'admin_message',
+      title: '📩 Nouveau message de l\'administration',
+      message: message.length > 100 ? message.substring(0, 100) + '...' : message,
+      data: { 
+        conversationId: conversation._id,
+        action: 'open_messages'
+      }
+    });
+
+    res.json({ 
+      message: 'Message envoyé avec succès',
+      conversationId: conversation._id,
+      messageId: newMessage._id
+    });
+  } catch (error) {
+    console.error('Erreur sendMessageToUser:', error);
+    res.status(500).json({ error: 'Erreur lors de l\'envoi du message' });
+  }
+};
+
+// Envoyer une notification à un utilisateur
+exports.sendNotificationToUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { title, message, type = 'admin_message' } = req.body;
+
+    if (!title || !message) {
+      return res.status(400).json({ error: 'Titre et message requis' });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'Utilisateur non trouvé' });
+    }
+
+    const notification = await Notification.create({
+      userId: userId,
+      type,
+      title,
+      message,
+      data: {
+        sentBy: 'admin',
+        adminId: req.user.sub
+      }
+    });
+
+    // Logger l'activité
+    await ActivityLog.logActivity({
+      userId: userId,
+      activityType: 'notification_sent',
+      description: `Notification admin: ${title}`,
+      details: { notificationId: notification._id, title, message }
+    });
+
+    res.json({ 
+      message: 'Notification envoyée avec succès',
+      notification 
+    });
+  } catch (error) {
+    console.error('Erreur sendNotificationToUser:', error);
+    res.status(500).json({ error: 'Erreur lors de l\'envoi de la notification' });
+  }
+};
+
+// Récupérer l'historique des activités d'un utilisateur
+exports.getUserActivities = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { page = 1, limit = 50, activityType } = req.query;
+
+    const result = await ActivityLog.getUserActivities(userId, {
+      page: parseInt(page),
+      limit: parseInt(limit),
+      activityType
+    });
+
+    res.json(result);
+  } catch (error) {
+    console.error('Erreur getUserActivities:', error);
+    res.status(500).json({ error: 'Erreur lors de la récupération des activités' });
   }
 };
