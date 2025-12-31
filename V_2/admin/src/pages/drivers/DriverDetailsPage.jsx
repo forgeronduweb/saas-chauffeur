@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { apiService } from '../../services/api'
-import { ArrowLeft, User, Car, FileText, Calendar, MapPin, Phone, Mail, Clock, CheckCircle, XCircle, AlertTriangle, Bell } from 'lucide-react'
+import { 
+  ArrowLeft, User, Car, FileText, Calendar, MapPin, Phone, Mail, Clock, 
+  CheckCircle, XCircle, AlertTriangle, Bell, MessageSquare, Activity, 
+  Globe, Monitor, LogIn, Ban, RefreshCw, Star, Image
+} from 'lucide-react'
 import toast from 'react-hot-toast'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '../../components/ui/card'
 import { Badge } from '../../components/ui/badge'
@@ -13,10 +17,19 @@ const DriverDetailsPage = () => {
   const { driverId } = useParams()
   const navigate = useNavigate()
   const [driver, setDriver] = useState(null)
+  const [userInfo, setUserInfo] = useState(null)
+  const [statistics, setStatistics] = useState(null)
+  const [activities, setActivities] = useState([])
   const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState(false)
+  const [activeTab, setActiveTab] = useState('info')
+  
   const [showNotificationForm, setShowNotificationForm] = useState(false)
+  const [showMessageForm, setShowMessageForm] = useState(false)
+  const [showSuspendForm, setShowSuspendForm] = useState(false)
   const [notificationData, setNotificationData] = useState({ title: '', message: '' })
+  const [messageData, setMessageData] = useState('')
+  const [suspendReason, setSuspendReason] = useState('')
   const [reason, setReason] = useState('')
 
   useEffect(() => {
@@ -26,15 +39,18 @@ const DriverDetailsPage = () => {
   const fetchDriverDetails = async () => {
     try {
       setLoading(true)
-      const response = await apiService.getAdminDrivers({ search: '', status: '' })
-      const foundDriver = response.data.drivers.find(d => d._id === driverId)
-      if (foundDriver) {
-        setDriver(foundDriver)
+      const response = await apiService.getAdminDriverById(driverId)
+      if (response.data) {
+        setDriver(response.data.driver)
+        setUserInfo(response.data.user)
+        setStatistics(response.data.statistics)
+        setActivities(response.data.recentActivities || [])
       } else {
         toast.error('Chauffeur non trouvé')
         navigate('/drivers')
       }
     } catch (error) {
+      console.error('Erreur:', error)
       toast.error('Erreur lors du chargement')
       navigate('/drivers')
     } finally {
@@ -55,6 +71,56 @@ const DriverDetailsPage = () => {
     }
   }
 
+  const handleSuspendAccount = async () => {
+    if (!suspendReason.trim()) {
+      toast.error('Veuillez indiquer une raison de suspension')
+      return
+    }
+    try {
+      setActionLoading(true)
+      await apiService.suspendAccount(driver.userId, { reason: suspendReason })
+      toast.success('Compte suspendu avec succès')
+      setShowSuspendForm(false)
+      setSuspendReason('')
+      fetchDriverDetails()
+    } catch (error) {
+      toast.error('Erreur lors de la suspension')
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  const handleReactivateAccount = async () => {
+    try {
+      setActionLoading(true)
+      await apiService.reactivateAccount(driver.userId)
+      toast.success('Compte réactivé avec succès')
+      fetchDriverDetails()
+    } catch (error) {
+      toast.error('Erreur lors de la réactivation')
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  const handleSendMessage = async () => {
+    if (!messageData.trim()) {
+      toast.error('Veuillez saisir un message')
+      return
+    }
+    try {
+      setActionLoading(true)
+      await apiService.sendMessageToUser(driver.userId, { message: messageData })
+      toast.success('Message envoyé dans la messagerie')
+      setShowMessageForm(false)
+      setMessageData('')
+    } catch (error) {
+      toast.error('Erreur lors de l\'envoi du message')
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
   const handleSendNotification = async () => {
     if (!notificationData.title || !notificationData.message) {
       toast.error('Remplissez tous les champs')
@@ -62,7 +128,7 @@ const DriverDetailsPage = () => {
     }
     try {
       setActionLoading(true)
-      await apiService.sendNotificationToDriver(driver._id, notificationData)
+      await apiService.sendNotificationToUser(driver.userId, notificationData)
       toast.success('Notification envoyée')
       setShowNotificationForm(false)
       setNotificationData({ title: '', message: '' })
@@ -71,6 +137,22 @@ const DriverDetailsPage = () => {
     } finally {
       setActionLoading(false)
     }
+  }
+
+  const formatDuration = (minutes) => {
+    if (!minutes) return '0 min'
+    const hours = Math.floor(minutes / 60)
+    const mins = minutes % 60
+    if (hours > 0) return `${hours}h ${mins}min`
+    return `${mins} min`
+  }
+
+  const formatDateTime = (date) => {
+    if (!date) return 'Non disponible'
+    return new Date(date).toLocaleString('fr-FR', {
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    })
   }
 
   const getStatusBadge = (status) => {
@@ -108,11 +190,9 @@ const DriverDetailsPage = () => {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Retour
           </Button>
-          <div>
-            <p className="text-lg font-medium text-gray-900">
-              {driver.firstName} {driver.lastName}
-            </p>
-          </div>
+          <p className="text-lg font-medium text-gray-900">
+            {driver.firstName} {driver.lastName}
+          </p>
         </div>
         {getStatusBadge(driver.status)}
       </div>
@@ -141,7 +221,15 @@ const DriverDetailsPage = () => {
             </div>
             <div className="flex items-center gap-3">
               <Calendar className="h-4 w-4 text-gray-400" />
-              <span className="text-sm">Inscrit le {new Date(driver.createdAt).toLocaleDateString('fr-FR')}</span>
+              <span className="text-sm">Inscrit le {formatDateTime(userInfo?.createdAt || driver.createdAt)}</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <LogIn className="h-4 w-4 text-gray-400" />
+              <span className="text-sm">Dernière connexion: {formatDateTime(userInfo?.lastLogin)}</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <Clock className="h-4 w-4 text-gray-400" />
+              <span className="text-sm">Temps total: {formatDuration(userInfo?.totalSessionDuration)}</span>
             </div>
           </CardContent>
         </Card>
@@ -217,7 +305,7 @@ const DriverDetailsPage = () => {
         </Card>
       </div>
 
-      {/* Actions */}
+      {/* Actions de validation */}
       {driver.status === 'pending' && (
         <Card>
           <CardHeader>
@@ -249,53 +337,120 @@ const DriverDetailsPage = () => {
         </Card>
       )}
 
-      {/* Notification */}
+      {/* Actions - Gestion du statut */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Bell className="h-5 w-5" />
-            Envoyer une notification
-          </CardTitle>
+          <CardTitle>Actions</CardTitle>
+          <CardDescription>Gérer le statut de ce chauffeur</CardDescription>
         </CardHeader>
-        {showNotificationForm ? (
-          <>
-            <CardContent className="space-y-4">
-              <div>
-                <label className="text-sm text-gray-500">Titre</label>
-                <Input
-                  value={notificationData.title}
-                  onChange={(e) => setNotificationData({...notificationData, title: e.target.value})}
-                  placeholder="Titre de la notification"
-                />
-              </div>
-              <div>
-                <label className="text-sm text-gray-500">Message</label>
-                <Textarea
-                  value={notificationData.message}
-                  onChange={(e) => setNotificationData({...notificationData, message: e.target.value})}
-                  placeholder="Message..."
-                  rows={3}
-                />
-              </div>
-            </CardContent>
-            <CardFooter className="gap-2">
-              <Button onClick={handleSendNotification} disabled={actionLoading}>
-                Envoyer
-              </Button>
-              <Button variant="ghost" onClick={() => setShowNotificationForm(false)}>
-                Annuler
-              </Button>
-            </CardFooter>
-          </>
-        ) : (
-          <CardContent>
-            <Button variant="outline" onClick={() => setShowNotificationForm(true)}>
-              <Bell className="h-4 w-4 mr-2" />
-              Nouvelle notification
+        <CardFooter className="gap-2 flex-wrap">
+          {userInfo?.isActive !== false ? (
+            <Button variant="outline" onClick={() => setShowSuspendForm(true)} disabled={actionLoading}>
+              <XCircle className="h-4 w-4 mr-2" />
+              Suspendre
             </Button>
-          </CardContent>
-        )}
+          ) : (
+            <Button onClick={handleReactivateAccount} disabled={actionLoading}>
+              <CheckCircle className="h-4 w-4 mr-2" />
+              Réactiver
+            </Button>
+          )}
+          <Button variant="outline" onClick={() => setShowMessageForm(true)}>
+            <MessageSquare className="h-4 w-4 mr-2" />
+            Envoyer un message
+          </Button>
+          <Button variant="outline" onClick={() => setShowNotificationForm(true)}>
+            <Bell className="h-4 w-4 mr-2" />
+            Envoyer une notification
+          </Button>
+        </CardFooter>
       </Card>
+
+      {/* Formulaire suspension */}
+      {showSuspendForm && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Suspendre le compte</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Textarea
+              value={suspendReason}
+              onChange={(e) => setSuspendReason(e.target.value)}
+              placeholder="Raison de la suspension (obligatoire)..."
+              rows={3}
+            />
+          </CardContent>
+          <CardFooter className="gap-2">
+            <Button variant="destructive" onClick={handleSuspendAccount} disabled={actionLoading}>
+              {actionLoading ? 'Suspension...' : 'Confirmer'}
+            </Button>
+            <Button variant="ghost" onClick={() => setShowSuspendForm(false)}>Annuler</Button>
+          </CardFooter>
+        </Card>
+      )}
+
+      {/* Formulaire message */}
+      {showMessageForm && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <MessageSquare className="h-5 w-5" />
+              Envoyer un message
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Textarea
+              value={messageData}
+              onChange={(e) => setMessageData(e.target.value)}
+              placeholder="Votre message (sera envoyé dans la messagerie)..."
+              rows={4}
+            />
+          </CardContent>
+          <CardFooter className="gap-2">
+            <Button onClick={handleSendMessage} disabled={actionLoading}>
+              {actionLoading ? 'Envoi...' : 'Envoyer'}
+            </Button>
+            <Button variant="ghost" onClick={() => setShowMessageForm(false)}>Annuler</Button>
+          </CardFooter>
+        </Card>
+      )}
+
+      {/* Notification */}
+      {showNotificationForm && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Bell className="h-5 w-5" />
+              Envoyer une notification
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <label className="text-sm text-gray-500">Titre</label>
+              <Input
+                value={notificationData.title}
+                onChange={(e) => setNotificationData({...notificationData, title: e.target.value})}
+                placeholder="Titre de la notification"
+              />
+            </div>
+            <div>
+              <label className="text-sm text-gray-500">Message</label>
+              <Textarea
+                value={notificationData.message}
+                onChange={(e) => setNotificationData({...notificationData, message: e.target.value})}
+                placeholder="Message..."
+                rows={3}
+              />
+            </div>
+          </CardContent>
+          <CardFooter className="gap-2">
+            <Button onClick={handleSendNotification} disabled={actionLoading}>
+              {actionLoading ? 'Envoi...' : 'Envoyer'}
+            </Button>
+            <Button variant="ghost" onClick={() => setShowNotificationForm(false)}>Annuler</Button>
+          </CardFooter>
+        </Card>
+      )}
 
       {/* Documents */}
       {driver.documents && Object.keys(driver.documents).length > 0 && (
@@ -322,6 +477,49 @@ const DriverDetailsPage = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Historique des activités */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Activity className="h-5 w-5" />
+            Historique des activités
+          </CardTitle>
+          <CardDescription>Les dernières actions de ce chauffeur</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {activities.length > 0 ? (
+            <div className="border rounded-lg overflow-hidden">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {activities.map((activity, index) => (
+                    <tr key={index} className="hover:bg-gray-50">
+                      <td className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">
+                        {formatDateTime(activity.createdAt)}
+                      </td>
+                      <td className="px-4 py-3 text-sm">
+                        <Badge variant="secondary">{activity.activityType}</Badge>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-900">
+                        {activity.description}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="text-center text-gray-500 py-8">Aucune activité enregistrée</p>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }

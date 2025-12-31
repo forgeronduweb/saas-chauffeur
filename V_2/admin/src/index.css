@@ -99,6 +99,9 @@ body {
   min-height: 100vh;
   height: 100%;
   background-color: #f9fafb;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   /* Masquer la scrollbar */
   -ms-overflow-style: none;  /* Internet Explorer 10+ */
   scrollbar-width: none;  /* Firefox */
@@ -106,6 +109,28 @@ body {
 
 body::-webkit-scrollbar {
   display: none;  /* Safari et Chrome */
+}
+
+/* Polices minces pour tout l'admin - sans gras */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 400 !important;
+}
+
+p, span, label, a, div, td, th, li, strong, b {
+  font-weight: 400 !important;
+}
+
+input, select, textarea, button {
+  font-weight: 400 !important;
+  font-family: 'Inter', sans-serif;
+}
+
+.font-medium,
+.font-semibold,
+.font-bold,
+.font-extrabold,
+.font-black {
+  font-weight: 400 !important;
 }
 
 #root {

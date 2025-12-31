@@ -88,12 +88,21 @@ export const apiService = {
   
   // Gestion des chauffeurs admin
   getAdminDrivers: (params = {}) => api.get('/admin/drivers', { params }),
+  getAdminDriverById: (driverId) => api.get(`/admin/drivers/${driverId}`),
   updateDriverStatus: (driverId, data) => api.put(`/admin/drivers/${driverId}/status`, data),
   sendNotificationToDriver: (driverId, data) => api.post(`/admin/drivers/${driverId}/notify`, data),
   
   // Gestion des employeurs admin
   getAdminEmployers: (params = {}) => api.get('/admin/employers', { params }),
+  getAdminEmployerById: (employerId) => api.get(`/admin/employers/${employerId}`),
   updateEmployerStatus: (employerId, data) => api.put(`/admin/employers/${employerId}/status`, data),
+
+  // Actions sur les comptes utilisateurs
+  suspendAccount: (userId, data) => api.put(`/admin/users/${userId}/suspend`, data),
+  reactivateAccount: (userId) => api.put(`/admin/users/${userId}/reactivate`),
+  sendMessageToUser: (userId, data) => api.post(`/admin/users/${userId}/message`, data),
+  sendNotificationToUser: (userId, data) => api.post(`/admin/users/${userId}/notify`, data),
+  getUserActivities: (userId, params = {}) => api.get(`/admin/users/${userId}/activities`, { params }),
   
   // Gestion des candidatures admin
   getAdminApplications: (params = {}) => api.get('/admin/applications', { params }),
