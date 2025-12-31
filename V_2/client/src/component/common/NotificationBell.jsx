@@ -20,8 +20,10 @@ export default function NotificationBell() {
   }, []);
 
   const handleNotificationClick = async (notification) => {
+    console.log('🔔 Notification cliquée dans dropdown:', notification._id, notification.unread);
     if (notification.unread) {
-      await markAsRead(notification._id);
+      const result = await markAsRead(notification._id);
+      console.log('🔔 Résultat markAsRead dropdown:', result);
     }
     setIsOpen(false);
   };
@@ -41,11 +43,17 @@ export default function NotificationBell() {
     return notifDate.toLocaleDateString('fr-FR');
   };
 
+  // Enlever les emojis du texte
+  const removeEmojis = (text) => {
+    if (!text) return '';
+    return text.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F900}-\u{1F9FF}]|[\u{1FA00}-\u{1FA6F}]|[\u{1FA70}-\u{1FAFF}]|[\u{231A}-\u{231B}]|[\u{23E9}-\u{23F3}]|[\u{23F8}-\u{23FA}]|[\u{25AA}-\u{25AB}]|[\u{25B6}]|[\u{25C0}]|[\u{25FB}-\u{25FE}]|[\u{2614}-\u{2615}]|[\u{2648}-\u{2653}]|[\u{267F}]|[\u{2693}]|[\u{26A1}]|[\u{26AA}-\u{26AB}]|[\u{26BD}-\u{26BE}]|[\u{26C4}-\u{26C5}]|[\u{26CE}]|[\u{26D4}]|[\u{26EA}]|[\u{26F2}-\u{26F3}]|[\u{26F5}]|[\u{26FA}]|[\u{26FD}]|[\u{2702}]|[\u{2705}]|[\u{2708}-\u{270D}]|[\u{270F}]|[\u{2712}]|[\u{2714}]|[\u{2716}]|[\u{271D}]|[\u{2721}]|[\u{2728}]|[\u{2733}-\u{2734}]|[\u{2744}]|[\u{2747}]|[\u{274C}]|[\u{274E}]|[\u{2753}-\u{2755}]|[\u{2757}]|[\u{2763}-\u{2764}]|[\u{2795}-\u{2797}]|[\u{27A1}]|[\u{27B0}]|[\u{27BF}]|[\u{2934}-\u{2935}]|[\u{2B05}-\u{2B07}]|[\u{2B1B}-\u{2B1C}]|[\u{2B50}]|[\u{2B55}]|[\u{3030}]|[\u{303D}]|[\u{3297}]|[\u{3299}]/gu, '').trim();
+  };
+
   const getPriorityColor = (priority) => {
     switch (priority) {
       case 'urgent': return 'border-l-red-500';
       case 'high': return 'border-l-orange-500';
-      case 'normal': return 'border-l-blue-500';
+      case 'normal': return 'border-l-gray-300';
       default: return 'border-l-gray-300';
     }
   };
@@ -64,7 +72,7 @@ export default function NotificationBell() {
         
         {/* Badge compteur */}
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+          <span className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
             {unreadCount > 99 ? '99+' : unreadCount}
           </span>
         )}
@@ -88,7 +96,7 @@ export default function NotificationBell() {
               {unreadCount > 0 && (
                 <button
                   onClick={markAllAsRead}
-                  className="text-xs text-orange-600 hover:text-orange-700 font-medium"
+                  className="text-xs text-orange-600 hover:text-orange-700"
                 >
                   Tout marquer comme lu
                 </button>
@@ -108,15 +116,11 @@ export default function NotificationBell() {
           {/* Liste des notifications */}
           <div className="max-h-[60vh] md:max-h-96 overflow-y-auto">
             {loading ? (
-              <div className="p-4 text-center text-gray-500">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-orange-500 mx-auto mb-2"></div>
+              <div className="p-6 text-center text-gray-500 text-sm">
                 Chargement...
               </div>
             ) : notifications.length === 0 ? (
-              <div className="p-8 text-center">
-                <svg className="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                </svg>
+              <div className="p-6 text-center">
                 <p className="text-gray-500 text-sm">Aucune notification</p>
               </div>
             ) : (
@@ -124,15 +128,15 @@ export default function NotificationBell() {
                 <div
                   key={notification._id}
                   onClick={() => handleNotificationClick(notification)}
-                  className={`px-4 py-3 md:px-3 md:py-2 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors border-l-4 ${getPriorityColor(notification.priority)} ${notification.unread ? 'bg-orange-50/50' : ''}`}
+                  className={`px-4 py-3 md:px-3 md:py-2 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors ${notification.unread ? 'bg-orange-50/50' : ''}`}
                 >
                   <div className="flex items-start gap-3">
                     <div className="flex-1 min-w-0">
-                      <p className={`text-sm md:text-xs ${notification.unread ? 'font-medium md:font-normal text-gray-900' : 'text-gray-700'}`}>
-                        {notification.title}
+                      <p className={`text-sm md:text-xs ${notification.unread ? 'text-gray-900' : 'text-gray-700'}`}>
+                        {removeEmojis(notification.title)}
                       </p>
                       <p className="text-xs md:text-[11px] text-gray-500 mt-0.5 line-clamp-2">
-                        {notification.message}
+                        {removeEmojis(notification.message)}
                       </p>
                       <p className="text-xs md:text-[10px] text-gray-400 mt-1">
                         {formatTime(notification.createdAt)}
@@ -152,7 +156,7 @@ export default function NotificationBell() {
             <Link
               to="/notifications"
               onClick={() => setIsOpen(false)}
-              className="block px-4 py-3 text-center text-sm text-orange-600 hover:bg-gray-50 border-t border-gray-200 font-medium"
+              className="block px-4 py-3 text-center text-sm text-orange-600 hover:bg-gray-50 border-t border-gray-200"
             >
               Voir toutes les notifications
             </Link>
