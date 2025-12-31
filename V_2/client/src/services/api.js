@@ -68,12 +68,32 @@ api.interceptors.response.use(
       }
     );
     
+    // Gestion des comptes suspendus (403 avec code ACCOUNT_SUSPENDED)
+    if (error.response?.status === 403 && error.response?.data?.code === 'ACCOUNT_SUSPENDED') {
+      const reason = error.response.data.reason || 'Votre compte a été suspendu.';
+      
+      logger.warn('Account suspended', { reason });
+      
+      // Sauvegarder la raison pour l'afficher sur la page de connexion
+      localStorage.setItem('accountSuspendedReason', reason);
+      
+      // Nettoyer les données de session
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      
+      // Rediriger vers une page de compte suspendu ou la page de connexion
+      window.location.href = '/compte-suspendu';
+      
+      return Promise.reject(error);
+    }
+    
     // Gestion des erreurs 401 (non autorisé)
     if (error.response?.status === 401) {
       // Liste des routes publiques qui ne nécessitent pas de redirection
       const publicRoutes = ['/', '/auth', '/forgot-password', '/reset-password', 
                           '/offres', '/chauffeurs', '/marketing-vente', 
-                          '/a-propos', '/contact', '/conditions', '/confidentialite'];
+                          '/a-propos', '/contact', '/conditions', '/confidentialite',
+                          '/compte-suspendu'];
       const currentPath = window.location.pathname;
       
       // Ne pas rediriger si on est sur une route publique

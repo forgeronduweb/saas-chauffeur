@@ -16,6 +16,7 @@ class NotificationService {
 
   // Notifier tous les listeners
   notifyListeners() {
+    console.log('🔔 notifyListeners - Notification des', this.listeners.size, 'listeners avec', this.notifications.length, 'notifications');
     this.listeners.forEach(callback => {
       try {
         callback(this.notifications);
@@ -57,6 +58,9 @@ class NotificationService {
       const hasNewNotifications = this.hasNewNotifications(newNotifications);
       
       this.notifications = newNotifications;
+      
+      console.log('🔔 fetchNotifications - Notifications chargées:', newNotifications.length, 'non lues:', newNotifications.filter(n => n.unread).length);
+      
       this.notifyListeners();
       
       // Afficher une notification browser si il y en a de nouvelles
@@ -150,19 +154,16 @@ class NotificationService {
   // Marquer une notification comme lue
   async markAsRead(notificationId) {
     try {
-      await notificationsApi.markAsRead(notificationId);
+      console.log('🔔 Marquer notification comme lue:', notificationId);
+      const response = await notificationsApi.markAsRead(notificationId);
+      console.log('✅ Réponse API markAsRead:', response);
       
-      // Mettre à jour localement
-      this.notifications = this.notifications.map(notification =>
-        notification.id === notificationId
-          ? { ...notification, unread: false }
-          : notification
-      );
-      
-      this.notifyListeners();
+      // Recharger les notifications depuis le serveur pour synchroniser
+      await this.fetchNotifications();
       return true;
     } catch (error) {
-      console.error('Erreur lors du marquage comme lu:', error);
+      console.error('❌ Erreur lors du marquage comme lu:', error);
+      console.error('Détails:', error.response?.data || error.message);
       return false;
     }
   }
@@ -170,18 +171,16 @@ class NotificationService {
   // Marquer toutes les notifications comme lues
   async markAllAsRead() {
     try {
-      await notificationsApi.markAllAsRead();
+      console.log(' Marquer toutes les notifications comme lues');
+      const response = await notificationsApi.markAllAsRead();
+      console.log(' Réponse API markAllAsRead:', response);
       
-      // Mettre à jour localement
-      this.notifications = this.notifications.map(notification => ({
-        ...notification,
-        unread: false
-      }));
-      
-      this.notifyListeners();
+      // Recharger les notifications depuis le serveur pour synchroniser
+      await this.fetchNotifications();
       return true;
     } catch (error) {
-      console.error('Erreur lors du marquage de toutes comme lues:', error);
+      console.error('❌ Erreur lors du marquage de toutes comme lues:', error);
+      console.error('Détails:', error.response?.data || error.message);
       return false;
     }
   }

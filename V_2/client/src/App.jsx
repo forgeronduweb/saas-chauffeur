@@ -31,6 +31,7 @@ import ConfidentialitePage from './pages/ConfidentialitePage.jsx'
 import AProposPage from './pages/AProposPage.jsx'
 import ContactPage from './pages/ContactPage.jsx'
 import NotificationsPage from './pages/NotificationsPage.jsx'
+import AccountSuspendedPage from './pages/AccountSuspendedPage.jsx'
 import MyCandidates from './pages/employer/MyCandidates.jsx'
 import MyOffers from './pages/employer/MyOffers.jsx'
 import MyProducts from './pages/employer/MyProducts.jsx'
@@ -185,6 +186,7 @@ function App() {
             <Route path="/a-propos" element={<AProposPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
+            <Route path="/compte-suspendu" element={<AccountSuspendedPage />} />
             
             {/* Pages d'inscription spécifiques */}
             <Route path="/inscription-chauffeur" element={<RoleSelection />} />
