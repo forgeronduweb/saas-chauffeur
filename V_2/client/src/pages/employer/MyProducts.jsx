@@ -29,7 +29,6 @@ export default function MyProducts() {
   const { user } = useAuth();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('all');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
@@ -68,12 +67,7 @@ export default function MyProducts() {
   }, [user, navigate]);
 
 
-  const filteredProducts = filter === 'all' 
-    ? products 
-    : filter === 'inactive' 
-      ? products.filter(p => p.status === 'paused')
-      : products.filter(p => p.status === filter);
-
+  
   const openDeleteModal = (product) => {
     setProductToDelete(product);
     setShowDeleteModal(true);
@@ -155,61 +149,13 @@ export default function MyProducts() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-xl lg:text-2xl text-gray-900">Mes offres marketing</h1>
+          <h1 className="text-base lg:text-lg text-gray-900">Mes offres marketing</h1>
           <p className="text-sm text-gray-500 mt-1">Gérez vos produits et services en vente</p>
         </div>
-
-        {/* Filters */}
-        <div className="flex gap-2 mb-4">
-          {[
-            { value: 'all', label: 'Toutes' },
-            { value: 'active', label: 'Actives' },
-            { value: 'inactive', label: 'En pause' },
-          ].map((option) => (
-            <button
-              key={option.value}
-              onClick={() => setFilter(option.value)}
-              className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
-                filter === option.value
-                  ? 'bg-gray-900 text-white'
-                  : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
-              }`}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
         {/* Data Table */}
-        <Card>
-                    <CardContent className="p-0">
-            {loading ? (
-              <div className="p-6 space-y-4">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="flex items-center gap-4">
-                    <Skeleton className="h-12 w-12 rounded" />
-                    <div className="space-y-2 flex-1">
-                      <Skeleton className="h-4 w-1/3" />
-                      <Skeleton className="h-3 w-1/4" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : filteredProducts.length === 0 ? (
-              <div className="p-12 text-center">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Package className="w-8 h-8 text-gray-400" />
-                </div>
-                <h3 className="text-gray-900 mb-1">Aucune annonce</h3>
-                <p className="text-sm text-gray-500 mb-4">Commencez à vendre en créant votre première annonce</p>
-                <button
-                  onClick={() => navigate('/create-offer?type=product')}
-                  className="inline-flex items-center gap-2 bg-orange-500 text-white px-4 py-2 hover:bg-orange-600 transition-colors text-sm"
-                >
-                  <Plus className="w-4 h-4" />
-                  Créer une annonce
-                </button>
-              </div>
-            ) : (
+        {products.length > 0 ? (
+          <Card>
+            <CardContent className="p-0">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -223,7 +169,7 @@ export default function MyProducts() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredProducts.map((product) => (
+                  {products.map((product) => (
                     <TableRow key={product._id}>
                       <TableCell>
                         <div className="flex items-center gap-3">
@@ -305,9 +251,13 @@ export default function MyProducts() {
                   ))}
                 </TableBody>
               </Table>
-            )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-gray-500">Aucune offre marketing à afficher pour le moment</p>
+          </div>
+        )}
       </div>
 
       {/* Modal de suppression */}

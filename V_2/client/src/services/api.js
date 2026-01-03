@@ -322,23 +322,7 @@ export const driversService = {
   getById: (driverId) => api.get(`/drivers/${driverId}`), // Récupérer un chauffeur spécifique
 }
 
-// Service pour le chat
-export const chatService = {
-  // Conversations
-  getConversations: () => api.get('/chat/conversations'),
-  createOrGetConversation: (targetUserId, context = {}) => 
-    api.post('/chat/conversations', { targetUserId, context }),
-  markConversationAsRead: (conversationId) => 
-    api.put(`/chat/conversations/${conversationId}/read`),
-  
-  // Messages
-  getMessages: (conversationId, page = 1, limit = 50) => 
-    api.get(`/chat/conversations/${conversationId}/messages?page=${page}&limit=${limit}`),
-  sendMessage: (conversationId, content, type = 'text', metadata = {}) => 
-    api.post(`/chat/conversations/${conversationId}/messages`, { content, type, metadata }),
-}
-
-// API pour les messages (système complet)
+// API pour les messages (système complet - Système 2)
 export const messagesApi = {
   // Conversations
   createOrGetConversation: (participantId, context = {}) => 

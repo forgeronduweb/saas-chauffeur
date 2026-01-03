@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CiFilter } from 'react-icons/ci';
 import { useAuth } from '../../contexts/AuthContext';
 import SimpleHeader from '../../component/common/SimpleHeader';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
-import CustomDropdown from '../../component/common/CustomDropdown';
 import { offersApi } from '../../services/api';
 
 export default function MyOffers() {
@@ -12,11 +10,9 @@ export default function MyOffers() {
   const { user } = useAuth();
   const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('all'); // all, active, closed
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [offerToDelete, setOfferToDelete] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
-  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   useEffect(() => {
     if (!user || user.role !== 'employer') {
@@ -65,10 +61,7 @@ export default function MyOffers() {
     }
   };
 
-  const filteredOffers = filter === 'all' 
-    ? offers 
-    : offers.filter(o => o.status === filter);
-
+  
   const handleEdit = (offerId) => {
     navigate(`/edit-job-offer/${offerId}`);
   };
@@ -108,33 +101,9 @@ export default function MyOffers() {
       <SimpleHeader hideSubNav={true} />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header avec filtres */}
+        {/* Header */}
         <div className="mb-6">
-          <div className="flex items-center justify-between mb-2">
-            <h1 className="text-xl sm:text-2xl lg:text-3xl text-gray-900">Mes annonces</h1>
-            
-            {/* Bouton filtres mobile */}
-            <button
-              onClick={() => setShowMobileFilters(true)}
-              className="sm:hidden p-2 text-orange-500 hover:bg-orange-50 rounded-lg transition-colors"
-            >
-              <CiFilter className="w-6 h-6" />
-            </button>
-            
-            {/* Dropdown personnalisé - Desktop uniquement */}
-            <div className="hidden sm:block">
-              <CustomDropdown
-                value={filter}
-                onChange={setFilter}
-                placeholder="Filtrer par statut"
-                options={[
-                  { value: 'all', label: `Toutes (${offers.length})` },
-                  { value: 'active', label: `Actives (${offers.filter(o => o.status === 'active').length})` },
-                  { value: 'closed', label: `Fermées (${offers.filter(o => o.status === 'closed').length})` }
-                ]}
-              />
-            </div>
-          </div>
+          <h1 className="text-base lg:text-lg text-gray-900">Mes annonces</h1>
           <p className="text-gray-600 text-sm">Gérez vos offres d'emploi publiées</p>
         </div>
 
@@ -143,18 +112,9 @@ export default function MyOffers() {
           <div className="flex items-center justify-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
           </div>
-        ) : filteredOffers.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
-            
-            <h3 className="text-2xl text-gray-900 mb-3">Aucune annonce</h3>
-            <p className="text-gray-600 mb-8 max-w-md mx-auto">
-              Commencez à recruter les meilleurs chauffeurs. Créez votre première offre d'emploi et trouvez le candidat idéal.
-            </p>
-            
-          </div>
-        ) : (
+        ) : offers.length > 0 ? (
           <div className="grid grid-cols-1 gap-4">
-            {filteredOffers.map((offer) => (
+            {offers.map((offer) => (
               <div
                 key={offer.id}
                 className="bg-white rounded-lg border border-gray-200 transition-all overflow-hidden"
@@ -258,59 +218,13 @@ export default function MyOffers() {
               </div>
             ))}
           </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-gray-500">Aucune annonce à afficher pour le moment</p>
+          </div>
         )}
       </main>
 
-      {/* Panneau filtres mobile */}
-      {showMobileFilters && (
-        <div className="fixed inset-0 z-50 sm:hidden">
-          {/* Overlay */}
-          <div 
-            className="absolute inset-0 bg-black/40"
-            onClick={() => setShowMobileFilters(false)}
-          ></div>
-          
-          {/* Modal Content - Bottom sheet */}
-          <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-xl">
-            {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
-              <span className="text-gray-900">Filtrer par statut</span>
-              <button
-                onClick={() => setShowMobileFilters(false)}
-                className="p-1 hover:bg-gray-100 rounded"
-              >
-                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            {/* Liste des options */}
-            <div className="py-2">
-              {[
-                { value: 'all', label: `Toutes les annonces (${offers.length})` },
-                { value: 'active', label: `Actives (${offers.filter(o => o.status === 'active').length})` },
-                { value: 'closed', label: `Fermées (${offers.filter(o => o.status === 'closed').length})` }
-              ].map((option) => (
-                <button
-                  key={option.value}
-                  onClick={() => {
-                    setFilter(option.value);
-                    setShowMobileFilters(false);
-                  }}
-                  className={`w-full text-left px-4 py-2.5 text-sm ${
-                    filter === option.value 
-                      ? 'bg-orange-50 text-orange-600' 
-                      : 'text-gray-700 hover:bg-gray-50'
-                  }`}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Modal de confirmation de suppression */}
       <ConfirmDialog

@@ -391,7 +391,7 @@ export default function DriverProfilePage() {
         </div>
 
         {/* Expériences professionnelles - En bas */}
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-4 sm:p-6 lg:p-8 mt-6 lg:mt-8">
+        <div className="bg-white border border-gray-200 p-4 sm:p-6 lg:p-8 mt-6 lg:mt-8">
           <h2 className="text-base sm:text-lg lg:text-xl !text-gray-900 mb-4 sm:mb-6 flex items-center gap-2">
             <div className="p-2 bg-orange-100 rounded-lg">
               <Briefcase className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600" />

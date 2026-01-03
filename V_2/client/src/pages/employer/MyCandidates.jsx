@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CiFilter } from 'react-icons/ci';
 import { useAuth } from '../../contexts/AuthContext';
 import SimpleHeader from '../../component/common/SimpleHeader';
-import CustomDropdown from '../../component/common/CustomDropdown';
 import { applicationsApi } from '../../services/api';
 
 export default function MyCandidates() {
@@ -11,8 +9,6 @@ export default function MyCandidates() {
   const { user } = useAuth();
   const [candidates, setCandidates] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('all'); // all, pending, accepted, rejected
-  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   useEffect(() => {
     if (!user || user.role !== 'employer') {
@@ -55,19 +51,7 @@ export default function MyCandidates() {
     }
   };
 
-  const getStatusBadge = (status) => {
-    const badges = {
-      pending: { text: 'En attente', color: 'bg-orange-50 text-orange-600 border border-orange-500' },
-      accepted: { text: 'Acceptée', color: 'bg-orange-50 text-orange-600 border border-orange-500' },
-      rejected: { text: 'Rejetée', color: 'bg-orange-50 text-orange-600 border border-orange-500' }
-    };
-    return badges[status] || badges.pending;
-  };
-
-  const filteredCandidates = filter === 'all' 
-    ? candidates 
-    : candidates.filter(c => c.status === filter);
-
+  
   const handleAccept = async (candidateId) => {
     try {
       await applicationsApi.updateStatus(candidateId, 'accepted');
@@ -99,34 +83,9 @@ export default function MyCandidates() {
       <SimpleHeader hideSubNav={true} />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header avec filtres */}
+        {/* Header */}
         <div className="mb-6">
-          <div className="flex items-center justify-between mb-2">
-            <h1 className="text-xl sm:text-2xl lg:text-3xl text-gray-900">Mes candidatures</h1>
-            
-            {/* Bouton filtres mobile */}
-            <button
-              onClick={() => setShowMobileFilters(true)}
-              className="sm:hidden p-2 text-orange-500 hover:bg-orange-50 rounded-lg transition-colors"
-            >
-              <CiFilter className="w-6 h-6" />
-            </button>
-            
-            {/* Dropdown personnalisé - Desktop uniquement */}
-            <div className="hidden sm:block">
-              <CustomDropdown
-                value={filter}
-                onChange={setFilter}
-                placeholder="Filtrer par statut"
-                options={[
-                  { value: 'all', label: `Toutes (${candidates.length})` },
-                  { value: 'pending', label: `En attente (${candidates.filter(c => c.status === 'pending').length})` },
-                  { value: 'accepted', label: `Acceptées (${candidates.filter(c => c.status === 'accepted').length})` },
-                  { value: 'rejected', label: `Rejetées (${candidates.filter(c => c.status === 'rejected').length})` }
-                ]}
-              />
-            </div>
-          </div>
+          <h1 className="text-base lg:text-lg text-gray-900">Mes candidatures</h1>
           <p className="text-gray-600 text-sm">Gérez les candidatures reçues pour vos offres d'emploi</p>
         </div>
 
@@ -135,18 +94,15 @@ export default function MyCandidates() {
           <div className="flex items-center justify-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
           </div>
-        ) : filteredCandidates.length === 0 ? (
-          <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
-            <h3 className="text-gray-900 mb-3">Aucune candidature</h3>
-            <p className="text-gray-600 max-w-md mx-auto">
-              Vous n'avez pas encore reçu de candidatures.
-            </p>
-            
-          </div>
-        ) : (
+        ) : candidates.length > 0 ? (
           <div className="grid grid-cols-1 gap-4">
-            {filteredCandidates.map((candidate) => {
-              const badge = getStatusBadge(candidate.status);
+            {candidates.map((candidate) => {
+              const badge = {
+                pending: { text: 'En attente', color: 'bg-orange-50 text-orange-600 border border-orange-500' },
+                accepted: { text: 'Acceptée', color: 'bg-orange-50 text-orange-600 border border-orange-500' },
+                rejected: { text: 'Rejetée', color: 'bg-orange-50 text-orange-600 border border-orange-500' }
+              }[candidate.status] || { text: 'En attente', color: 'bg-orange-50 text-orange-600 border border-orange-500' };
+              
               const cardClasses = "bg-white rounded-lg border border-gray-200 transition-all overflow-hidden";
               
               return (
@@ -220,69 +176,12 @@ export default function MyCandidates() {
               );
             })}
           </div>
-        )}
-
-        {/* Panneau filtres mobile */}
-        {showMobileFilters && (
-          <div className="fixed inset-0 z-50 sm:hidden">
-            {/* Overlay */}
-            <div 
-              className="absolute inset-0 bg-black/50"
-              onClick={() => setShowMobileFilters(false)}
-            ></div>
-            
-            {/* Modal Content */}
-            <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl max-h-[70vh] overflow-y-auto">
-              {/* Header */}
-              <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
-                <h3 className="text-base text-gray-900">Filtres</h3>
-                <button
-                  onClick={() => setShowMobileFilters(false)}
-                  className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-
-              {/* Filtres */}
-              <div className="p-4 space-y-3">
-                <div>
-                  <label className="block text-xs text-gray-700 mb-1.5">
-                    Statut
-                  </label>
-                  <select 
-                    value={filter}
-                    onChange={(e) => setFilter(e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  >
-                    <option value="all">Toutes ({candidates.length})</option>
-                    <option value="pending">En attente ({candidates.filter(c => c.status === 'pending').length})</option>
-                    <option value="accepted">Acceptées ({candidates.filter(c => c.status === 'accepted').length})</option>
-                    <option value="rejected">Rejetées ({candidates.filter(c => c.status === 'rejected').length})</option>
-                  </select>
-                </div>
-
-                {/* Boutons */}
-                <div className="flex gap-2 pt-3">
-                  <button 
-                    onClick={() => setFilter('all')}
-                    className="flex-1 px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-                  >
-                    Réinitialiser
-                  </button>
-                  <button 
-                    onClick={() => setShowMobileFilters(false)}
-                    className="flex-1 px-3 py-2 text-sm bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
-                  >
-                    Appliquer
-                  </button>
-                </div>
-              </div>
-            </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-gray-500">Aucune candidature à afficher pour le moment</p>
           </div>
         )}
+
       </main>
     </div>
   );
