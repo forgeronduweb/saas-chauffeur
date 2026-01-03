@@ -104,7 +104,7 @@ export default function ApplicationCard({ application, userRole, onUpdate, onOpe
     }
   };
 
-  const cardClasses = "bg-white border border-gray-200 rounded-lg p-6 shadow-sm";
+  const cardClasses = "bg-white border border-gray-200 rounded-lg p-6";
 
   return (
     <div className={cardClasses}>
