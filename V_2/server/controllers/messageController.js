@@ -3,197 +3,65 @@ const Message = require('../models/Message');
 const User = require('../models/User');
 const ActivityLog = require('../models/ActivityLog');
 
-// Créer ou récupérer une conversation
+/* ======================================================
+   CRÉER OU RÉCUPÉRER UNE CONVERSATION
+====================================================== */
 exports.createOrGetConversation = async (req, res) => {
   try {
-    // Accepter à la fois participantId (nouveau) et targetUserId (ancien) pour compatibilité
     const { participantId, targetUserId, context = {} } = req.body;
-    const targetId = participantId || targetUserId;
     const currentUserId = req.user.sub;
-    
-    console.log('🔵 createOrGetConversation appelé:', {
-      currentUserId,
-      targetId,
-      participantId,
-      targetUserId,
-      context
-    });
+    const targetId = participantId || targetUserId;
 
     if (!targetId) {
-      return res.status(400).json({ error: 'participantId ou targetUserId requis' });
+      return res.status(400).json({ error: 'participantId requis' });
     }
 
-    // Vérifier qu'un utilisateur ne se contacte pas lui-même
-    if (currentUserId.toString() === targetId.toString()) {
-      console.log('❌ Tentative de se contacter soi-même');
-      return res.status(400).json({ error: 'Vous ne pouvez pas vous contacter vous-même' });
+    if (currentUserId === targetId) {
+      return res.status(400).json({ error: 'Action non autorisée' });
     }
 
-    // Vérifier que l'utilisateur cible existe
     const targetUser = await User.findById(targetId);
     if (!targetUser) {
-      return res.status(404).json({ error: 'Utilisateur non trouvé' });
+      return res.status(404).json({ error: 'Utilisateur introuvable' });
     }
 
-    // Vérifier si une conversation existe déjà
     let conversation = await Conversation.findOne({
       participants: { $all: [currentUserId, targetId] },
       isActive: true
     }).populate('participants', 'firstName lastName email role profilePhotoUrl');
 
-    console.log('🔍 Conversation existante trouvée:', !!conversation);
+    let isNew = false;
 
-    let isNewConversation = false;
-
-    // Si pas de conversation, en créer une nouvelle
     if (!conversation) {
-      isNewConversation = true;
-      console.log('➕ Création d\'une nouvelle conversation');
+      isNew = true;
       conversation = new Conversation({
         participants: [currentUserId, targetId],
         context,
         unreadCount: new Map([
           [currentUserId.toString(), 0],
-          [targetId.toString(), 1] // 1 message non lu pour le destinataire
+          [targetId.toString(), 0]
         ])
       });
       await conversation.save();
       await conversation.populate('participants', 'firstName lastName email role profilePhotoUrl');
-
-      // Si c'est une demande concernant une offre marketing, créer un message personnalisé
-      if (context.type === 'product_inquiry' && context.offerId && isNewConversation) {
-        console.log('📤 Création du message automatique pour l\'offre:', context.offerId);
-        const Offer = require('../models/Offer');
-        const offer = await Offer.findById(context.offerId);
-        const currentUser = await User.findById(currentUserId);
-        
-        if (offer && currentUser) {
-          const productUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/produit/${offer._id}`;
-          const messageContent = `Bonjour,\n\nJe suis intéressé(e) par votre offre "${offer.title}".\n\nPourriez-vous me donner plus d'informations ?\n\nLien de l'offre : ${productUrl}`;
-          
-          console.log('💬 Contenu du message:', messageContent);
-          
-          // Message texte avec les infos
-          const metadata = new Map();
-          metadata.set('productId', offer._id.toString());
-          metadata.set('productTitle', offer.title);
-          metadata.set('productPrice', offer.price);
-          metadata.set('productImage', offer.mainImage || (offer.images && offer.images.length > 0 ? offer.images[0] : null));
-          metadata.set('productUrl', productUrl);
-          
-          const initialMessage = new Message({
-            conversationId: conversation._id,
-            senderId: currentUserId,
-            content: messageContent,
-            type: 'text',
-            metadata: metadata
-          });
-          await initialMessage.save();
-          
-          console.log('✅ Message automatique sauvegardé:', initialMessage._id);
-          
-          // Incrémenter le compteur de messages de l'offre
-          offer.incrementMessagesCount().catch(err => 
-            console.error('Erreur lors de l\'incrémentation des messages:', err)
-          );
-          
-          // Mettre à jour le dernier message de la conversation
-          conversation.lastMessage = {
-            content: messageContent,
-            senderId: currentUserId,
-            createdAt: new Date()
-          };
-          await conversation.save();
-        } else {
-          console.log('❌ Offre ou utilisateur non trouvé:', { offer: !!offer, currentUser: !!currentUser });
-        }
-      } else if (isNewConversation) {
-        // Message système de bienvenue par défaut pour les nouvelles conversations
-        const systemMessage = new Message({
-          conversationId: conversation._id,
-          senderId: currentUserId,
-          content: 'Conversation démarrée',
-          type: 'system'
-        });
-        await systemMessage.save();
-      }
     }
-    
-    // Si c'est une conversation existante mais vide, et que c'est une demande d'offre, créer le message
-    if (!isNewConversation && context.type === 'product_inquiry' && context.offerId) {
-      const existingMessages = await Message.countDocuments({ conversationId: conversation._id });
-      console.log('📊 Messages existants dans la conversation:', existingMessages);
-      
-      if (existingMessages === 0) {
-        console.log('📤 Création du message automatique pour conversation existante vide');
-        const Offer = require('../models/Offer');
-        const offer = await Offer.findById(context.offerId);
-        const currentUser = await User.findById(currentUserId);
-        
-        if (offer && currentUser) {
-          const productUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/produit/${offer._id}`;
-          const messageContent = `Bonjour,\n\nJe suis intéressé(e) par votre offre "${offer.title}".\n\nPourriez-vous me donner plus d'informations ?\n\nLien de l'offre : ${productUrl}`;
-          
-          const metadata = new Map();
-          metadata.set('productId', offer._id.toString());
-          metadata.set('productTitle', offer.title);
-          metadata.set('productPrice', offer.price);
-          metadata.set('productImage', offer.mainImage || (offer.images && offer.images.length > 0 ? offer.images[0] : null));
-          metadata.set('productUrl', productUrl);
-          
-          const initialMessage = new Message({
-            conversationId: conversation._id,
-            senderId: currentUserId,
-            content: messageContent,
-            type: 'text',
-            metadata: metadata
-          });
-          await initialMessage.save();
-          
-          console.log('✅ Message automatique créé pour conversation existante');
-          
-          // Incrémenter le compteur de messages de l'offre
-          offer.incrementMessagesCount().catch(err => 
-            console.error('Erreur lors de l\'incrémentation des messages:', err)
-          );
-          
-          // Mettre à jour le dernier message et le compteur
-          conversation.lastMessage = {
-            content: messageContent,
-            senderId: currentUserId,
-            createdAt: new Date()
-          };
-          conversation.unreadCount.set(targetUserId.toString(), 1);
-          await conversation.save();
-        }
-      }
-    }
-    
-    console.log('📊 Conversation finale:', {
-      id: conversation._id,
-      isNew: isNewConversation,
-      contextType: context.type
-    });
 
-    // Récupérer les messages de la conversation pour les retourner
     const messages = await Message.find({ conversationId: conversation._id })
       .populate('senderId', 'firstName lastName profilePhotoUrl')
       .sort({ createdAt: 1 })
       .limit(50);
 
-    console.log('📬 Messages à retourner:', messages.length);
-
-    res.json({ 
-      conversation,
-      messages // Inclure les messages dans la réponse
-    });
-  } catch (error) {
-    console.error('Erreur création conversation:', error);
-    res.status(500).json({ error: 'Erreur lors de la création de la conversation' });
+    res.json({ conversation, messages, isNew });
+  } catch (err) {
+    console.error('❌ Erreur création conversation:', err);
+    console.error('❌ Stack trace:', err.stack);
+    res.status(500).json({ error: 'Erreur création conversation' });
   }
 };
 
-// Récupérer toutes les conversations de l'utilisateur
+/* ======================================================
+   LISTE DES CONVERSATIONS
+====================================================== */
 exports.getConversations = async (req, res) => {
   try {
     const userId = req.user.sub;
@@ -203,24 +71,19 @@ exports.getConversations = async (req, res) => {
       participants: userId,
       isActive: true
     })
-      .populate('participants', 'firstName lastName email role profilePhotoUrl companyName')
+      .populate('participants', 'firstName lastName email role profilePhotoUrl')
       .populate('lastMessage.senderId', 'firstName lastName')
       .sort({ updatedAt: -1 })
       .skip((page - 1) * limit)
-      .limit(parseInt(limit))
+      .limit(Number(limit))
       .lean();
 
-    // Ajouter les informations de l'autre participant
-    const conversationsWithDetails = conversations.map(conv => {
-      const otherParticipant = conv.participants.find(
-        p => p._id.toString() !== userId.toString()
-      );
-      const unreadCount = conv.unreadCount?.[userId.toString()] || 0;
-
+    const data = conversations.map(c => {
+      const other = c.participants.find(p => p._id.toString() !== userId);
       return {
-        ...conv,
-        otherParticipant,
-        unreadCount
+        ...c,
+        otherParticipant: other,
+        unreadCount: c.unreadCount?.[userId] || 0
       };
     });
 
@@ -230,28 +93,109 @@ exports.getConversations = async (req, res) => {
     });
 
     res.json({
-      conversations: conversationsWithDetails,
+      conversations: data,
       pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
+        page: Number(page),
+        limit: Number(limit),
         total,
         pages: Math.ceil(total / limit)
       }
     });
-  } catch (error) {
-    console.error('Erreur récupération conversations:', error);
-    res.status(500).json({ error: 'Erreur lors de la récupération des conversations' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Erreur récupération conversations' });
   }
 };
 
-// Récupérer les messages d'une conversation
+/* ======================================================
+   RÉCUPÉRER LES MESSAGES
+====================================================== */
 exports.getMessages = async (req, res) => {
   try {
     const { conversationId } = req.params;
     const userId = req.user.sub;
     const { page = 1, limit = 50 } = req.query;
 
-    // Vérifier que l'utilisateur est participant
+    console.log('🔍 getMessages appelé:', { conversationId, userId });
+
+    // Gérer les conversations temporaires
+    if (conversationId.startsWith('temp-')) {
+      console.log('📋 Conversation temporaire détectée');
+      
+      try {
+        // Pour les conversations temporaires, vérifier que l'utilisateur est autorisé
+        // Format: temp-{userId1}-{userId2}
+        const parts = conversationId.split('-');
+        console.log('🔧 Parts parsing:', { parts, length: parts.length });
+        
+        if (parts.length < 3) {
+          console.log('❌ Format invalide - parts length < 3');
+          return res.status(400).json({ error: 'Format d\'ID de conversation temporaire invalide' });
+        }
+        
+        const userA = parts[1];
+        const userB = parts[2];
+        console.log('👤 User IDs:', { 
+          requestUserId: userId, 
+          userA, 
+          userB,
+          match1: userA === userId,
+          match2: userB === userId
+        });
+        
+        // Vérifier que l'utilisateur actuel est autorisé (soit userA soit userB)
+        if (userA !== userId && userB !== userId) {
+          console.log('❌ Accès non autorisé pour la conversation temporaire:', { 
+            userId, 
+            userA, 
+            userB 
+          });
+          return res.status(403).json({ error: 'Accès non autorisé' });
+        }
+
+        // Créer un ID de conversation normalisé (toujours le même ordre)
+        const normalizedConversationId = [userA, userB].sort().join('-');
+        const searchConversationId = `temp-${normalizedConversationId}`;
+        
+        console.log('🔍 ID normalisé pour recherche:', searchConversationId);
+
+        console.log('✅ Utilisateur autorisé, recherche des messages...');
+        const messages = await Message.find({
+          conversationId: searchConversationId,
+          isDeleted: false
+        })
+          .populate('senderId', 'firstName lastName profilePhotoUrl')
+          .sort({ createdAt: -1 })
+          .limit(limit * 1)
+          .skip((page - 1) * limit);
+
+        console.log('📬 Messages trouvés:', messages.length);
+        console.log('📬 Détails messages:', messages.map(m => ({ id: m._id, content: m.content.substring(0, 30), sender: m.senderId?.firstName })));
+
+        const total = await Message.countDocuments({
+          conversationId: searchConversationId,
+          isDeleted: false
+        });
+
+        console.log('📊 Total messages:', total);
+
+        return res.json({
+          messages: messages.reverse(),
+          pagination: {
+            currentPage: parseInt(page),
+            totalPages: Math.ceil(total / limit),
+            total,
+            hasNext: page * limit < total,
+            hasPrev: page > 1
+          }
+        });
+      } catch (error) {
+        console.error('❌ Erreur dans conversation temporaire:', error);
+        return res.status(500).json({ error: 'Erreur lors de la récupération des messages temporaires' });
+      }
+    }
+
+    // Vérifier que l'utilisateur est participant (pour les conversations persistantes)
     const conversation = await Conversation.findById(conversationId);
     if (!conversation) {
       return res.status(404).json({ error: 'Conversation non trouvée' });
@@ -267,13 +211,23 @@ exports.getMessages = async (req, res) => {
     })
       .populate('senderId', 'firstName lastName profilePhotoUrl')
       .sort({ createdAt: -1 })
-      .skip((page - 1) * limit)
-      .limit(parseInt(limit))
-      .lean();
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
 
     const total = await Message.countDocuments({
       conversationId,
       isDeleted: false
+    });
+
+    res.json({
+      messages,
+      pagination: {
+        currentPage: parseInt(page),
+        totalPages: Math.ceil(total / limit),
+        total,
+        hasNext: page * limit < total,
+        hasPrev: page > 1
+      }
     });
 
     // Marquer les messages comme lus
@@ -300,30 +254,65 @@ exports.getMessages = async (req, res) => {
         pages: Math.ceil(total / limit)
       }
     });
-  } catch (error) {
-    console.error('Erreur récupération messages:', error);
-    res.status(500).json({ error: 'Erreur lors de la récupération des messages' });
+  } catch (err) {
+    console.error('❌ Erreur récupération messages:', err);
+    console.error('❌ Stack trace:', err.stack);
+    res.status(500).json({ error: 'Erreur récupération messages' });
   }
 };
 
-// Envoyer un message
+/* ======================================================
+   ENVOYER UN MESSAGE
+====================================================== */
 exports.sendMessage = async (req, res) => {
   try {
     const { conversationId } = req.params;
     const { content, type = 'text', metadata = {} } = req.body;
     const senderId = req.user.sub;
 
-    // Vérifier la conversation
+    if (conversationId.startsWith('temp-')) {
+      console.log('📋 Envoi message dans conversation temporaire');
+      
+      // Pour les conversations temporaires, créer et sauvegarder le message directement
+      const parts = conversationId.split('-');
+      if (parts.length < 3) {
+        return res.status(400).json({ error: 'Format ID temporaire invalide' });
+      }
+      
+      const userA = parts[1];
+      const userB = parts[2];
+      if (![userA, userB].includes(senderId)) {
+        return res.status(403).json({ error: 'Accès refusé' });
+      }
+
+      // Créer un ID de conversation normalisé (toujours le même ordre)
+      const normalizedConversationId = [userA, userB].sort().join('-');
+      const searchConversationId = `temp-${normalizedConversationId}`;
+      
+      console.log('🔍 ID normalisé pour sauvegarde:', searchConversationId);
+
+      const message = new Message({
+        conversationId: searchConversationId, // Utiliser l'ID normalisé
+        senderId,
+        content,
+        type,
+        metadata,
+        readBy: [{ userId: senderId, readAt: new Date() }]
+      });
+
+      await message.save();
+      console.log('💬 Message temporaire sauvegardé:', message._id);
+      await message.populate('senderId', 'firstName lastName profilePhotoUrl');
+      console.log('💬 Message avec populate:', message);
+
+      return res.status(201).json({ message });
+    }
+
     const conversation = await Conversation.findById(conversationId);
-    if (!conversation) {
-      return res.status(404).json({ error: 'Conversation non trouvée' });
+    if (!conversation || !conversation.isParticipant(senderId)) {
+      return res.status(403).json({ error: 'Accès interdit' });
     }
 
-    if (!conversation.isParticipant(senderId)) {
-      return res.status(403).json({ error: 'Accès non autorisé' });
-    }
-
-    // Créer le message
     const message = new Message({
       conversationId,
       senderId,
@@ -336,75 +325,56 @@ exports.sendMessage = async (req, res) => {
     await message.save();
     await message.populate('senderId', 'firstName lastName profilePhotoUrl');
 
-    // Logger l'activité de conversation
-    const otherUser = await User.findById(conversation.getOtherParticipant(senderId));
-    await ActivityLog.logActivity({
-      userId: senderId,
-      activityType: 'conversation',
-      description: `Message envoyé à ${otherUser?.firstName || 'utilisateur'} ${otherUser?.lastName || ''}`,
-      details: { conversationId, messageId: message._id, recipientId: otherUser?._id },
-      relatedResource: { resourceType: 'message', resourceId: message._id }
-    });
-
-    // Si la conversation concerne une offre, incrémenter le compteur de messages
-    if (conversation.context?.type === 'product_inquiry' && conversation.context?.offerId) {
-      const Offer = require('../models/Offer');
-      const offer = await Offer.findById(conversation.context.offerId);
-      if (offer) {
-        offer.incrementMessagesCount().catch(err => 
-          console.error('Erreur lors de l\'incrémentation des messages:', err)
-        );
-      }
+    const otherUserId = conversation.getOtherParticipant(senderId);
+    if (otherUserId) {
+      await conversation.incrementUnread(otherUserId);
     }
 
-    // Mettre à jour la conversation
     conversation.lastMessage = {
       content,
       senderId,
-      timestamp: message.createdAt,
+      createdAt: message.createdAt,
       type
     };
-
-    // Incrémenter le compteur pour l'autre participant
-    const otherParticipantId = conversation.getOtherParticipant(senderId);
-    if (otherParticipantId) {
-      await conversation.incrementUnread(otherParticipantId);
-    }
 
     await conversation.save();
 
     res.status(201).json({ message });
-  } catch (error) {
-    console.error('Erreur envoi message:', error);
-    res.status(500).json({ error: 'Erreur lors de l\'envoi du message' });
+  } catch (err) {
+    console.error('❌ Erreur envoi message:', err);
+    console.error('❌ Stack trace:', err.stack);
+    res.status(500).json({ error: 'Erreur envoi message' });
   }
 };
 
-// Marquer une conversation comme lue
+/* ======================================================
+   MARQUER COMME LU
+====================================================== */
 exports.markConversationAsRead = async (req, res) => {
   try {
     const { conversationId } = req.params;
     const userId = req.user.sub;
 
-    const conversation = await Conversation.findById(conversationId);
-    if (!conversation) {
-      return res.status(404).json({ error: 'Conversation non trouvée' });
+    if (conversationId.startsWith('temp-')) {
+      return res.json({ success: true });
     }
 
-    if (!conversation.isParticipant(userId)) {
-      return res.status(403).json({ error: 'Accès non autorisé' });
+    const conversation = await Conversation.findById(conversationId);
+    if (!conversation || !conversation.isParticipant(userId)) {
+      return res.status(403).json({ error: 'Accès interdit' });
     }
 
     await conversation.resetUnread(userId);
-
     res.json({ success: true });
-  } catch (error) {
-    console.error('Erreur marquage lecture:', error);
-    res.status(500).json({ error: 'Erreur lors du marquage comme lu' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Erreur marquage lecture' });
   }
 };
 
-// Obtenir le nombre total de messages non lus
+/* ======================================================
+   TOTAL NON LUS
+====================================================== */
 exports.getUnreadCount = async (req, res) => {
   try {
     const userId = req.user.sub;
@@ -414,38 +384,37 @@ exports.getUnreadCount = async (req, res) => {
       isActive: true
     }).lean();
 
-    const totalUnread = conversations.reduce((sum, conv) => {
-      return sum + (conv.unreadCount?.[userId.toString()] || 0);
-    }, 0);
+    const unread = conversations.reduce(
+      (sum, c) => sum + (c.unreadCount?.[userId] || 0),
+      0
+    );
 
-    res.json({ unreadCount: totalUnread });
-  } catch (error) {
-    console.error('Erreur comptage non lus:', error);
-    res.status(500).json({ error: 'Erreur lors du comptage des messages non lus' });
+    res.json({ unreadCount: unread });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Erreur calcul non lus' });
   }
 };
 
-// Supprimer une conversation
+/* ======================================================
+   SUPPRIMER CONVERSATION
+====================================================== */
 exports.deleteConversation = async (req, res) => {
   try {
     const { conversationId } = req.params;
     const userId = req.user.sub;
 
     const conversation = await Conversation.findById(conversationId);
-    if (!conversation) {
-      return res.status(404).json({ error: 'Conversation non trouvée' });
-    }
-
-    if (!conversation.isParticipant(userId)) {
-      return res.status(403).json({ error: 'Accès non autorisé' });
+    if (!conversation || !conversation.isParticipant(userId)) {
+      return res.status(403).json({ error: 'Accès interdit' });
     }
 
     conversation.isActive = false;
     await conversation.save();
 
     res.json({ success: true });
-  } catch (error) {
-    console.error('Erreur suppression conversation:', error);
-    res.status(500).json({ error: 'Erreur lors de la suppression' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Erreur suppression' });
   }
 };

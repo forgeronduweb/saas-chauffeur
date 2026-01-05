@@ -2,8 +2,7 @@ const mongoose = require('mongoose');
 
 const messageSchema = new mongoose.Schema({
   conversationId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Conversation',
+    type: mongoose.Schema.Types.Mixed, // Accepte ObjectId ou string pour les conversations temporaires
     required: true,
     index: true
   },
