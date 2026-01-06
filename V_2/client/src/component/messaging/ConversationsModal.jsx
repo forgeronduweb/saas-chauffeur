@@ -20,12 +20,15 @@ const ConversationsModal = ({ isOpen, onClose, onSelectConversation }) => {
   const loadConversations = async () => {
     try {
       setLoading(true);
-      const response = await messagesApi.getConversations();
+      // Ajouter timestamp pour éviter le cache
+      const timestamp = Date.now();
+      const response = await messagesApi.getConversations(`?t=${timestamp}`);
       // L'API peut retourner response.data directement ou response.data.conversations
       const conversationsData = Array.isArray(response.data) 
         ? response.data 
         : (response.data?.conversations || []);
       setConversations(conversationsData);
+      console.log('📬 Conversations chargées:', conversationsData.length);
     } catch (error) {
       console.error('Erreur chargement conversations:', error);
       setConversations([]);
@@ -35,8 +38,14 @@ const ConversationsModal = ({ isOpen, onClose, onSelectConversation }) => {
   };
 
   const getOtherParticipant = (conversation) => {
-    const currentUserId = user?._id;
-    return conversation.participants?.find(p => p._id !== currentUserId);
+    // Essayer différentes sources pour l'ID utilisateur
+    const currentUserId = user?._id || user?.id || user?.userId || localStorage.getItem('userId');
+    console.log('🔍 getOtherParticipant appelé:', { conversation, currentUserId, user });
+    console.log('🔍 Participants dans conversation:', conversation.participants);
+    
+    const other = conversation.participants?.find(p => p._id !== currentUserId);
+    console.log('🔍 Autre participant trouvé:', other);
+    return other;
   };
 
   const filteredConversations = conversations.filter(conv => {
@@ -111,6 +120,15 @@ const ConversationsModal = ({ isOpen, onClose, onSelectConversation }) => {
                 const hasUnread = conversation.unreadCount > 0;
                 const lastMessage = conversation.lastMessage;
 
+                console.log('🔍 Affichage conversation:', {
+                  id: conversation._id,
+                  other: other.firstName + ' ' + other.lastName,
+                  lastMessage: lastMessage,
+                  lastMessageContent: lastMessage?.content,
+                  lastMessageCreatedAt: lastMessage?.createdAt,
+                  hasUnread
+                });
+
                 return (
                   <button
                     key={conversation._id}
@@ -166,9 +184,15 @@ const ConversationsModal = ({ isOpen, onClose, onSelectConversation }) => {
                         )}
                       </div>
                       
-                      {lastMessage && (
+                      {lastMessage && lastMessage.content && (
                         <p className={`text-xs truncate ${hasUnread ? 'text-gray-900 font-medium' : 'text-gray-500'}`}>
                           {lastMessage.content}
+                        </p>
+                      )}
+                      
+                      {(!lastMessage || !lastMessage.content) && (
+                        <p className="text-xs text-gray-400 italic">
+                          Aucun message
                         </p>
                       )}
                     </div>

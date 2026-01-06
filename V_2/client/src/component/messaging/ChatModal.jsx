@@ -32,17 +32,28 @@ const ChatModal = ({ isOpen, conversation, onClose, onBack }) => {
   }, [messages]);
 
   const loadMessages = async () => {
-    if (!conversation?._id) return;
+    if (!conversation?._id) {
+      console.log('❌ Conversation ID manquant:', conversation);
+      return;
+    }
+    
+    console.log('🔍 Chargement messages pour conversation:', conversation._id);
+    console.log('🔍 Conversation complète:', conversation);
     
     try {
       const response = await messagesApi.getMessages(conversation._id);
+      console.log('📬 Réponse API messages:', response);
+      
       // L'API peut retourner response.data directement ou response.data.messages
       const messagesData = Array.isArray(response.data) 
         ? response.data 
         : (response.data?.messages || []);
+      
+      console.log('📬 Messages parsés:', messagesData);
       setMessages(messagesData);
     } catch (error) {
-      console.error('Erreur chargement messages:', error);
+      console.error('❌ Erreur chargement messages:', error);
+      console.error('❌ Détails erreur:', error.response?.data);
       setMessages([]);
     } finally {
       setLoading(false);
