@@ -2,6 +2,7 @@ const Conversation = require('../models/Conversation');
 const Message = require('../models/Message');
 const User = require('../models/User');
 const ActivityLog = require('../models/ActivityLog');
+const mongoose = require('mongoose');
 
 /* ======================================================
    CRÉER OU RÉCUPÉRER UNE CONVERSATION
@@ -67,6 +68,9 @@ exports.getConversations = async (req, res) => {
     const userId = req.user.sub;
     const { page = 1, limit = 20 } = req.query;
 
+    console.log('📋 getConversations appelé pour userId:', userId);
+
+    // 1. Récupérer les conversations persistantes
     const conversations = await Conversation.find({
       participants: userId,
       isActive: true
@@ -78,7 +82,159 @@ exports.getConversations = async (req, res) => {
       .limit(Number(limit))
       .lean();
 
-    const data = conversations.map(c => {
+    // 2. Récupérer les conversations temporaires (messages avec conversationId commençant par temp-)
+    // IMPORTANT: Trier par date DÉCROISSANTE AVANT de grouper pour que $first récupère le message le plus récent
+    const tempConversations = await Message.aggregate([
+      {
+        $match: {
+          conversationId: { $regex: '^temp-' },
+          isDeleted: false
+        }
+      },
+      {
+        $sort: { createdAt: -1 }  // Trier par date décroissante AVANT le group
+      },
+      {
+        $group: {
+          _id: '$conversationId',
+          lastMessage: { $first: '$$ROOT' },  // Maintenant $first = le plus récent
+          messageCount: { $sum: 1 },
+          lastMessageAt: { $max: '$createdAt' }
+        }
+      },
+      {
+        $sort: { lastMessageAt: -1 }
+      }
+    ]);
+
+    console.log('📬 Conversations temporaires brutes trouvées:', tempConversations.length);
+
+    // 3. Filtrer et formater les conversations temporaires pour cet utilisateur
+    const filteredTempConversations = [];
+    const conversationMap = new Map(); // Pour fusionner les conversations avec mêmes participants
+    
+    for (const tempConv of tempConversations) {
+      const parts = tempConv._id.split('-');
+      console.log('🔧 Analyse conversation temporaire:', { conversationId: tempConv._id, parts });
+      
+      if (parts.length >= 3) {
+        const userA = parts[1];
+        const userB = parts[2];
+        
+        console.log('👤 Utilisateurs dans conversation:', { userA, userB, currentUserId: userId });
+        
+        // Vérifier que l'utilisateur actuel fait partie de cette conversation
+        if (userA === userId || userB === userId) {
+          const otherUserId = userA === userId ? userB : userA;
+          
+          console.log('Recherche infos pour autre utilisateur:', otherUserId);
+          
+          // Récupérer les infos de l'autre utilisateur
+          const otherUser = await User.findById(otherUserId).select('firstName lastName email role profilePhotoUrl companyName');
+          
+          if (otherUser) {
+            console.log('✅ Autre utilisateur trouvé:', otherUser.firstName);
+            console.log('📝 Dernier message:', tempConv.lastMessage.content);
+            
+            // Créer une clé unique pour cette paire d'utilisateurs (ordre normalisé)
+            const userPairKey = [userId, otherUserId].sort().join('-');
+            
+            // Vérifier si on a déjà une conversation pour cette paire
+            if (conversationMap.has(userPairKey)) {
+              // Fusionner : garder la conversation avec le message le plus récent
+              const existingConv = conversationMap.get(userPairKey);
+              if (new Date(tempConv.lastMessageAt) > new Date(existingConv.lastMessageAt)) {
+                console.log('🔄 Fusion : conversation plus récente trouvée');
+                conversationMap.set(userPairKey, {
+                  _id: tempConv._id,
+                  isTemporary: true,
+                  participants: [
+                    { _id: userId, role: 'user' },
+                    { 
+                      _id: otherUser._id, 
+                      firstName: otherUser.firstName, 
+                      lastName: otherUser.lastName,
+                      email: otherUser.email,
+                      role: otherUser.role,
+                      profilePhotoUrl: otherUser.profilePhotoUrl,
+                      companyName: otherUser.companyName
+                    }
+                  ],
+                  otherParticipant: otherUser,
+                  lastMessage: {
+                    content: tempConv.lastMessage.content,
+                    senderId: tempConv.lastMessage.senderId,
+                    createdAt: tempConv.lastMessage.createdAt,
+                    type: tempConv.lastMessage.type
+                  },
+                  unreadCount: 0,
+                  updatedAt: tempConv.lastMessageAt,
+                  messageCount: tempConv.messageCount
+                });
+              }
+            } else {
+              // Première conversation pour cette paire
+              console.log('➕ Première conversation pour cette paire');
+              conversationMap.set(userPairKey, {
+                _id: tempConv._id,
+                isTemporary: true,
+                participants: [
+                  { _id: userId, role: 'user' },
+                  { 
+                    _id: otherUser._id, 
+                    firstName: otherUser.firstName, 
+                    lastName: otherUser.lastName,
+                    email: otherUser.email,
+                    role: otherUser.role,
+                    profilePhotoUrl: otherUser.profilePhotoUrl,
+                    companyName: otherUser.companyName
+                  }
+                ],
+                otherParticipant: otherUser,
+                lastMessage: {
+                  content: tempConv.lastMessage.content,
+                  senderId: tempConv.lastMessage.senderId,
+                  createdAt: tempConv.lastMessage.createdAt,
+                  type: tempConv.lastMessage.type
+                },
+                unreadCount: 0,
+                updatedAt: tempConv.lastMessageAt,
+                messageCount: tempConv.messageCount
+              });
+            }
+            
+            console.log('💬 Conversation traitée:', {
+              userPairKey,
+              lastMessageContent: tempConv.lastMessage.content,
+              lastMessageTime: tempConv.lastMessage.createdAt
+            });
+          } else {
+            console.log('❌ Autre utilisateur non trouvé:', otherUserId);
+          }
+        } else {
+          console.log('❌ Utilisateur ne fait pas partie de cette conversation');
+        }
+      } else {
+        console.log('❌ Format ID conversation temporaire invalide:', parts);
+      }
+    }
+
+    // Convertir la Map en tableau
+    const mergedTempConversations = Array.from(conversationMap.values());
+    console.log('📬 Conversations temporaires après fusion:', mergedTempConversations.length);
+
+    // 4. Combiner et formater toutes les conversations
+    const allConversations = [...conversations, ...mergedTempConversations];
+    
+    // Trier par date de dernière activité
+    allConversations.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+
+    // 5. Appliquer la pagination
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + Number(limit);
+    const paginatedConversations = allConversations.slice(startIndex, endIndex);
+
+    const data = paginatedConversations.map(c => {
       const other = c.participants.find(p => p._id.toString() !== userId);
       return {
         ...c,
@@ -90,7 +246,9 @@ exports.getConversations = async (req, res) => {
     const total = await Conversation.countDocuments({
       participants: userId,
       isActive: true
-    });
+    }) + mergedTempConversations.length;
+
+    console.log('📊 Total conversations (persistantes + temporaires):', total);
 
     res.json({
       conversations: data,
