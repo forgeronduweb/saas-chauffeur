@@ -8,14 +8,15 @@ import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from '.
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog'
 import { DataTable } from '../../components/ui/data-table'
 import { cn } from '../../lib/utils'
-import { Plus, Trash2, Image, Eye, EyeOff, Save, Rocket, Share2, Star, Users, TrendingUp, Pencil, Check, ChevronsUpDown, Clock } from 'lucide-react'
+import { Plus, Trash2, Image, Eye, EyeOff, Save, Mail, MessageSquare, Send, Pencil, Check, ChevronsUpDown, Clock, Users, BarChart3 } from 'lucide-react'
+import { Textarea } from '../../components/ui/textarea'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000'
 
 function BannersPage() {
   const [activeSection, setActiveSection] = useState('banners')
   const [banners, setBanners] = useState([])
-  const [boosts, setBoosts] = useState([])
+  const [campaigns, setCampaigns] = useState([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingBanner, setEditingBanner] = useState(null)
@@ -30,9 +31,17 @@ function BannersPage() {
   })
   const [imagePreview, setImagePreview] = useState('')
   const [open, setOpen] = useState(false)
-  const [showBoostDialog, setShowBoostDialog] = useState(false)
-  const [showSocialDialog, setShowSocialDialog] = useState(false)
-  const [showPremiumDialog, setShowPremiumDialog] = useState(false)
+  const [showCampaignDialog, setShowCampaignDialog] = useState(false)
+  const [campaignType, setCampaignType] = useState('email')
+  const [openTypeCombo, setOpenTypeCombo] = useState(false)
+  const [campaignContent, setCampaignContent] = useState('')
+  const [contacts, setContacts] = useState([
+    { id: 1, name: 'Tous les chauffeurs', type: 'group', count: 0 },
+    { id: 2, name: 'Tous les employeurs', type: 'group', count: 0 },
+    { id: 3, name: 'Utilisateurs actifs', type: 'group', count: 0 },
+    { id: 4, name: 'Nouveaux inscrits', type: 'group', count: 0 },
+  ])
+  const [selectedContacts, setSelectedContacts] = useState([])
 
   useEffect(() => {
     fetchBanners()
@@ -180,17 +189,19 @@ function BannersPage() {
     )
   }
 
-  // Colonnes pour DataTable des boosts
-  const boostColumns = [
+  // Colonnes pour DataTable des campagnes
+  const campaignColumns = [
     {
-      accessorKey: 'user',
-      header: 'Utilisateur',
+      accessorKey: 'name',
+      header: 'Nom',
       cell: ({ row }) => (
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-sm font-medium">
-            {row.original.userName?.[0] || 'U'}
-          </div>
-          <span className="font-medium">{row.original.userName || 'Utilisateur'}</span>
+          {row.original.type === 'email' ? (
+            <Mail className="h-4 w-4 text-gray-500" />
+          ) : (
+            <MessageSquare className="h-4 w-4 text-gray-500" />
+          )}
+          <span className="font-medium">{row.original.name}</span>
         </div>
       ),
     },
@@ -199,38 +210,49 @@ function BannersPage() {
       header: 'Type',
       cell: ({ row }) => (
         <Badge variant="outline">
-          {row.original.type === 'driver' ? 'Chauffeur' : 'Employeur'}
+          {row.original.type === 'email' ? 'Email' : 'SMS'}
         </Badge>
       ),
     },
     {
-      accessorKey: 'startDate',
-      header: 'Début',
+      accessorKey: 'audience',
+      header: 'Audience',
       cell: ({ row }) => (
-        <span className="text-sm">{row.original.startDate || '-'}</span>
+        <span className="text-sm">{row.original.audienceCount || 0} destinataires</span>
       ),
     },
     {
-      accessorKey: 'endDate',
-      header: 'Fin',
+      accessorKey: 'scheduledDate',
+      header: 'Programmée',
       cell: ({ row }) => (
-        <span className="text-sm">{row.original.endDate || '-'}</span>
+        <span className="text-sm">{row.original.scheduledDate || 'Immédiat'}</span>
       ),
     },
     {
       accessorKey: 'status',
       header: 'Statut',
-      cell: ({ row }) => (
-        <Badge variant={row.original.status === 'active' ? 'default' : 'secondary'}>
-          {row.original.status === 'active' ? 'Actif' : 'Expiré'}
-        </Badge>
-      ),
+      cell: ({ row }) => {
+        const statusMap = {
+          draft: { label: 'Brouillon', variant: 'secondary' },
+          scheduled: { label: 'Programmée', variant: 'outline' },
+          sending: { label: 'En cours', variant: 'default' },
+          sent: { label: 'Envoyée', variant: 'default' },
+          failed: { label: 'Échec', variant: 'destructive' }
+        }
+        const status = statusMap[row.original.status] || statusMap.draft
+        return <Badge variant={status.variant}>{status.label}</Badge>
+      },
     },
     {
       id: 'actions',
       header: 'Actions',
       cell: ({ row }) => (
         <div className="flex items-center gap-1">
+          {row.original.status === 'draft' && (
+            <Button variant="ghost" size="sm" title="Envoyer">
+              <Send className="h-4 w-4" />
+            </Button>
+          )}
           <Button variant="ghost" size="sm">
             <Pencil className="h-4 w-4" />
           </Button>
@@ -242,160 +264,48 @@ function BannersPage() {
     },
   ]
 
-  // Composant pour la section Boost Utilisateurs
-  const BoostSection = () => (
+  // Composant pour la section Campagnes Email/SMS
+  const CampaignsSection = () => (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+      {/* Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
         <Card>
           <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-gray-100 rounded">
-                <Users className="h-5 w-5 text-gray-600" />
-              </div>
-              <div>
-                <p className="text-2xl">{boosts.filter(b => b.type === 'driver').length}</p>
-                <p className="text-sm text-gray-500">Chauffeurs boostés</p>
-              </div>
-            </div>
+            <p className="text-sm text-gray-500">Emails</p>
+            <p className="text-2xl font-semibold">{campaigns.filter(c => c.type === 'email').length}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-gray-100 rounded">
-                <TrendingUp className="h-5 w-5 text-gray-600" />
-              </div>
-              <div>
-                <p className="text-2xl">{boosts.filter(b => b.type === 'employer').length}</p>
-                <p className="text-sm text-gray-500">Employeurs boostés</p>
-              </div>
-            </div>
+            <p className="text-sm text-gray-500">SMS</p>
+            <p className="text-2xl font-semibold">{campaigns.filter(c => c.type === 'sms').length}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-gray-100 rounded">
-                <Star className="h-5 w-5 text-gray-600" />
-              </div>
-              <div>
-                <p className="text-2xl">0 FCFA</p>
-                <p className="text-sm text-gray-500">Revenus boost</p>
-              </div>
-            </div>
+            <p className="text-sm text-gray-500">Destinataires</p>
+            <p className="text-2xl font-semibold">0</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <p className="text-sm text-gray-500">Taux d'ouverture</p>
+            <p className="text-2xl font-semibold">0%</p>
           </CardContent>
         </Card>
       </div>
 
-      {boosts.length === 0 ? (
+      {/* Liste des campagnes */}
+      {campaigns.length === 0 ? (
         <Card>
           <CardContent className="py-8">
-            <div className="text-center text-gray-500">
-              <Rocket className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>Aucun boost actif pour le moment</p>
-              <p className="text-sm">Les utilisateurs boostés apparaîtront ici</p>
-            </div>
+            <p className="text-center text-sm text-gray-500">Aucune campagne</p>
           </CardContent>
         </Card>
       ) : (
-        <DataTable columns={boostColumns} data={boosts} />
+        <DataTable columns={campaignColumns} data={campaigns} />
       )}
     </>
-  )
-
-  // Composant pour la section Promotions Réseaux Sociaux
-  const SocialSection = () => (
-    <Card>
-      <CardContent className="pt-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center">
-                  <span className="text-gray-600">f</span>
-                </div>
-                <div>
-                  <p className="font-medium">Facebook</p>
-                  <p className="text-sm text-gray-500">0 partages ce mois</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center">
-                  <span className="text-gray-600">IG</span>
-                </div>
-                <div>
-                  <p className="font-medium">Instagram</p>
-                  <p className="text-sm text-gray-500">0 partages ce mois</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-        <div className="text-center py-8 text-gray-500 border border-dashed">
-          <Share2 className="h-12 w-12 mx-auto mb-4 opacity-50" />
-          <p className="font-medium">Promotions RS à venir</p>
-          <p className="text-sm mt-1">Partagez automatiquement les profils sur les réseaux sociaux</p>
-        </div>
-      </CardContent>
-    </Card>
-  )
-
-  // Composant pour la section Profils Premium
-  const PremiumSection = () => (
-    <Card>
-      <CardContent className="pt-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <Card>
-            <CardContent className="p-4 text-center">
-              <Star className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-              <p className="text-lg">Bronze</p>
-              <p className="text-2xl">5 000 FCFA</p>
-              <p className="text-xs text-gray-500">/mois</p>
-              <ul className="text-sm text-left mt-3 space-y-1 text-gray-600">
-                <li>✓ Badge vérifié</li>
-                <li>✓ Priorité recherche +10%</li>
-              </ul>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 text-center">
-              <Star className="h-8 w-8 text-gray-500 mx-auto mb-2" />
-              <p className="text-lg">Silver</p>
-              <p className="text-2xl">15 000 FCFA</p>
-              <p className="text-xs text-gray-500">/mois</p>
-              <ul className="text-sm text-left mt-3 space-y-1 text-gray-600">
-                <li>✓ Badge vérifié</li>
-                <li>✓ Priorité recherche +30%</li>
-                <li>✓ Profil mis en avant</li>
-              </ul>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 text-center">
-              <Star className="h-8 w-8 text-gray-600 mx-auto mb-2" />
-              <p className="text-lg">Gold</p>
-              <p className="text-2xl">30 000 FCFA</p>
-              <p className="text-xs text-gray-500">/mois</p>
-              <ul className="text-sm text-left mt-3 space-y-1 text-gray-600">
-                <li>✓ Badge Gold</li>
-                <li>✓ Priorité recherche +50%</li>
-                <li>✓ En haut des résultats</li>
-                <li>✓ Support prioritaire</li>
-              </ul>
-            </CardContent>
-          </Card>
-        </div>
-        <div className="text-center py-8 text-gray-500 border border-dashed">
-          <Star className="h-12 w-12 mx-auto mb-4 opacity-50" />
-          <p className="font-medium">Abonnements Premium à venir</p>
-          <p className="text-sm mt-1">Proposez des abonnements pour augmenter la visibilité des profils</p>
-        </div>
-      </CardContent>
-    </Card>
   )
 
   // Colonnes pour DataTable des bannières
@@ -498,25 +408,11 @@ function BannersPage() {
             Ajouter
           </Button>
         )
-      case 'boost':
+      case 'campaigns':
         return (
-          <Button onClick={() => setShowBoostDialog(true)} className="bg-gray-900 hover:bg-gray-800">
+          <Button onClick={() => setShowCampaignDialog(true)} className="bg-gray-900 hover:bg-gray-800">
             <Plus className="h-4 w-4 mr-2" />
-            Ajouter un boost
-          </Button>
-        )
-      case 'social':
-        return (
-          <Button onClick={() => setShowSocialDialog(true)} className="bg-gray-900 hover:bg-gray-800">
-            <Plus className="h-4 w-4 mr-2" />
-            Connecter un compte
-          </Button>
-        )
-      case 'premium':
-        return (
-          <Button onClick={() => setShowPremiumDialog(true)} className="bg-gray-900 hover:bg-gray-800">
-            <Plus className="h-4 w-4 mr-2" />
-            Ajouter un abonnement
+            Nouvelle campagne
           </Button>
         )
       default:
@@ -526,9 +422,7 @@ function BannersPage() {
 
   const sections = [
     { value: 'banners', label: `Bannières (${banners.length})`, icon: Image },
-    { value: 'boost', label: 'Boost Utilisateurs', icon: Rocket },
-    { value: 'social', label: 'Promotions RS', icon: Share2 },
-    { value: 'premium', label: 'Profils Premium', icon: Star },
+    { value: 'campaigns', label: 'Campagnes Email/SMS', icon: Send },
   ]
 
   return (
@@ -581,9 +475,7 @@ function BannersPage() {
 
       {/* Content */}
       {activeSection === 'banners' && <BannersSection />}
-      {activeSection === 'boost' && <BoostSection />}
-      {activeSection === 'social' && <SocialSection />}
-      {activeSection === 'premium' && <PremiumSection />}
+      {activeSection === 'campaigns' && <CampaignsSection />}
 
       {/* Dialog Bannière */}
       <Dialog open={showForm} onOpenChange={setShowForm}>
@@ -697,107 +589,158 @@ function BannersPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Dialog Boost */}
-      <Dialog open={showBoostDialog} onOpenChange={setShowBoostDialog}>
-        <DialogContent className="max-w-md">
+      {/* Dialog Campagne Email/SMS */}
+      <Dialog open={showCampaignDialog} onOpenChange={setShowCampaignDialog}>
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Ajouter un boost</DialogTitle>
+            <DialogTitle>Nouvelle campagne</DialogTitle>
           </DialogHeader>
+          
           <div className="space-y-4">
+            {/* Combobox Type Email/SMS */}
             <div>
-              <label className="block text-sm font-medium mb-1">Utilisateur</label>
-              <Input placeholder="Rechercher un utilisateur..." />
+              <label className="block text-sm font-medium mb-2">Type de campagne</label>
+              <Popover open={openTypeCombo} onOpenChange={setOpenTypeCombo}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={openTypeCombo}
+                    className="w-full justify-between"
+                  >
+                    <div className="flex items-center gap-2">
+                      {campaignType === 'email' ? (
+                        <>
+                          <Mail className="h-4 w-4" />
+                          Email
+                        </>
+                      ) : (
+                        <>
+                          <MessageSquare className="h-4 w-4" />
+                          SMS
+                        </>
+                      )}
+                    </div>
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0">
+                  <Command>
+                    <CommandList>
+                      <CommandGroup>
+                        <CommandItem
+                          value="email"
+                          onSelect={() => {
+                            setCampaignType('email')
+                            setOpenTypeCombo(false)
+                          }}
+                        >
+                          <Check className={cn("mr-2 h-4 w-4", campaignType === 'email' ? "opacity-100" : "opacity-0")} />
+                          <Mail className="mr-2 h-4 w-4" />
+                          Email
+                        </CommandItem>
+                        <CommandItem
+                          value="sms"
+                          onSelect={() => {
+                            setCampaignType('sms')
+                            setOpenTypeCombo(false)
+                          }}
+                        >
+                          <Check className={cn("mr-2 h-4 w-4", campaignType === 'sms' ? "opacity-100" : "opacity-0")} />
+                          <MessageSquare className="mr-2 h-4 w-4" />
+                          SMS
+                        </CommandItem>
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Type</label>
-              <select className="w-full h-10 px-3 border border-gray-300 bg-transparent text-gray-900 text-sm">
-                <option value="driver">Chauffeur</option>
-                <option value="employer">Employeur</option>
-              </select>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Date début</label>
-                <Input type="date" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Date fin</label>
-                <Input type="date" />
-              </div>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowBoostDialog(false)}>Annuler</Button>
-            <Button className="bg-gray-900 hover:bg-gray-800">Ajouter</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
-      {/* Dialog Social */}
-      <Dialog open={showSocialDialog} onOpenChange={setShowSocialDialog}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Connecter un compte</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
+            {/* Liste des contacts */}
             <div>
-              <label className="block text-sm font-medium mb-1">Plateforme</label>
-              <select className="w-full h-10 px-3 border border-gray-300 bg-transparent text-gray-900 text-sm">
-                <option value="facebook">Facebook</option>
-                <option value="instagram">Instagram</option>
-                <option value="twitter">Twitter / X</option>
-                <option value="linkedin">LinkedIn</option>
-              </select>
+              <label className="block text-sm font-medium mb-2">Destinataires</label>
+              <div className="border border-gray-200 rounded-md max-h-40 overflow-y-auto">
+                {contacts.map((contact) => (
+                  <div
+                    key={contact.id}
+                    className={cn(
+                      "flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-gray-50 border-b border-gray-100 last:border-b-0",
+                      selectedContacts.includes(contact.id) && "bg-gray-100"
+                    )}
+                    onClick={() => {
+                      if (selectedContacts.includes(contact.id)) {
+                        setSelectedContacts(selectedContacts.filter(id => id !== contact.id))
+                      } else {
+                        setSelectedContacts([...selectedContacts, contact.id])
+                      }
+                    }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={cn(
+                        "w-4 h-4 border rounded flex items-center justify-center",
+                        selectedContacts.includes(contact.id) ? "bg-gray-900 border-gray-900" : "border-gray-300"
+                      )}>
+                        {selectedContacts.includes(contact.id) && (
+                          <Check className="h-3 w-3 text-white" />
+                        )}
+                      </div>
+                      <Users className="h-4 w-4 text-gray-400" />
+                      <span className="text-sm">{contact.name}</span>
+                    </div>
+                    <Badge variant="secondary" className="text-xs">
+                      {contact.count} contacts
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                {selectedContacts.length} groupe(s) sélectionné(s)
+              </p>
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Nom du compte</label>
-              <Input placeholder="@votrecompte" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Token d'accès</label>
-              <Input type="password" placeholder="Token API..." />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowSocialDialog(false)}>Annuler</Button>
-            <Button className="bg-gray-900 hover:bg-gray-800">Connecter</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
-      {/* Dialog Premium */}
-      <Dialog open={showPremiumDialog} onOpenChange={setShowPremiumDialog}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Ajouter un abonnement Premium</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">Utilisateur</label>
-              <Input placeholder="Rechercher un utilisateur..." />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Formule</label>
-              <select className="w-full h-10 px-3 border border-gray-300 bg-transparent text-gray-900 text-sm">
-                <option value="bronze">Bronze - 5 000 FCFA/mois</option>
-                <option value="silver">Silver - 15 000 FCFA/mois</option>
-                <option value="gold">Gold - 30 000 FCFA/mois</option>
-              </select>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
+            {/* Objet (email uniquement) */}
+            {campaignType === 'email' && (
               <div>
-                <label className="block text-sm font-medium mb-1">Date début</label>
-                <Input type="date" />
+                <label className="block text-sm font-medium mb-2">Objet</label>
+                <Input placeholder="Objet de l'email..." />
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Durée (mois)</label>
-                <Input type="number" min="1" defaultValue="1" />
-              </div>
+            )}
+
+            {/* Contenu */}
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                {campaignType === 'email' ? 'Contenu de l\'email' : 'Message SMS'}
+              </label>
+              <Textarea 
+                placeholder={campaignType === 'email' 
+                  ? "Rédigez votre email...\n\nVariables : {{prenom}}, {{nom}}, {{email}}" 
+                  : "Rédigez votre SMS (160 car. max)...\n\nVariables : {{prenom}}, {{nom}}"
+                }
+                value={campaignContent}
+                onChange={(e) => setCampaignContent(e.target.value)}
+                className="min-h-[120px]"
+              />
+              {campaignType === 'sms' && (
+                <p className="text-xs text-gray-500 mt-1">
+                  {campaignContent.length}/160 caractères
+                </p>
+              )}
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowPremiumDialog(false)}>Annuler</Button>
-            <Button className="bg-gray-900 hover:bg-gray-800">Ajouter</Button>
+
+          <DialogFooter className="mt-4">
+            <Button variant="outline" onClick={() => {
+              setShowCampaignDialog(false)
+              setCampaignContent('')
+              setSelectedContacts([])
+            }}>
+              Annuler
+            </Button>
+            <Button className="bg-gray-900 hover:bg-gray-800 flex items-center gap-2">
+              <Send className="h-4 w-4" />
+              Envoyer
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
