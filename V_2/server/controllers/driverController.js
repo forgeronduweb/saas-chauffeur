@@ -387,12 +387,24 @@ const getDriverProfileById = async (req, res) => {
     
     // Rechercher le chauffeur par son ID
     const driver = await Driver.findById(driverId)
-      .populate('userId', 'firstName lastName email phone')
+      .populate('userId', 'firstName lastName email phone isActive')
       .select('-__v -createdAt -updatedAt');
     
     if (!driver) {
       console.log('Chauffeur non trouvé pour ID:', driverId);
       return res.status(404).json({ message: 'Chauffeur non trouvé' });
+    }
+
+    // Vérifier si le chauffeur est suspendu
+    if (driver.status === 'suspended') {
+      console.log('Chauffeur suspendu:', driverId);
+      return res.status(404).json({ message: 'Ce profil n\'est plus disponible' });
+    }
+
+    // Vérifier si le compte utilisateur associé est actif
+    if (driver.userId && driver.userId.isActive === false) {
+      console.log('Compte utilisateur inactif:', driverId);
+      return res.status(404).json({ message: 'Ce profil n\'est plus disponible' });
     }
     
     console.log('Profil chauffeur trouvé:', driver.userId?.firstName, driver.userId?.lastName);
@@ -427,10 +439,13 @@ const getDriverProfileById = async (req, res) => {
   }
 };
 
-// Obtenir le nombre total de chauffeurs
+// Obtenir le nombre total de chauffeurs (actifs uniquement)
 const getDriversCount = async (req, res) => {
   try {
-    const count = await Driver.countDocuments();
+    // Compter uniquement les chauffeurs non suspendus
+    const count = await Driver.countDocuments({ 
+      status: { $ne: 'suspended' } 
+    });
     res.json({ count });
   } catch (error) {
     console.error('Erreur lors de la récupération du nombre de chauffeurs:', error);
@@ -443,16 +458,32 @@ const getPublicDrivers = async (req, res) => {
   try {
     const { limit = 50 } = req.query;
 
-    // Récupérer uniquement les chauffeurs actifs
-    const drivers = await Driver.find({ isActive: true })
-      .select('firstName lastName rating totalRides experience vehicleType vehicleBrand workZone specialties isAvailable profilePhotoUrl')
+    // Récupérer uniquement les chauffeurs approuvés (non suspendus)
+    const drivers = await Driver.find({ 
+      status: 'approved'  // Exclure pending, rejected et suspended
+    })
+      .populate('userId', 'isActive')
+      .select('firstName lastName rating totalRides experience vehicleType vehicleBrand workZone specialties isAvailable profilePhotoUrl userId')
       .sort({ rating: -1, totalRides: -1 })
-      .limit(parseInt(limit))
+      .limit(parseInt(limit) * 2)
       .lean();
+
+    // Filtrer les chauffeurs dont l'utilisateur associé est inactif (suspendu)
+    const activeDrivers = drivers
+      .filter(driver => {
+        // Si pas de userId populé, garder le chauffeur (cas rare)
+        if (!driver.userId) return true;
+        // Sinon vérifier que l'utilisateur est actif
+        return driver.userId.isActive !== false;
+      })
+      .slice(0, parseInt(limit));
+
+    // Nettoyer les données (enlever userId de la réponse)
+    const cleanedDrivers = activeDrivers.map(({ userId, ...rest }) => rest);
 
     res.json({
       success: true,
-      data: drivers
+      data: cleanedDrivers
     });
 
   } catch (error) {

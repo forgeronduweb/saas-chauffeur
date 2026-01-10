@@ -43,20 +43,36 @@ const getAllOffers = async (req, res) => {
     const skip = (parseInt(page) - 1) * parseInt(limit);
     const sort = { [sortBy]: sortOrder === 'desc' ? -1 : 1 };
 
-    // Requête optimisée avec projection
-    const [offers, total] = await Promise.all([
-      Offer.find(filters)
-        .populate('employer', 'firstName lastName companyName')
-        .select('-__v') // Exclure les champs inutiles
-        .sort(sort)
-        .skip(skip)
-        .limit(parseInt(limit))
-        .lean(),
-      Offer.countDocuments(filters)
-    ]);
+    // Requête optimisée avec projection et filtrage des employeurs suspendus
+    const rawOffers = await Offer.find(filters)
+      .populate('employerId', 'firstName lastName companyName isActive')
+      .select('-__v')
+      .sort(sort)
+      .skip(skip)
+      .limit(parseInt(limit) * 2)
+      .lean();
+
+    // Filtrer les offres dont l'employeur est suspendu
+    const activeOffers = rawOffers
+      .filter(offer => {
+        if (!offer.employerId) return true;
+        return offer.employerId.isActive !== false;
+      })
+      .slice(0, parseInt(limit));
+
+    // Compter le total (sans pagination)
+    const allOffersForCount = await Offer.find(filters)
+      .populate('employerId', 'isActive')
+      .select('employerId')
+      .lean();
+    
+    const total = allOffersForCount.filter(o => {
+      if (!o.employerId) return true;
+      return o.employerId.isActive !== false;
+    }).length;
 
     res.json({
-      offers,
+      offers: activeOffers,
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),
@@ -274,11 +290,18 @@ const getOfferById = async (req, res) => {
     
     // Récupérer l'offre sans lean() pour pouvoir utiliser les méthodes du modèle
     const offer = await Offer.findById(offerId)
-      .populate('employerId', 'firstName lastName email phone');
+      .populate('employerId', 'firstName lastName email phone isActive');
 
     if (!offer) {
       return res.status(404).json({ 
         error: 'Offre non trouvée' 
+      });
+    }
+
+    // Vérifier si l'employeur est suspendu
+    if (offer.employerId && offer.employerId.isActive === false) {
+      return res.status(404).json({ 
+        error: 'Cette offre n\'est plus disponible' 
       });
     }
 

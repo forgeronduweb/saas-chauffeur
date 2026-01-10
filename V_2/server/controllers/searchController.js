@@ -78,17 +78,25 @@ exports.globalSearch = async (req, res) => {
     // Créer une regex plus permissive pour les recherches courtes
     const isShortQuery = query.trim().length <= 2;
     
-    // Récupérer tous les chauffeurs actifs (on filtre après en JavaScript)
-    const allDrivers = await Driver.find({ isActive: true })
-      .populate('userId', 'firstName lastName')
-      .select('userId vehicleBrand vehicleModel workZone city specialties experience rating totalRides')
+    // Récupérer tous les chauffeurs approuvés (non suspendus)
+    const allDrivers = await Driver.find({ 
+      status: 'approved'  // Exclure pending, rejected et suspended
+    })
+      .populate('userId', 'firstName lastName isActive')
+      .select('userId vehicleBrand vehicleModel workZone city specialties experience rating totalRides status')
       .limit(100)
       .lean();
+
+    // Filtrer les chauffeurs dont l'utilisateur associé est inactif (suspendu)
+    const activeDrivers = allDrivers.filter(driver => {
+      if (!driver.userId) return true;
+      return driver.userId.isActive !== false;
+    });
     
     // Seuil de similarité très bas pour être ultra-permissif
     const similarityThreshold = 0.1; // Accepter presque tout
     
-    const matchedDrivers = allDrivers
+    const matchedDrivers = activeDrivers
       .map(driver => {
         let score = 0;
         const searchableFields = [
@@ -130,14 +138,20 @@ exports.globalSearch = async (req, res) => {
       .slice(0, 10);
 
     // Recherche des offres d'emploi (récupérer toutes les offres actives sauf produits et "Autre")
-    const allOffers = await Offer.find({ 
+    const allOffersRaw = await Offer.find({ 
       status: 'active',
       type: { $nin: ['product', 'Autre'] } // Tout sauf les produits et offres marketing
     })
-      .populate('employer', 'firstName lastName companyName')
-      .select('title description type location employer vehicleType licenseType createdAt')
+      .populate('employerId', 'firstName lastName companyName isActive')
+      .select('title description type location employerId vehicleType licenseType createdAt')
       .limit(100)
       .lean();
+
+    // Filtrer les offres dont l'employeur est suspendu
+    const allOffers = allOffersRaw.filter(offer => {
+      if (!offer.employerId) return true;
+      return offer.employerId.isActive !== false;
+    });
     
     const matchedOffers = allOffers
       .map(offer => {
@@ -147,7 +161,7 @@ exports.globalSearch = async (req, res) => {
           offer.description,
           offer.type,
           offer.location,
-          offer.employer?.companyName,
+          offer.employerId?.companyName,
           offer.vehicleType,
           offer.licenseType
         ];
@@ -195,14 +209,20 @@ exports.globalSearch = async (req, res) => {
       .slice(0, 10);
 
     // Recherche des offres marketing/produits (récupérer tous les produits actifs)
-    const allProducts = await Offer.find({ 
+    const allProductsRaw = await Offer.find({ 
       status: 'active',
       type: { $in: ['product', 'Autre'] } // Produits et offres marketing
     })
-      .populate('employer', 'firstName lastName companyName')
-      .select('title description category location employer price images createdAt')
+      .populate('employerId', 'firstName lastName companyName isActive')
+      .select('title description category location employerId price images createdAt')
       .limit(100)
       .lean();
+
+    // Filtrer les produits dont l'employeur est suspendu
+    const allProducts = allProductsRaw.filter(product => {
+      if (!product.employerId) return true;
+      return product.employerId.isActive !== false;
+    });
     
     const matchedProducts = allProducts
       .map(product => {
@@ -212,7 +232,7 @@ exports.globalSearch = async (req, res) => {
           product.description,
           product.category,
           product.location,
-          product.employer?.companyName
+          product.employerId?.companyName
         ];
         
         searchableFields.forEach(field => {
@@ -275,13 +295,21 @@ exports.quickSearch = async (req, res) => {
 
     const normalizedQuery = normalizeText(query);
     
-    // Recherche rapide dans les chauffeurs
-    const drivers = await Driver.find({ isActive: true })
-      .populate('userId', 'firstName lastName')
-      .limit(5)
+    // Recherche rapide dans les chauffeurs (approuvés et non suspendus)
+    const drivers = await Driver.find({ 
+      status: 'approved'  // Exclure suspended
+    })
+      .populate('userId', 'firstName lastName isActive')
+      .limit(10)
       .lean();
+
+    // Filtrer les chauffeurs dont l'utilisateur associé est inactif (suspendu)
+    const activeDriversQuick = drivers.filter(d => {
+      if (!d.userId) return true;
+      return d.userId.isActive !== false;
+    }).slice(0, 5);
     
-    const driverSuggestions = drivers
+    const driverSuggestions = activeDriversQuick
       .filter(driver => {
         const fullName = normalizeText(`${driver.userId?.firstName} ${driver.userId?.lastName}`);
         const city = normalizeText(driver.city);
