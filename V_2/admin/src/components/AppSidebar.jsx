@@ -114,7 +114,7 @@ export function AppSidebar() {
       <SidebarFooter className="p-2">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton onClick={handleLogout} className="text-gray-600 hover:text-red-600 hover:bg-red-50">
+            <SidebarMenuButton onClick={handleLogout} className="text-gray-600 hover:text-orange-600 hover:bg-orange-50">
               <LogOut className="h-4 w-4" />
               <span>Déconnexion</span>
             </SidebarMenuButton>

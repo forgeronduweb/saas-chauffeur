@@ -403,14 +403,14 @@ function BannersPage() {
     switch (activeSection) {
       case 'banners':
         return (
-          <Button onClick={() => setShowForm(true)} className="bg-gray-900 hover:bg-gray-800">
+          <Button onClick={() => setShowForm(true)} className="bg-orange-600 hover:bg-orange-700">
             <Plus className="h-4 w-4 mr-2" />
             Ajouter
           </Button>
         )
       case 'campaigns':
         return (
-          <Button onClick={() => setShowCampaignDialog(true)} className="bg-gray-900 hover:bg-gray-800">
+          <Button onClick={() => setShowCampaignDialog(true)} className="bg-orange-600 hover:bg-orange-700">
             <Plus className="h-4 w-4 mr-2" />
             Nouvelle campagne
           </Button>
@@ -523,7 +523,7 @@ function BannersPage() {
             <div>
               <label className="block text-sm font-medium mb-1">Image</label>
               <div className="p-3 bg-gray-50 border border-gray-200 mb-3 text-xs text-gray-600">
-                <strong>Taille :</strong> 1920 × 600 px • <strong>Format :</strong> JPG, PNG, WebP • <strong>Max :</strong> 500 Ko
+                <strong>Taille recommandée :</strong> 1920 × 800 px • <strong>Format :</strong> JPG, PNG, WebP • <strong>Max :</strong> 1 Mo
               </div>
               <label className="cursor-pointer inline-block">
                 <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 transition-colors text-sm">
@@ -580,7 +580,7 @@ function BannersPage() {
               <Button type="button" variant="outline" onClick={resetForm}>
                 Annuler
               </Button>
-              <Button type="submit" className="bg-gray-900 hover:bg-gray-800">
+              <Button type="submit" className="bg-orange-600 hover:bg-orange-700">
                 <Save className="h-4 w-4 mr-2" />
                 {editingBanner ? 'Mettre à jour' : 'Enregistrer'}
               </Button>
@@ -737,7 +737,7 @@ function BannersPage() {
             }}>
               Annuler
             </Button>
-            <Button className="bg-gray-900 hover:bg-gray-800 flex items-center gap-2">
+            <Button className="bg-orange-600 hover:bg-orange-700 flex items-center gap-2">
               <Send className="h-4 w-4" />
               Envoyer
             </Button>

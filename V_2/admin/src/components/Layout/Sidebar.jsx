@@ -125,7 +125,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                           className={`
                             flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors
                             ${isActive 
-                              ? 'bg-gray-800 text-white' 
+                              ? 'bg-orange-800 text-white' 
                               : 'text-gray-700 hover:bg-gray-100'
                             }
                           `}
@@ -146,7 +146,7 @@ const Sidebar = ({ isOpen, onClose }) => {
         <div className="border-t border-gray-200 p-2.5">
           {/* User Info */}
           <div className="flex items-center gap-2 px-2.5 py-1.5 mb-1.5 bg-gray-50 rounded-lg">
-            <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center flex-shrink-0">
+            <div className="w-8 h-8 bg-orange-800 rounded-full flex items-center justify-center flex-shrink-0">
               <User className="w-4 h-4 text-white" />
             </div>
             <div className="flex-1 min-w-0">

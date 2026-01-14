@@ -189,7 +189,7 @@ const OfferDetails = () => {
               <button
                 onClick={() => handleModeration('approve')}
                 disabled={actionLoading || offer.status === 'active'}
-                className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <CheckCircle className="w-5 h-5" />
                 <span>Approuver</span>

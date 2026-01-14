@@ -93,7 +93,7 @@ const AdminDashboard = () => {
           <p className="text-red-600">{error}</p>
           <button 
             onClick={() => fetchDashboardData()}
-            className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+            className="mt-2 px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700"
           >
             Réessayer
           </button>
@@ -273,7 +273,7 @@ const AdminDashboard = () => {
                   </td>
                   <td className="px-4 py-3">
                     <span className={`inline-flex px-2 py-1 rounded text-xs font-medium ${
-                      driver.status === 'approved' ? 'bg-green-100 text-green-700' :
+                      driver.status === 'approved' ? 'bg-orange-100 text-orange-700' :
                       driver.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
                       'bg-red-100 text-red-700'
                     }`}>
@@ -285,7 +285,7 @@ const AdminDashboard = () => {
                       <div className="flex gap-2 justify-end">
                         <button
                           onClick={() => handleQuickAction('approve_driver', driver._id)}
-                          className="p-1.5 bg-green-500 text-white rounded hover:bg-green-600"
+                          className="p-1.5 bg-orange-500 text-white rounded hover:bg-orange-600"
                           title="Approuver"
                         >
                           <CheckCircle className="w-4 h-4" />
@@ -357,7 +357,7 @@ const AdminDashboard = () => {
                   </td>
                   <td className="px-4 py-3">
                     <span className={`inline-flex px-2 py-1 rounded text-xs font-medium ${
-                      offer.status === 'active' ? 'bg-green-100 text-green-700' :
+                      offer.status === 'active' ? 'bg-orange-100 text-orange-700' :
                       offer.status === 'expired' ? 'bg-gray-100 text-gray-700' :
                       'bg-yellow-100 text-yellow-700'
                     }`}>
@@ -394,7 +394,7 @@ const AdminDashboard = () => {
             <span className="text-3xl font-medium text-gray-900">{drivers?.pending || 0}</span>
             <button
               onClick={() => navigate('/drivers?status=pending')}
-              className="px-4 py-2 bg-gray-800 text-white rounded-lg text-sm font-medium"
+              className="px-4 py-2 bg-orange-600 text-white rounded-lg text-sm font-medium"
             >
               Valider maintenant
             </button>
@@ -416,7 +416,7 @@ const AdminDashboard = () => {
             <span className="text-3xl font-medium text-gray-900">{support?.pendingReports || 0}</span>
             <button
               onClick={() => navigate('/reports')}
-              className="px-4 py-2 bg-gray-800 text-white rounded-lg text-sm font-medium"
+              className="px-4 py-2 bg-orange-600 text-white rounded-lg text-sm font-medium"
             >
               Voir les signalements
             </button>

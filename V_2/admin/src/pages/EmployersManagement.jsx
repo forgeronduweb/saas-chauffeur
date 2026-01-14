@@ -293,7 +293,7 @@ const EmployersManagement = () => {
                 ) : (
                   <button
                     onClick={() => handleStatusUpdate(employer._id, true)}
-                    className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 flex items-center gap-2"
+                    className="px-6 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 flex items-center gap-2"
                   >
                     <CheckCircle className="w-4 h-4" />
                     Activer
@@ -351,7 +351,7 @@ const EmployersManagement = () => {
           <button
             onClick={exportToCSV}
             disabled={employers.length === 0}
-            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 whitespace-nowrap"
+            className="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 whitespace-nowrap"
           >
             <Download className="w-4 h-4" />
             Exporter CSV
@@ -443,7 +443,7 @@ const EmployersManagement = () => {
                         ) : (
                           <button
                             onClick={() => handleStatusUpdate(employer._id, true)}
-                            className="px-3 py-1.5 bg-green-100 text-green-700 rounded hover:bg-green-200 text-xs font-medium"
+                            className="px-3 py-1.5 bg-orange-100 text-orange-700 rounded hover:bg-orange-200 text-xs font-medium"
                           >
                             Activer
                           </button>

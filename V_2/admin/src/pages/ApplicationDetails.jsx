@@ -37,7 +37,7 @@ const ApplicationDetails = () => {
   const getStatusBadge = (status) => {
     const badges = {
       pending: { color: 'bg-orange-100 text-orange-800', icon: Clock, text: 'En attente' },
-      accepted: { color: 'bg-green-100 text-green-800', icon: CheckCircle, text: 'Acceptée' },
+      accepted: { color: 'bg-orange-100 text-orange-800', icon: CheckCircle, text: 'Acceptée' },
       rejected: { color: 'bg-red-100 text-red-800', icon: XCircle, text: 'Rejetée' }
     }
     
@@ -213,7 +213,7 @@ const ApplicationDetails = () => {
             <div className="space-y-3">
               <button
                 onClick={() => navigate(`/drivers/${application.driverId?._id}`)}
-                className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                className="w-full px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm"
               >
                 Voir le profil du chauffeur
               </button>

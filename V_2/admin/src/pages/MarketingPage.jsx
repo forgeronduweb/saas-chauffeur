@@ -29,7 +29,7 @@ const MarketingPage = () => {
       icon: Shield,
       title: 'Sécurité Garantie',
       description: 'Tous nos chauffeurs sont vérifiés et certifiés. Vos trajets en toute confiance.',
-      color: 'bg-blue-50 text-blue-600 border-blue-200'
+      color: 'bg-orange-50 text-orange-600 border-orange-200'
     },
     {
       icon: Clock,
@@ -47,13 +47,13 @@ const MarketingPage = () => {
       icon: TrendingUp,
       title: 'Tarifs Compétitifs',
       description: 'Prix transparents et compétitifs. Pas de frais cachés, paiement sécurisé.',
-      color: 'bg-green-50 text-green-600 border-green-200'
+      color: 'bg-orange-50 text-orange-600 border-orange-200'
     },
     {
       icon: MapPin,
       title: 'Couverture Nationale',
       description: 'Présent dans toutes les grandes villes de Côte d\'Ivoire.',
-      color: 'bg-purple-50 text-purple-600 border-purple-200'
+      color: 'bg-orange-50 text-orange-600 border-orange-200'
     },
     {
       icon: Zap,

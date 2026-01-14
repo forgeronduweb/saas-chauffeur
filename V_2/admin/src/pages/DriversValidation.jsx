@@ -168,7 +168,7 @@ const DriversValidation = () => {
           <button
             onClick={exportToCSV}
             disabled={drivers.length === 0}
-            className="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 whitespace-nowrap"
+            className="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-900 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 whitespace-nowrap"
           >
             <Download className="w-4 h-4" />
             Exporter CSV
@@ -251,7 +251,7 @@ const DriversValidation = () => {
                           <div className="flex gap-2">
                             <button
                               onClick={() => handleStatusUpdate(driver._id, 'approved')}
-                              className="px-3 py-1 bg-gray-800 text-white rounded hover:bg-gray-900 text-xs"
+                              className="px-3 py-1 bg-orange-600 text-white rounded hover:bg-orange-700 text-xs"
                             >
                               Approuver
                             </button>
@@ -274,7 +274,7 @@ const DriversValidation = () => {
                         {driver.status === 'suspended' && (
                           <button
                             onClick={() => handleStatusUpdate(driver._id, 'approved', 'Réactivé par admin')}
-                            className="px-3 py-1 bg-gray-800 text-white rounded hover:bg-gray-900 text-xs text-left"
+                            className="px-3 py-1 bg-orange-600 text-white rounded hover:bg-orange-700 text-xs text-left"
                           >
                             Réactiver
                           </button>

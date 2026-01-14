@@ -23,8 +23,8 @@ const TARGET_LABELS = {
 
 const STATUS_CONFIG = {
   pending: { label: 'En attente', color: 'bg-yellow-100 text-yellow-800', icon: Clock },
-  reviewed: { label: 'En cours', color: 'bg-blue-100 text-blue-800', icon: Eye },
-  resolved: { label: 'Résolu', color: 'bg-green-100 text-green-800', icon: CheckCircle },
+  reviewed: { label: 'En cours', color: 'bg-orange-100 text-orange-800', icon: Eye },
+  resolved: { label: 'Résolu', color: 'bg-orange-100 text-orange-800', icon: CheckCircle },
   dismissed: { label: 'Rejeté', color: 'bg-gray-100 text-gray-800', icon: XCircle }
 }
 
@@ -351,7 +351,7 @@ function ReportModal({ report, onClose, onUpdate, updating }) {
           <button
             onClick={() => handleSubmit('resolved')}
             disabled={updating}
-            className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm disabled:opacity-50"
+            className="flex-1 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm disabled:opacity-50"
           >
             <CheckCircle className="w-4 h-4 inline mr-1" />
             Résolu
@@ -367,7 +367,7 @@ function ReportModal({ report, onClose, onUpdate, updating }) {
           <button
             onClick={() => handleSubmit('reviewed')}
             disabled={updating}
-            className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm disabled:opacity-50"
+            className="flex-1 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm disabled:opacity-50"
           >
             <Eye className="w-4 h-4 inline mr-1" />
             En cours

@@ -263,7 +263,7 @@ const PlatformContent = () => {
                       <span className="text-xs font-medium text-gray-500">Ordre: {content.order}</span>
                       <span className={`text-xs px-3 py-1 font-medium border ${
                         content.isActive 
-                          ? 'bg-green-50 text-green-700 border-green-200' 
+                          ? 'bg-orange-50 text-orange-700 border-orange-200' 
                           : 'bg-gray-50 text-gray-700 border-gray-200'
                       }`}>
                         {content.isActive ? 'Actif' : 'Inactif'}
@@ -285,9 +285,9 @@ const PlatformContent = () => {
                     </button>
                     <button
                       onClick={() => openEditModal(content)}
-                      className="p-3 hover:bg-blue-50 transition-colors border border-gray-200"
+                      className="p-3 hover:bg-orange-50 transition-colors border border-gray-200"
                     >
-                      <Edit2 className="w-5 h-5 text-blue-600" />
+                      <Edit2 className="w-5 h-5 text-orange-600" />
                     </button>
                     <button
                       onClick={() => handleDelete(content._id)}
