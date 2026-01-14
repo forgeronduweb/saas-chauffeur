@@ -203,12 +203,12 @@ export default function HomePage() {
 
       {/* Section publicitaire - Carrousel */}
       <div className="max-w-7xl mx-auto px-3 lg:px-6 py-4 lg:py-8">
-        <div className="relative bg-gray-200 rounded-lg lg:rounded-xl overflow-hidden h-56 sm:h-80 lg:h-[450px]">
+        <div className="relative bg-gray-100 rounded-lg lg:rounded-xl overflow-hidden h-40 sm:h-52 md:h-64 lg:h-[520px] xl:h-[600px]">
           {/* Images du carrousel */}
           {banners.map((banner, index) => (
             <div
               key={banner.id}
-              className={`absolute inset-0 transition-opacity duration-1000 ${
+              className={`absolute inset-0 transition-opacity duration-700 ${
                 index === currentSlide ? 'opacity-100' : 'opacity-0'
               }`}
             >

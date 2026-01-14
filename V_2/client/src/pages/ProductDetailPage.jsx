@@ -276,11 +276,11 @@ export default function ProductDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Colonne gauche - Images */}
           <div>
-            <div className="relative h-96 lg:h-[500px] bg-gray-100 rounded-lg overflow-hidden mb-4">
+            <div className="relative bg-gray-100 rounded-lg overflow-hidden mb-4">
               <img 
                 src={product.images[currentImageIndex]} 
                 alt={product.name}
-                className="w-full h-full object-cover cursor-pointer"
+                className="w-full h-auto max-h-[500px] object-contain cursor-pointer"
                 onClick={() => setShowImageModal(true)}
               />
               
