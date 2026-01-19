@@ -56,7 +56,7 @@ export default function DriverCard({ driver }) {
 
   return (
     <div 
-      className="bg-white rounded-xl transition-transform duration-200 ease-out cursor-pointer border border-gray-300 p-2"
+      className="bg-white rounded-xl transition-transform duration-200 ease-out cursor-pointer border border-gray-300 p-1.5"
       onClick={() => navigate(`/driver/${driver._id}`)}
       onMouseMove={handleMove}
       onMouseLeave={() => setTilt({ x: 0, y: 0 })}
@@ -67,30 +67,30 @@ export default function DriverCard({ driver }) {
         <img 
           src={driver.profilePhotoUrl} 
           alt={`${driver.firstName} ${driver.lastName}`}
-          className="w-full h-44 lg:h-52 object-cover rounded-lg"
+          className="w-full h-32 lg:h-52 object-cover rounded-lg"
         />
       ) : (
-        <div className="w-full h-44 lg:h-52 bg-gray-100 flex items-center justify-center rounded-lg">
-          <span className="text-gray-400 text-4xl lg:text-5xl font-medium">
+        <div className="w-full h-32 lg:h-52 bg-gray-100 flex items-center justify-center rounded-lg">
+          <span className="text-gray-400 text-3xl lg:text-5xl font-medium">
             {initials}
           </span>
         </div>
       )}
 
-      <div className="p-3 lg:p-4 flex flex-col">
+      <div className="p-1.5 lg:p-3 flex flex-col">
         {/* Nom - toujours 2 lignes max avec truncate */}
-        <h3 className="text-sm lg:text-base font-semibold text-gray-800 mb-1 line-clamp-2 h-10">
+        <h3 className="text-xs lg:text-base font-semibold text-gray-800 mb-1 line-clamp-2 h-8">
           {driver.firstName} {driver.lastName}
         </h3>
         
         {/* Expérience - toujours 1 ligne */}
-        <p className="text-xs text-gray-600 mb-2 truncate h-4">
+        <p className="text-xs text-gray-600 mb-1 truncate h-3">
           {experienceText}
         </p>
 
         {/* Localité */}
         <div className="flex items-center gap-1 text-xs text-gray-600">
-          <svg className="w-3.5 h-3.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+          <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd"/>
           </svg>
           <span className="truncate">

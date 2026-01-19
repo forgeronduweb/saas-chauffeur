@@ -203,7 +203,7 @@ export default function HomePage() {
 
       {/* Section publicitaire - Carrousel */}
       <div className="max-w-[1600px] mx-auto px-4 lg:px-16 py-4 lg:py-8">
-        <div className="relative bg-zinc-900 rounded-lg lg:rounded-xl overflow-hidden aspect-[16/7]">
+        <div className="relative bg-zinc-900 rounded-lg lg:rounded-xl overflow-hidden aspect-[16/8]">
           {/* Images du carrousel - ratio adaptatif */}
           {banners.map((banner, index) => (
             <div

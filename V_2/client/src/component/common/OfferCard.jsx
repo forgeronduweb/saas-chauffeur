@@ -22,7 +22,7 @@ export default function OfferCard({ offer }) {
       className="bg-white border border-gray-300 rounded-lg hover:border-gray-400 hover:shadow-sm transition-all duration-200 overflow-hidden cursor-pointer"
       onClick={() => navigate(`/offre/${offer._id}`)}
     >
-      <div className="p-3 lg:p-5">
+      <div className="p-2 lg:p-4">
         <h3 className="text-sm lg:text-base font-semibold text-gray-900 mb-2 line-clamp-2">
           {offer.title}
         </h3>
