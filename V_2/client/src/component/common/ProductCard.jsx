@@ -30,16 +30,16 @@ export default function ProductCard({ product }) {
       {/* Contenu compact */}
       <div className="p-1.5 lg:p-3 flex-1 flex flex-col justify-between">
         <div>
-          <h3 className="text-xs lg:text-base font-semibold text-gray-900 mb-1 line-clamp-2">
+          <h3 className="text-sm lg:text-base font-semibold text-gray-900 mb-1 line-clamp-2">
             {product.title || product.name}
           </h3>
           
-          <p className="text-xs lg:text-lg font-bold text-gray-900 mb-1">
+          <p className="text-sm lg:text-base font-bold text-gray-900 mb-1">
             {product.price ? `${(Number(product.price) || 0).toLocaleString()} FCFA` : 'Prix sur demande'}
           </p>
         </div>
 
-        <div className="flex items-center gap-1 text-xs text-gray-600 mt-auto">
+        <div className="flex items-center gap-1 text-sm lg:text-sm text-gray-600 mt-auto">
           <svg className="w-2.5 h-2.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd"/>
           </svg>
