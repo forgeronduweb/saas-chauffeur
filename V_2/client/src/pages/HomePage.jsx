@@ -203,7 +203,7 @@ export default function HomePage() {
 
       {/* Section publicitaire - Carrousel */}
       <div className="max-w-[1600px] mx-auto px-4 lg:px-16 py-4 lg:py-8">
-        <div className="relative bg-gray-900 rounded-lg lg:rounded-xl overflow-hidden aspect-[16/8]">
+        <div className="relative bg-zinc-900 rounded-lg lg:rounded-xl overflow-hidden aspect-[16/7]">
           {/* Images du carrousel - ratio adaptatif */}
           {banners.map((banner, index) => (
             <div
@@ -212,12 +212,22 @@ export default function HomePage() {
                 index === currentSlide ? 'opacity-100' : 'opacity-0'
               }`}
             >
-              <img 
-                src={banner.image} 
-                alt={banner.title}
-                onClick={() => navigate(banner.link)}
-                className="w-full h-full object-cover cursor-pointer"
-              />
+              <div className="w-full h-full flex items-center justify-center">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-black/5 to-transparent">
+                  <img 
+                    src={banner.image} 
+                    alt={banner.title}
+                    onClick={() => navigate(banner.link)}
+                    className="absolute inset-0 w-full h-full object-cover object-center cursor-pointer opacity-40 blur-sm brightness-135"
+                  />
+                </div>
+                <img 
+                  src={banner.image} 
+                  alt={banner.title}
+                  onClick={() => navigate(banner.link)}
+                  className="relative w-full h-full object-contain object-center cursor-pointer z-10"
+                />
+              </div>
             </div>
           ))}
 
