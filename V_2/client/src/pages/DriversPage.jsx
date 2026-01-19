@@ -113,7 +113,7 @@ export default function DriversPage() {
       />
 
       {/* Contenu principal */}
-      <main className="max-w-7xl mx-auto px-4 lg:px-6 pb-8 pt-6">
+      <main className="max-w-[1600px] mx-auto px-4 lg:px-16 pb-8 pt-6">
         {/* Titre section avec bouton filtres mobile */}
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-xl lg:text-2xl font-normal text-gray-900">

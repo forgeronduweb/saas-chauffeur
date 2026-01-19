@@ -124,7 +124,7 @@ export default function OfferDetailPage() {
       <SimpleHeader activeTab="offres" />
 
       {/* Contenu - Style fiche produit */}
-      <main className="max-w-7xl mx-auto px-4 lg:px-6 py-8">
+      <main className="max-w-[1600px] mx-auto px-4 lg:px-16 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Colonne principale - Détails de l'offre */}
           <div className="lg:col-span-2">

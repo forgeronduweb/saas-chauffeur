@@ -170,7 +170,7 @@ export default function SimpleHeader({ activeTab = '', searchQuery = '', onSearc
   return (
     <>
     <header className={`bg-white border-b border-gray-200 sticky top-0 z-40 ${showMessaging ? 'hidden lg:block' : ''}`}>
-      <div className="max-w-7xl mx-auto px-3 lg:px-6 py-3 lg:py-4">
+      <div className="max-w-[1600px] mx-auto px-4 lg:px-16 py-3 lg:py-4">
         <div className="flex items-center justify-between gap-2">
           {/* Logo */}
           <Link to="/" className="flex items-center flex-shrink-0">

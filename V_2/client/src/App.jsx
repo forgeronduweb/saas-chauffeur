@@ -75,14 +75,10 @@ function App() {
               element={<OffersPage />} 
             />
 
-            {/* Page de détails offre protégée */}
+            {/* Page de détails offre publique (candidature nécessite connexion) */}
             <Route 
               path="/offre/:id" 
-              element={
-                <PrivateRoute>
-                  <OfferDetailPage />
-                </PrivateRoute>
-              } 
+              element={<OfferDetailPage />} 
             />
 
             {/* Page de création d'offre */}
@@ -97,14 +93,10 @@ function App() {
               element={<MarketingVentePage />} 
             />
 
-            {/* Page de détails produit protégée */}
+            {/* Page de détails produit publique (contact nécessite connexion) */}
             <Route 
               path="/produit/:id" 
-              element={
-                <PrivateRoute>
-                  <ProductDetailPage />
-                </PrivateRoute>
-              } 
+              element={<ProductDetailPage />} 
             />
 
             {/* Page d'édition d'offre d'emploi */}

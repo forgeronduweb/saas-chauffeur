@@ -194,7 +194,7 @@ export default function MarketingVentePage() {
       />
 
       {/* Contenu principal */}
-      <main className="max-w-7xl mx-auto px-4 lg:px-6 pb-8 pt-6">
+      <main className="max-w-[1600px] mx-auto px-4 lg:px-16 pb-8 pt-6">
         {/* Titre section avec compteur et bouton filtres mobile */}
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-xl lg:text-2xl font-normal text-gray-900">
@@ -300,10 +300,9 @@ export default function MarketingVentePage() {
                   <span className="text-sm text-gray-500">Sponsorisé</span>
                 </div>
                 
-                <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border-2 border-dashed border-purple-200">
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border-2 border-dashed border-purple-200 items-stretch">
                   {boostedOffers.map(product => (
-                    <div key={product._id} className="relative">
-                      {getBoostBadge(product.boost)}
+                    <div key={product._id} className="relative h-full">
                       <ProductCard product={product} />
                     </div>
                   ))}
@@ -326,7 +325,7 @@ export default function MarketingVentePage() {
             ))}
           </div>
         ) : filteredProducts.length > 0 ? (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 items-stretch">
             {filteredProducts.map(product => (
               <ProductCard key={product._id} product={product} />
             ))}

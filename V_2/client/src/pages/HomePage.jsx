@@ -202,7 +202,7 @@ export default function HomePage() {
       />
 
       {/* Section publicitaire - Carrousel */}
-      <div className="max-w-7xl mx-auto px-3 lg:px-6 py-4 lg:py-8">
+      <div className="max-w-[1600px] mx-auto px-4 lg:px-16 py-4 lg:py-8">
         <div className="relative bg-gray-900 rounded-lg lg:rounded-xl overflow-hidden aspect-[16/8]">
           {/* Images du carrousel - ratio adaptatif */}
           {banners.map((banner, index) => (
@@ -257,7 +257,7 @@ export default function HomePage() {
       </div>
 
       {/* Contenu principal */}
-      <main className="max-w-7xl mx-auto px-4 lg:px-6 pb-8">
+      <main className="max-w-[1600px] mx-auto px-4 lg:px-16 pb-8">
         {/* Titre section chauffeurs */}
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-lg lg:text-2xl font-normal text-gray-900">
@@ -317,7 +317,7 @@ export default function HomePage() {
           </div>
 
           {offers.length > 0 ? (
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 lg:gap-4">
               {offers.map(offer => (
                 <OfferCard key={offer._id} offer={offer} />
               ))}
@@ -345,7 +345,7 @@ export default function HomePage() {
           </div>
 
           {products.length > 0 ? (
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 lg:gap-4">
               {products.map(product => (
                 <ProductCard key={product._id} product={product} />
               ))}

@@ -14,7 +14,7 @@ export default function FormationsPage() {
 
   return (
     <PublicPageLayout activeTab="formations">
-      <div className="max-w-7xl mx-auto px-4 lg:px-6 py-8">
+      <div className="max-w-[1600px] mx-auto px-4 lg:px-16 py-8">
         <div className="mb-8">
           <h1 className="text-2xl lg:text-3xl text-gray-900 mb-3">
             Formations

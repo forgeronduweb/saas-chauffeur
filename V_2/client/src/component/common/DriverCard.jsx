@@ -56,7 +56,7 @@ export default function DriverCard({ driver }) {
 
   return (
     <div 
-      className="bg-white rounded-xl overflow-hidden transition-transform duration-200 ease-out cursor-pointer border border-gray-200"
+      className="bg-white rounded-xl transition-transform duration-200 ease-out cursor-pointer border border-gray-300 p-2"
       onClick={() => navigate(`/driver/${driver._id}`)}
       onMouseMove={handleMove}
       onMouseLeave={() => setTilt({ x: 0, y: 0 })}
@@ -67,10 +67,10 @@ export default function DriverCard({ driver }) {
         <img 
           src={driver.profilePhotoUrl} 
           alt={`${driver.firstName} ${driver.lastName}`}
-          className="w-full h-44 lg:h-52 object-cover"
+          className="w-full h-44 lg:h-52 object-cover rounded-lg"
         />
       ) : (
-        <div className="w-full h-44 lg:h-52 bg-gray-100 flex items-center justify-center">
+        <div className="w-full h-44 lg:h-52 bg-gray-100 flex items-center justify-center rounded-lg">
           <span className="text-gray-400 text-4xl lg:text-5xl font-medium">
             {initials}
           </span>

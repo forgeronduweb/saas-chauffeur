@@ -10,7 +10,7 @@ export default function TarifsPage() {
 
   return (
     <PublicPageLayout activeTab="tarifs">
-      <div className="max-w-7xl mx-auto px-4 lg:px-6 py-8">
+      <div className="max-w-[1600px] mx-auto px-4 lg:px-16 py-8">
         <div className="mb-8">
           <h1 className="text-xl lg:text-2xl font-semibold text-gray-900 mb-4">
             Tarifs

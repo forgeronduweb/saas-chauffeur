@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 export default function SubNavigation({ activeTab = '' }) {
   return (
     <div className="border-t border-gray-200">
-      <div className="max-w-7xl mx-auto">
-        <nav className="flex items-center lg:justify-center gap-4 lg:gap-8 overflow-x-auto scrollbar-hide px-4 lg:px-6">
+      <div className="max-w-[1600px] mx-auto">
+        <nav className="flex items-center lg:justify-center gap-4 lg:gap-8 overflow-x-auto scrollbar-hide px-4 lg:px-16">
           <Link 
             to="/chauffeurs" 
             className={`py-2.5 lg:py-4 text-sm lg:text-lg whitespace-nowrap flex-shrink-0 transition-colors border-b-2 ${

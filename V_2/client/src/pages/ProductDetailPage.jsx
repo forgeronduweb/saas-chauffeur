@@ -272,7 +272,7 @@ export default function ProductDetailPage() {
     <div className="min-h-screen bg-gray-50">
       <SimpleHeader activeTab="marketing" />
 
-      <main className="max-w-7xl mx-auto px-4 lg:px-6 py-8">
+      <main className="max-w-[1600px] mx-auto px-4 lg:px-16 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Colonne gauche - Images */}
           <div>
@@ -424,7 +424,23 @@ export default function ProductDetailPage() {
                 </div>
 
                 <div className="mt-4">
-                  {user && !isOwner ? (
+                  {/* Cas 1: Non connecté - Afficher lien de connexion */}
+                  {!user && (
+                    <>
+                      <Link
+                        to="/auth"
+                        className="block w-full py-2.5 bg-orange-500 text-white text-center rounded-lg hover:bg-orange-600 transition-colors mb-2"
+                      >
+                        Se connecter pour contacter
+                      </Link>
+                      <p className="text-xs text-gray-500 text-center">
+                        Créez un compte pour discuter avec le vendeur
+                      </p>
+                    </>
+                  )}
+
+                  {/* Cas 2: Connecté ET pas propriétaire - Afficher boutons contact et signaler */}
+                  {user && !isOwner && (
                     <div className="flex flex-col sm:flex-row gap-3 w-full">
                       <button
                         onClick={async () => {
@@ -467,31 +483,19 @@ export default function ProductDetailPage() {
                         )}
                       </button>
 
-                      {!isOwner && (
-                        <button
-                          onClick={() => setShowReportModal(true)}
-                          className="w-full py-2.5 px-4 bg-white border border-orange-500 text-orange-500 rounded-lg hover:bg-orange-50 transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                          </svg>
-                          <span>Signaler l'annonce</span>
-                        </button>
-                      )}
-                    </div>
-                  ) : (
-                    <>
-                      <Link
-                        to="/auth"
-                        className="block w-full py-2.5 bg-orange-500 text-white text-center rounded-lg hover:bg-orange-600 transition-colors mb-2"
+                      <button
+                        onClick={() => setShowReportModal(true)}
+                        className="w-full py-2.5 px-4 bg-white border border-orange-500 text-orange-500 rounded-lg hover:bg-orange-50 transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
                       >
-                        Se connecter pour contacter
-                      </Link>
-                      <p className="text-xs text-gray-500 text-center">
-                        Créez un compte pour discuter avec le vendeur
-                      </p>
-                    </>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        <span>Signaler l'annonce</span>
+                      </button>
+                    </div>
                   )}
+
+                  {/* Cas 3: Connecté ET propriétaire - Rien à afficher ici (boutons modifier/supprimer sont en haut) */}
                 </div>
               </div>
 
@@ -566,6 +570,19 @@ export default function ProductDetailPage() {
           <div className="bg-white rounded-lg border border-gray-200 p-6">
             <h2 className="section-title text-gray-900 mb-6">Avis et Commentaires</h2>
             
+            {/* Message pour les non-connectés */}
+            {!user && (
+              <div className="mb-8 p-4 bg-gray-50 rounded-lg text-center">
+                <p className="text-gray-700 mb-2">Vous souhaitez laisser un avis ?</p>
+                <Link
+                  to="/auth"
+                  className="inline-block px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm"
+                >
+                  Connectez-vous pour donner votre avis
+                </Link>
+              </div>
+            )}
+
             {/* Formulaire d'ajout de commentaire */}
             {user && (
               <div className="mb-8 p-4 bg-gray-50 rounded-lg">
