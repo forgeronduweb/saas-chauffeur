@@ -4,7 +4,7 @@ export default function SubNavigation({ activeTab = '' }) {
   return (
     <div className="border-t border-gray-200">
       <div className="max-w-[1600px] mx-auto">
-        <nav className="flex items-center lg:justify-center gap-4 lg:gap-8 overflow-x-auto scrollbar-hide px-8 lg:px-16">
+        <nav className="flex items-center lg:justify-center gap-6 lg:gap-12 overflow-x-auto scrollbar-hide px-8 lg:px-16">
           <Link 
             to="/chauffeurs" 
             className={`py-2.5 lg:py-4 text-sm lg:text-lg whitespace-nowrap flex-shrink-0 transition-colors border-b-2 ${
@@ -42,7 +42,7 @@ export default function SubNavigation({ activeTab = '' }) {
                 : 'text-gray-400 border-transparent'
             }`}
           >
-            Devenir partenaire
+            Partenaire
           </span>
           <span 
             className={`py-2.5 lg:py-4 text-sm lg:text-base whitespace-nowrap flex-shrink-0 border-b-2 cursor-not-allowed opacity-50 ${
@@ -52,33 +52,6 @@ export default function SubNavigation({ activeTab = '' }) {
             }`}
           >
             Formations
-          </span>
-          <span 
-            className={`py-2.5 lg:py-4 text-sm lg:text-base whitespace-nowrap flex-shrink-0 border-b-2 cursor-not-allowed opacity-50 ${
-              activeTab === 'certifications'
-                ? 'text-orange-600 border-orange-500'
-                : 'text-gray-400 border-transparent'
-            }`}
-          >
-            Certifications
-          </span>
-          <span 
-            className={`py-2.5 lg:py-4 text-sm lg:text-base whitespace-nowrap flex-shrink-0 border-b-2 cursor-not-allowed opacity-50 ${
-              activeTab === 'aide'
-                ? 'text-orange-600 border-orange-500'
-                : 'text-gray-400 border-transparent'
-            }`}
-          >
-            Centre d'aide
-          </span>
-          <span 
-            className={`py-2.5 lg:py-4 text-sm lg:text-base whitespace-nowrap flex-shrink-0 border-b-2 cursor-not-allowed opacity-50 ${
-              activeTab === 'tarifs'
-                ? 'text-orange-600 border-orange-500'
-                : 'text-gray-400 border-transparent'
-            }`}
-          >
-            Tarifs
           </span>
         </nav>
       </div>
