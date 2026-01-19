@@ -35,17 +35,77 @@ function BannersPage() {
   const [campaignType, setCampaignType] = useState('email')
   const [openTypeCombo, setOpenTypeCombo] = useState(false)
   const [campaignContent, setCampaignContent] = useState('')
-  const [contacts, setContacts] = useState([
-    { id: 1, name: 'Tous les chauffeurs', type: 'group', count: 0 },
-    { id: 2, name: 'Tous les employeurs', type: 'group', count: 0 },
-    { id: 3, name: 'Utilisateurs actifs', type: 'group', count: 0 },
-    { id: 4, name: 'Nouveaux inscrits', type: 'group', count: 0 },
-  ])
+  const [contacts, setContacts] = useState([])
   const [selectedContacts, setSelectedContacts] = useState([])
+  const [campaignSubject, setCampaignSubject] = useState('')
+  const [sending, setSending] = useState(false)
+  const [totalRecipients, setTotalRecipients] = useState(0)
+  const [sendToMessaging, setSendToMessaging] = useState(true)
+  const [noReply, setNoReply] = useState(false)
 
   useEffect(() => {
     fetchBanners()
+    fetchUserGroups()
   }, [])
+
+  const fetchUserGroups = async () => {
+    try {
+      const token = localStorage.getItem('admin_token')
+      const response = await fetch(`${API_URL}/api/admin/campaigns/user-groups`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      const data = await response.json()
+      if (data.groups) {
+        setContacts(data.groups)
+      }
+    } catch (error) {
+      console.error('Erreur récupération groupes:', error)
+    }
+  }
+
+  const handleSendCampaign = async () => {
+    if (selectedContacts.length === 0 || !campaignContent) {
+      alert('Veuillez sélectionner des destinataires et rédiger un message')
+      return
+    }
+
+    setSending(true)
+    try {
+      const token = localStorage.getItem('admin_token')
+      const response = await fetch(`${API_URL}/api/admin/campaigns/send`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          type: campaignType,
+          groups: selectedContacts,
+          subject: campaignSubject,
+          content: campaignContent,
+          sendToMessaging: sendToMessaging,
+          noReply: noReply
+        })
+      })
+      
+      const data = await response.json()
+      
+      if (data.success) {
+        alert(`Campagne envoyée avec succès à ${data.stats.totalRecipients} destinataires !`)
+        setShowCampaignDialog(false)
+        setCampaignContent('')
+        setCampaignSubject('')
+        setSelectedContacts([])
+      } else {
+        alert(data.error || 'Erreur lors de l\'envoi')
+      }
+    } catch (error) {
+      console.error('Erreur envoi campagne:', error)
+      alert('Erreur lors de l\'envoi de la campagne')
+    } finally {
+      setSending(false)
+    }
+  }
 
   const fetchBanners = async () => {
     try {
@@ -591,12 +651,12 @@ function BannersPage() {
 
       {/* Dialog Campagne Email/SMS */}
       <Dialog open={showCampaignDialog} onOpenChange={setShowCampaignDialog}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Nouvelle campagne</DialogTitle>
           </DialogHeader>
           
-          <div className="space-y-4">
+          <div className="space-y-3">
             {/* Combobox Type Email/SMS */}
             <div>
               <label className="block text-sm font-medium mb-2">Type de campagne</label>
@@ -660,13 +720,13 @@ function BannersPage() {
             {/* Liste des contacts */}
             <div>
               <label className="block text-sm font-medium mb-2">Destinataires</label>
-              <div className="border border-gray-200 rounded-md max-h-40 overflow-y-auto">
+              <div className="border border-gray-200 rounded-md max-h-28 overflow-y-auto">
                 {contacts.map((contact) => (
                   <div
                     key={contact.id}
                     className={cn(
                       "flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-gray-50 border-b border-gray-100 last:border-b-0",
-                      selectedContacts.includes(contact.id) && "bg-gray-100"
+                      selectedContacts.includes(contact.id) && "bg-orange-50"
                     )}
                     onClick={() => {
                       if (selectedContacts.includes(contact.id)) {
@@ -679,7 +739,7 @@ function BannersPage() {
                     <div className="flex items-center gap-3">
                       <div className={cn(
                         "w-4 h-4 border rounded flex items-center justify-center",
-                        selectedContacts.includes(contact.id) ? "bg-gray-900 border-gray-900" : "border-gray-300"
+                        selectedContacts.includes(contact.id) ? "bg-orange-500 border-orange-500" : "border-gray-300"
                       )}>
                         {selectedContacts.includes(contact.id) && (
                           <Check className="h-3 w-3 text-white" />
@@ -689,7 +749,7 @@ function BannersPage() {
                       <span className="text-sm">{contact.name}</span>
                     </div>
                     <Badge variant="secondary" className="text-xs">
-                      {contact.count} contacts
+                      {contact.count} utilisateurs
                     </Badge>
                   </div>
                 ))}
@@ -703,7 +763,11 @@ function BannersPage() {
             {campaignType === 'email' && (
               <div>
                 <label className="block text-sm font-medium mb-2">Objet</label>
-                <Input placeholder="Objet de l'email..." />
+                <Input 
+                  placeholder="Objet de l'email..." 
+                  value={campaignSubject}
+                  onChange={(e) => setCampaignSubject(e.target.value)}
+                />
               </div>
             )}
 
@@ -719,7 +783,7 @@ function BannersPage() {
                 }
                 value={campaignContent}
                 onChange={(e) => setCampaignContent(e.target.value)}
-                className="min-h-[120px]"
+                className="min-h-[80px]"
               />
               {campaignType === 'sms' && (
                 <p className="text-xs text-gray-500 mt-1">
@@ -727,6 +791,38 @@ function BannersPage() {
                 </p>
               )}
             </div>
+
+            {/* Option messagerie */}
+            <div className="flex items-center gap-2 p-2 bg-orange-50 border border-orange-200 rounded-md">
+              <input
+                type="checkbox"
+                id="sendToMessaging"
+                checked={sendToMessaging}
+                onChange={(e) => setSendToMessaging(e.target.checked)}
+                className="w-4 h-4 accent-orange-500"
+              />
+              <label htmlFor="sendToMessaging" className="text-sm">
+                <span className="font-medium text-gray-900">Envoyer dans la messagerie</span>
+                <p className="text-xs text-gray-500">Les utilisateurs recevront le message dans leur boîte de messagerie</p>
+              </label>
+            </div>
+
+            {/* Option ne pas permettre de répondre */}
+            {sendToMessaging && (
+              <div className="flex items-center gap-2 p-2 bg-gray-50 border border-gray-200 rounded-md">
+                <input
+                  type="checkbox"
+                  id="noReply"
+                  checked={noReply}
+                  onChange={(e) => setNoReply(e.target.checked)}
+                  className="w-4 h-4 accent-gray-500"
+                />
+                <label htmlFor="noReply" className="text-sm">
+                  <span className="font-medium text-gray-900">Ne pas permettre de répondre</span>
+                  <p className="text-xs text-gray-500">Les utilisateurs ne pourront pas répondre à ce message</p>
+                </label>
+              </div>
+            )}
           </div>
 
           <DialogFooter className="mt-4">
@@ -737,9 +833,17 @@ function BannersPage() {
             }}>
               Annuler
             </Button>
-            <Button className="bg-orange-600 hover:bg-orange-700 flex items-center gap-2">
-              <Send className="h-4 w-4" />
-              Envoyer
+            <Button 
+              className="bg-orange-600 hover:bg-orange-700 flex items-center gap-2"
+              onClick={handleSendCampaign}
+              disabled={sending || selectedContacts.length === 0 || !campaignContent}
+            >
+              {sending ? (
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
+              {sending ? 'Envoi...' : 'Envoyer'}
             </Button>
           </DialogFooter>
         </DialogContent>
