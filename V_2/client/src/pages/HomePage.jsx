@@ -203,8 +203,8 @@ export default function HomePage() {
 
       {/* Section publicitaire - Carrousel */}
       <div className="max-w-7xl mx-auto px-3 lg:px-6 py-4 lg:py-8">
-        <div className="relative bg-gray-100 rounded-lg lg:rounded-xl overflow-hidden h-40 sm:h-52 md:h-64 lg:h-[520px] xl:h-[600px]">
-          {/* Images du carrousel */}
+        <div className="relative bg-gray-900 rounded-lg lg:rounded-xl overflow-hidden aspect-[16/8]">
+          {/* Images du carrousel - ratio adaptatif */}
           {banners.map((banner, index) => (
             <div
               key={banner.id}
