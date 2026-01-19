@@ -891,3 +891,223 @@ exports.getUserActivities = async (req, res) => {
     res.status(500).json({ error: 'Erreur lors de la récupération des activités' });
   }
 };
+
+// Récupérer les groupes d'utilisateurs pour les campagnes
+exports.getUserGroups = async (req, res) => {
+  try {
+    // Compter les chauffeurs
+    const driversCount = await Driver.countDocuments({ status: 'approved' });
+    
+    // Compter les employeurs
+    const employersCount = await User.countDocuments({ role: 'employer', isActive: true });
+    
+    // Utilisateurs actifs (connectés dans les 30 derniers jours)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const activeUsersCount = await User.countDocuments({ 
+      lastLoginAt: { $gte: thirtyDaysAgo },
+      isActive: true 
+    });
+    
+    // Nouveaux inscrits (7 derniers jours)
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const newUsersCount = await User.countDocuments({ 
+      createdAt: { $gte: sevenDaysAgo } 
+    });
+
+    const groups = [
+      { id: 'all_drivers', name: 'Tous les chauffeurs', type: 'group', count: driversCount },
+      { id: 'all_employers', name: 'Tous les employeurs', type: 'group', count: employersCount },
+      { id: 'active_users', name: 'Utilisateurs actifs', type: 'group', count: activeUsersCount },
+      { id: 'new_users', name: 'Nouveaux inscrits', type: 'group', count: newUsersCount },
+    ];
+
+    res.json({ groups });
+  } catch (error) {
+    console.error('Erreur getUserGroups:', error);
+    res.status(500).json({ error: 'Erreur lors de la récupération des groupes' });
+  }
+};
+
+// Envoyer une campagne Email/SMS
+exports.sendCampaign = async (req, res) => {
+  try {
+    const { type, groups, subject, content, sendToMessaging, noReply } = req.body;
+
+    if (!type || !groups || groups.length === 0 || !content) {
+      return res.status(400).json({ error: 'Type, groupes et contenu requis' });
+    }
+
+    const adminId = req.user.sub;
+    let users = [];
+
+    // Récupérer les utilisateurs selon les groupes sélectionnés
+    for (const groupId of groups) {
+      let groupUsers = [];
+      
+      if (groupId === 'all_drivers') {
+        const drivers = await Driver.find({ status: 'approved' })
+          .populate('userId', 'email phone firstName lastName');
+        groupUsers = drivers.map(d => ({
+          userId: d.userId?._id,
+          email: d.userId?.email,
+          phone: d.userId?.phone || d.phone,
+          firstName: d.userId?.firstName || d.firstName,
+          lastName: d.userId?.lastName || d.lastName,
+          type: 'driver'
+        })).filter(u => u.userId);
+      } 
+      else if (groupId === 'all_employers') {
+        const employers = await User.find({ role: 'employer', isActive: true })
+          .select('email phone firstName lastName');
+        groupUsers = employers.map(e => ({
+          userId: e._id,
+          email: e.email,
+          phone: e.phone,
+          firstName: e.firstName,
+          lastName: e.lastName,
+          type: 'employer'
+        })).filter(u => u.userId);
+      }
+      else if (groupId === 'active_users') {
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        const activeUsers = await User.find({ 
+          lastLoginAt: { $gte: thirtyDaysAgo },
+          isActive: true 
+        }).select('email phone firstName lastName role');
+        groupUsers = activeUsers.map(u => ({
+          userId: u._id,
+          email: u.email,
+          phone: u.phone,
+          firstName: u.firstName,
+          lastName: u.lastName,
+          type: u.role
+        })).filter(u => u.userId);
+      }
+      else if (groupId === 'new_users') {
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        const newUsers = await User.find({ 
+          createdAt: { $gte: sevenDaysAgo } 
+        }).select('email phone firstName lastName role');
+        groupUsers = newUsers.map(u => ({
+          userId: u._id,
+          email: u.email,
+          phone: u.phone,
+          firstName: u.firstName,
+          lastName: u.lastName,
+          type: u.role
+        })).filter(u => u.userId);
+      }
+
+      users = [...users, ...groupUsers];
+    }
+
+    // Supprimer les doublons par userId
+    const uniqueUsers = users.reduce((acc, user) => {
+      if (!acc.find(u => u.userId?.toString() === user.userId?.toString())) {
+        acc.push(user);
+      }
+      return acc;
+    }, []);
+
+    let messagesSent = 0;
+    let notificationsSent = 0;
+
+    for (const user of uniqueUsers) {
+      if (!user.userId) continue;
+
+      // Personnaliser le contenu avec les variables
+      let personalizedContent = content
+        .replace(/\{\{prenom\}\}/g, user.firstName || '')
+        .replace(/\{\{nom\}\}/g, user.lastName || '')
+        .replace(/\{\{email\}\}/g, user.email || '');
+
+      // Envoyer dans la messagerie si demandé
+      if (sendToMessaging) {
+        // Chercher ou créer une conversation admin-utilisateur
+        let conversation = await Conversation.findOne({
+          participants: { $all: [adminId, user.userId] },
+          'context.type': 'direct_contact'
+        });
+
+        if (!conversation) {
+          conversation = await Conversation.create({
+            participants: [adminId, user.userId],
+            context: { type: 'direct_contact' },
+            lastMessage: {
+              content: personalizedContent.substring(0, 100),
+              senderId: adminId,
+              timestamp: new Date(),
+              type: 'text'
+            },
+            unreadCount: new Map([[user.userId.toString(), 1]]),
+            metadata: noReply ? new Map([['noReply', true], ['adminOnly', true]]) : new Map()
+          });
+        } else {
+          // Mettre à jour le lastMessage et incrémenter unreadCount
+          conversation.lastMessage = {
+            content: personalizedContent.substring(0, 100),
+            senderId: adminId,
+            timestamp: new Date(),
+            type: 'text'
+          };
+          const currentUnread = conversation.unreadCount.get(user.userId.toString()) || 0;
+          conversation.unreadCount.set(user.userId.toString(), currentUnread + 1);
+          // Mettre à jour noReply si activé
+          if (noReply) {
+            conversation.metadata = conversation.metadata || new Map();
+            conversation.metadata.set('noReply', true);
+            conversation.metadata.set('adminOnly', true);
+          }
+          await conversation.save();
+        }
+
+        // Créer le message
+        await Message.create({
+          conversationId: conversation._id,
+          senderId: adminId,
+          content: personalizedContent,
+          type: 'text',
+          metadata: new Map([
+            ['campaignType', type],
+            ['subject', subject || 'Message de GoDriver']
+          ])
+        });
+
+        messagesSent++;
+      }
+
+      // Créer aussi une notification
+      await Notification.create({
+        userId: user.userId,
+        type: 'admin_message',
+        title: subject || 'Message de GoDriver',
+        message: personalizedContent.substring(0, 200),
+        data: {
+          campaignType: type,
+          sentBy: 'admin',
+          adminId: adminId,
+          hasMessage: sendToMessaging
+        }
+      });
+      notificationsSent++;
+    }
+
+    res.json({ 
+      success: true,
+      message: `Campagne envoyée à ${uniqueUsers.length} destinataires`,
+      stats: {
+        totalRecipients: uniqueUsers.length,
+        messagesSent,
+        notificationsSent,
+        type
+      }
+    });
+  } catch (error) {
+    console.error('Erreur sendCampaign:', error);
+    res.status(500).json({ error: 'Erreur lors de l\'envoi de la campagne' });
+  }
+};

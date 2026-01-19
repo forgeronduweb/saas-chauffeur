@@ -363,8 +363,16 @@ exports.getMessages = async (req, res) => {
       return res.status(403).json({ error: 'Accès non autorisé' });
     }
 
+    // Convertir en ObjectId pour la recherche (le conversationId peut être stocké comme ObjectId ou string)
+    const searchId = mongoose.Types.ObjectId.isValid(conversationId) 
+      ? new mongoose.Types.ObjectId(conversationId) 
+      : conversationId;
+
     const messages = await Message.find({
-      conversationId,
+      $or: [
+        { conversationId: searchId },
+        { conversationId: conversationId }
+      ],
       isDeleted: false
     })
       .populate('senderId', 'firstName lastName profilePhotoUrl')
@@ -373,43 +381,40 @@ exports.getMessages = async (req, res) => {
       .skip((page - 1) * limit);
 
     const total = await Message.countDocuments({
-      conversationId,
+      $or: [
+        { conversationId: searchId },
+        { conversationId: conversationId }
+      ],
       isDeleted: false
     });
 
-    res.json({
-      messages,
-      pagination: {
-        currentPage: parseInt(page),
-        totalPages: Math.ceil(total / limit),
-        total,
-        hasNext: page * limit < total,
-        hasPrev: page > 1
-      }
-    });
-
-    // Marquer les messages comme lus
-    await Message.updateMany(
+    // Marquer les messages comme lus (en arrière-plan)
+    Message.updateMany(
       {
-        conversationId,
+        $or: [
+          { conversationId: searchId },
+          { conversationId: conversationId }
+        ],
         senderId: { $ne: userId },
         'readBy.userId': { $ne: userId }
       },
       {
         $push: { readBy: { userId, readAt: new Date() } }
       }
-    );
+    ).catch(err => console.error('Erreur marquage lu:', err));
 
-    // Réinitialiser le compteur de non lus
-    await conversation.resetUnread(userId);
+    // Réinitialiser le compteur de non lus (en arrière-plan)
+    conversation.resetUnread(userId).catch(err => console.error('Erreur reset unread:', err));
 
+    // Renvoyer les messages en ordre chronologique (anciens en haut, nouveaux en bas)
     res.json({
-      messages: messages.reverse(), // Ordre chronologique
+      messages: messages.reverse(),
       pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
+        currentPage: parseInt(page),
+        totalPages: Math.ceil(total / limit),
         total,
-        pages: Math.ceil(total / limit)
+        hasNext: page * limit < total,
+        hasPrev: page > 1
       }
     });
   } catch (err) {
