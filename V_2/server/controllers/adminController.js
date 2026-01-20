@@ -292,6 +292,99 @@ exports.moderateOffer = async (req, res) => {
   }
 };
 
+// Mettre à jour le statut d'une offre
+exports.updateOfferStatus = async (req, res) => {
+  try {
+    const { offerId } = req.params;
+    const { status } = req.body;
+
+    // Valider le statut
+    const validStatuses = ['active', 'paused', 'closed', 'draft', 'completed'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ error: 'Statut invalide' });
+    }
+
+    const offer = await Offer.findByIdAndUpdate(
+      offerId, 
+      { 
+        status,
+        updatedAt: new Date(),
+        // Si l'offre est fermée ou complétée, mettre à jour la date de fin
+        ...(status === 'closed' || status === 'completed' ? { closedAt: new Date() } : {})
+      }, 
+      { new: true }
+    ).populate('employerId', 'firstName lastName email');
+
+    if (!offer) {
+      return res.status(404).json({ error: 'Offre non trouvée' });
+    }
+
+    // Créer une notification pour l'employeur
+    try {
+      await Notification.create({
+        userId: offer.employerId._id,
+        type: 'offer_status_update',
+        title: `Statut de votre offre mis à jour`,
+        message: `Votre offre "${offer.title}" est maintenant ${status === 'active' ? 'active' : status === 'paused' ? 'en pause' : status === 'closed' ? 'fermée' : 'en brouillon'}`,
+        relatedId: offer._id,
+        relatedType: 'offer'
+      });
+    } catch (notificationError) {
+      console.error('Erreur lors de la création de la notification:', notificationError);
+      // Ne pas bloquer la réponse si la notification échoue
+    }
+
+    res.json({ 
+      message: 'Statut de l\'offre mis à jour avec succès', 
+      offer: {
+        ...offer.toObject(),
+        employerId: offer.employerId
+      }
+    });
+  } catch (error) {
+    console.error('Erreur updateOfferStatus:', error);
+    res.status(500).json({ error: 'Erreur lors de la mise à jour du statut de l\'offre' });
+  }
+};
+
+// Supprimer une offre
+exports.deleteOffer = async (req, res) => {
+  try {
+    const { offerId } = req.params;
+
+    const offer = await Offer.findById(offerId);
+    if (!offer) {
+      return res.status(404).json({ error: 'Offre non trouvée' });
+    }
+
+    // Supprimer les candidatures associées
+    await Application.deleteMany({ offerId });
+
+    // Supprimer l'offre
+    await Offer.findByIdAndDelete(offerId);
+
+    // Créer une notification pour l'employeur
+    try {
+      await Notification.create({
+        userId: offer.employerId,
+        type: 'offer_deleted',
+        title: 'Offre supprimée',
+        message: `Votre offre "${offer.title}" a été supprimée par l\'administration`,
+        relatedId: offer._id,
+        relatedType: 'offer'
+      });
+    } catch (notificationError) {
+      console.error('Erreur lors de la création de la notification:', notificationError);
+      // Ne pas bloquer la réponse si la notification échoue
+    }
+
+    res.json({ message: 'Offre supprimée avec succès' });
+  } catch (error) {
+    console.error('Erreur deleteOffer:', error);
+    res.status(500).json({ error: 'Erreur lors de la suppression de l\'offre' });
+  }
+};
+
 // Récupérer les transactions (à implémenter selon votre modèle)
 exports.getTransactions = async (req, res) => {
   try {
