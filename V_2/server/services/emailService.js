@@ -1,30 +1,54 @@
 const nodemailer = require('nodemailer');
 
-// Configuration du transporteur email
-const emailPort = parseInt(process.env.EMAIL_PORT) || 587;
-const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-  port: emailPort,
-  secure: emailPort === 465, // true pour 465, false pour 587
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD
-  }
-});
+// Vérifier si les credentials email sont configurés
+const isEmailConfigured = process.env.EMAIL_USER && process.env.EMAIL_PASSWORD;
 
-// Vérifier la connexion au serveur email
-transporter.verify((error, success) => {
-  if (error) {
-    console.error('❌ Erreur de configuration email:', error);
-  } else {
-    console.log('✅ Serveur email prêt à envoyer des messages');
-  }
-});
+// Configuration du transporteur email (seulement si configuré)
+let transporter = null;
+
+if (isEmailConfigured) {
+  const emailPort = parseInt(process.env.EMAIL_PORT) || 587;
+  transporter = nodemailer.createTransport({
+    host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+    port: emailPort,
+    secure: emailPort === 465, // true pour 465, false pour 587
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASSWORD
+    },
+    connectionTimeout: 10000, // 10 secondes
+    greetingTimeout: 10000,
+    socketTimeout: 10000
+  });
+
+  // Vérifier la connexion au serveur email (async, ne bloque pas le démarrage)
+  transporter.verify((error, success) => {
+    if (error) {
+      console.warn('⚠️ Email non disponible:', error.message);
+      console.warn('⚠️ Les emails ne seront pas envoyés tant que la configuration n\'est pas correcte');
+    } else {
+      console.log('✅ Serveur email prêt à envoyer des messages');
+    }
+  });
+} else {
+  console.warn('⚠️ EMAIL_USER ou EMAIL_PASSWORD non configuré');
+  console.warn('⚠️ Les fonctionnalités email sont désactivées');
+}
+
+// Fonction helper pour vérifier si l'email est disponible
+const isEmailAvailable = () => {
+  return transporter !== null;
+};
 
 /**
  * Envoyer un email de validation de compte chauffeur
  */
 const sendDriverValidationEmail = async (driver) => {
+  if (!isEmailAvailable()) {
+    console.warn('⚠️ Email non configuré - validation email non envoyé à', driver.email);
+    return { success: false, error: 'Email service not configured' };
+  }
+  
   try {
     const mailOptions = {
       from: `"GoDriver" <${process.env.EMAIL_USER}>`,
@@ -95,6 +119,11 @@ const sendDriverValidationEmail = async (driver) => {
  * Envoyer un email de rejet de compte chauffeur
  */
 const sendDriverRejectionEmail = async (driver, reason) => {
+  if (!isEmailAvailable()) {
+    console.warn('⚠️ Email non configuré - rejection email non envoyé à', driver.email);
+    return { success: false, error: 'Email service not configured' };
+  }
+  
   try {
     const mailOptions = {
       from: `"GoDriver" <${process.env.EMAIL_USER}>`,
@@ -174,6 +203,11 @@ const sendDriverRejectionEmail = async (driver, reason) => {
  * Envoyer un email de bienvenue
  */
 const sendWelcomeEmail = async (user) => {
+  if (!isEmailAvailable()) {
+    console.warn('⚠️ Email non configuré - welcome email non envoyé à', user.email);
+    return { success: false, error: 'Email service not configured' };
+  }
+  
   try {
     const mailOptions = {
       from: `"GoDriver" <${process.env.EMAIL_USER}>`,
@@ -256,6 +290,11 @@ const sendWelcomeEmail = async (user) => {
  * Envoyer un email de notification de nouvelle candidature à l'employeur
  */
 const sendNewApplicationEmail = async (employer, offer, driver) => {
+  if (!isEmailAvailable()) {
+    console.warn('⚠️ Email non configuré - application email non envoyé à', employer.email);
+    return { success: false, error: 'Email service not configured' };
+  }
+  
   try {
     const mailOptions = {
       from: `"GoDriver" <${process.env.EMAIL_USER}>`,
@@ -333,6 +372,15 @@ const sendNewApplicationEmail = async (employer, offer, driver) => {
  * Envoyer un email avec le code de vérification lors de l'inscription
  */
 const sendVerificationEmail = async (user, code) => {
+  if (!isEmailAvailable()) {
+    console.warn('⚠️ Email non configuré - verification email non envoyé à', user.email);
+    // En développement, afficher le code quand même
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`🔢 Code de vérification (email désactivé): ${code}`);
+    }
+    return { success: false, error: 'Email service not configured' };
+  }
+  
   try {
     console.log(`📬 SERVICE EMAIL - Préparation email pour: ${user.email}`);
     console.log(`📬 Objet user reçu:`, { email: user.email, firstName: user.firstName, _id: user._id });
@@ -414,6 +462,11 @@ const sendVerificationEmail = async (user, code) => {
  * Envoyer un email de notification de nouveau signalement aux admins
  */
 const sendNewReportEmail = async (adminEmail, report, reporter) => {
+  if (!isEmailAvailable()) {
+    console.warn('⚠️ Email non configuré - report email non envoyé à', adminEmail);
+    return { success: false, error: 'Email service not configured' };
+  }
+  
   const reasonLabels = {
     spam: 'Spam ou publicité',
     inappropriate: 'Contenu inapproprié',
@@ -502,6 +555,11 @@ const sendNewReportEmail = async (adminEmail, report, reporter) => {
  * Envoyer un email au signaleur quand son signalement est traité
  */
 const sendReportResolvedEmail = async (userEmail, userName, report, status, actionTaken) => {
+  if (!isEmailAvailable()) {
+    console.warn('⚠️ Email non configuré - resolved email non envoyé à', userEmail);
+    return { success: false, error: 'Email service not configured' };
+  }
+  
   const statusLabels = {
     resolved: 'traité et résolu',
     dismissed: 'examiné et classé sans suite'
@@ -588,5 +646,6 @@ module.exports = {
   sendNewApplicationEmail,
   sendVerificationEmail,
   sendNewReportEmail,
-  sendReportResolvedEmail
+  sendReportResolvedEmail,
+  isEmailAvailable
 };
