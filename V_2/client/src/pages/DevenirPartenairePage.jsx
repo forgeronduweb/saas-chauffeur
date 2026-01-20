@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import SimpleHeader from '../component/common/SimpleHeader';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import api from '../services/api';
 
 export default function DevenirPartenairePage() {
+  const { user } = useAuth();
   const [partners, setPartners] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -32,6 +34,7 @@ export default function DevenirPartenairePage() {
       <SimpleHeader activeTab="partenaire" />
       
       <main className="max-w-[1600px] mx-auto px-4 lg:px-16 pb-8 pt-6">
+        
         {/* Liste des partenaires */}
         {loading ? (
           <div className="flex justify-center items-center py-12">
@@ -42,16 +45,8 @@ export default function DevenirPartenairePage() {
             {error}
           </div>
         ) : partners.length === 0 ? (
-          <div className="bg-gray-50 border border-gray-200 p-12 text-center rounded-xl">
-            <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
-            </div>
-            <h3 className="text-lg text-gray-900 mb-2">Aucune entreprise partenaire</h3>
-            <p className="text-gray-600">
-              Soyez le premier à rejoindre notre réseau de partenaires
-            </p>
+          <div className="text-center py-12">
+            <p className="text-gray-600">Aucun partenaire pour le moment</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
