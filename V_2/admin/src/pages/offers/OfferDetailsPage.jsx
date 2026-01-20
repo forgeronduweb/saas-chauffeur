@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { apiService } from '../../services/api'
-import { ArrowLeft, Briefcase, MapPin, Calendar, DollarSign, Clock, User, FileText, Image } from 'lucide-react'
+import { ArrowLeft, Briefcase, MapPin, Calendar, DollarSign, Clock, User, FileText, Image, Power, XCircle, Trash2, CheckCircle, AlertTriangle } from 'lucide-react'
 import toast from 'react-hot-toast'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '../../components/ui/card'
 import { Badge } from '../../components/ui/badge'
 import { Button } from '../../components/ui/button'
 
@@ -14,6 +14,7 @@ const OfferDetailsPage = () => {
   const navigate = useNavigate()
   const [offer, setOffer] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [actionLoading, setActionLoading] = useState(false)
 
   useEffect(() => {
     fetchOfferDetails()
@@ -34,6 +35,47 @@ const OfferDetailsPage = () => {
       navigate('/offers')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleUpdateStatus = async (newStatus) => {
+    try {
+      setActionLoading(true)
+      await apiService.updateOfferStatus(id, newStatus)
+      
+      setOffer(prev => ({ ...prev, status: newStatus }))
+      
+      const statusMessages = {
+        active: 'Offre activée avec succès',
+        paused: 'Offre mise en pause',
+        closed: 'Offre fermée',
+        draft: 'Offre mise en brouillon'
+      }
+      
+      toast.success(statusMessages[newStatus] || 'Statut mis à jour')
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour du statut:', error)
+      toast.error('Erreur lors de la mise à jour du statut')
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer cette offre ? Cette action est irréversible.')) {
+      return
+    }
+    
+    try {
+      setActionLoading(true)
+      await apiService.deleteOffer(id)
+      toast.success('Offre supprimée avec succès')
+      navigate('/offers')
+    } catch (error) {
+      console.error('Erreur lors de la suppression:', error)
+      toast.error('Erreur lors de la suppression')
+    } finally {
+      setActionLoading(false)
     }
   }
 
@@ -283,9 +325,73 @@ const OfferDetailsPage = () => {
                 )
               })}
             </div>
-                      </CardContent>
+          </CardContent>
         </Card>
       )}
+
+      {/* Actions administratives */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <AlertTriangle className="h-5 w-5" />
+            Actions administratives
+          </CardTitle>
+        </CardHeader>
+        <CardFooter className="flex flex-wrap gap-2">
+          {/* Activer/Désactiver */}
+          {offer.status === 'active' ? (
+            <Button 
+              variant="outline" 
+              onClick={() => handleUpdateStatus('paused')} 
+              disabled={actionLoading}
+            >
+              <Power className="h-4 w-4 mr-2" />
+              Désactiver
+            </Button>
+          ) : offer.status !== 'closed' && (
+            <Button 
+              onClick={() => handleUpdateStatus('active')} 
+              disabled={actionLoading}
+            >
+              <CheckCircle className="h-4 w-4 mr-2" />
+              Activer
+            </Button>
+          )}
+          
+          {/* Fermer */}
+          {offer.status !== 'closed' && (
+            <Button 
+              variant="outline" 
+              onClick={() => handleUpdateStatus('closed')} 
+              disabled={actionLoading}
+            >
+              <XCircle className="h-4 w-4 mr-2" />
+              Fermer
+            </Button>
+          )}
+          
+          {/* Réactiver si fermée */}
+          {offer.status === 'closed' && (
+            <Button 
+              onClick={() => handleUpdateStatus('active')} 
+              disabled={actionLoading}
+            >
+              <CheckCircle className="h-4 w-4 mr-2" />
+              Réactiver
+            </Button>
+          )}
+          
+          {/* Supprimer */}
+          <Button 
+            variant="outline" 
+            onClick={handleDelete} 
+            disabled={actionLoading}
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Supprimer
+          </Button>
+        </CardFooter>
+      </Card>
     </div>
   )
 }

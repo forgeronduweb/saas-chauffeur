@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { apiService } from '../services/api'
-import { Briefcase, MapPin, DollarSign, Calendar, Eye, Download, Clock } from 'lucide-react'
+import { Briefcase, MapPin, DollarSign, Calendar, Eye, Download, Clock, Power, Trash2, AlertTriangle } from 'lucide-react'
 import toast from 'react-hot-toast'
 import Breadcrumb from '../components/common/Breadcrumb'
 
@@ -103,6 +103,121 @@ const OffersModeration = () => {
     } catch (error) {
       toast.error('Erreur lors de l\'export')
     }
+  }
+
+  const handleUpdateOfferStatus = async (offerId, newStatus) => {
+    try {
+      const response = await apiService.updateOfferStatus(offerId, newStatus)
+      
+      // Mettre à jour l'offre localement
+      setOffers(prevOffers => 
+        prevOffers.map(offer => 
+          offer._id === offerId 
+            ? { ...offer, status: newStatus }
+            : offer
+        )
+      )
+      
+      const statusMessages = {
+        active: 'Offre activée avec succès',
+        paused: 'Offre mise en pause',
+        closed: 'Offre fermée',
+        draft: 'Offre mise en brouillon'
+      }
+      
+      toast.success(statusMessages[newStatus] || 'Statut mis à jour')
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour du statut:', error)
+      toast.error('Erreur lors de la mise à jour du statut')
+    }
+  }
+
+  const handleDeleteOffer = async (offerId) => {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer cette offre ? Cette action est irréversible.')) {
+      return
+    }
+    
+    try {
+      await apiService.deleteOffer(offerId)
+      
+      // Retirer l'offre de la liste
+      setOffers(prevOffers => prevOffers.filter(offer => offer._id !== offerId))
+      
+      toast.success('Offre supprimée avec succès')
+    } catch (error) {
+      console.error('Erreur lors de la suppression:', error)
+      toast.error('Erreur lors de la suppression de l\'offre')
+    }
+  }
+
+  const getActionButtons = (offer) => {
+    const isActive = offer.status === 'active'
+    const isPaused = offer.status === 'paused'
+    const isClosed = offer.status === 'closed'
+    
+    return (
+      <div className="flex flex-col gap-2">
+        {/* Voir détails */}
+        <button
+          onClick={() => navigate(`/offers/${offer._id}`)}
+          className="text-gray-600 hover:text-gray-800 text-left"
+        >
+          Voir détails
+        </button>
+        
+        {/* Actions selon le statut */}
+        {isActive && (
+          <div className="flex gap-2">
+            <button
+              onClick={() => handleUpdateOfferStatus(offer._id, 'paused')}
+              className="px-3 py-1 bg-orange-600 text-white rounded hover:bg-orange-700 text-xs"
+            >
+              Désactiver
+            </button>
+            <button
+              onClick={() => handleUpdateOfferStatus(offer._id, 'closed')}
+              className="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-xs"
+            >
+              Fermer
+            </button>
+          </div>
+        )}
+        
+        {isPaused && (
+          <div className="flex gap-2">
+            <button
+              onClick={() => handleUpdateOfferStatus(offer._id, 'active')}
+              className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-xs"
+            >
+              Activer
+            </button>
+            <button
+              onClick={() => handleUpdateOfferStatus(offer._id, 'closed')}
+              className="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-xs"
+            >
+              Fermer
+            </button>
+          </div>
+        )}
+        
+        {isClosed && (
+          <button
+            onClick={() => handleUpdateOfferStatus(offer._id, 'active')}
+            className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-xs text-left"
+          >
+            Réactiver
+          </button>
+        )}
+        
+        {/* Supprimer */}
+        <button
+          onClick={() => handleDeleteOffer(offer._id)}
+          className="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 text-xs text-left"
+        >
+          Supprimer
+        </button>
+      </div>
+    )
   }
 
   return (
@@ -286,13 +401,7 @@ const OffersModeration = () => {
                       {new Date(offer.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button
-                        onClick={() => navigate(`/offers/${offer._id}`)}
-                        className="px-3 py-2 text-gray-700 hover:bg-orange-50 transition-colors border border-gray-200 flex items-center space-x-2"
-                      >
-                        <Eye className="w-4 h-4" />
-                        <span className="text-sm font-medium">Voir détails</span>
-                      </button>
+                      {getActionButtons(offer)}
                     </td>
                   </tr>
                 ))}

@@ -117,6 +117,14 @@ export const apiService = {
   getAdminOffers: (params = {}) => api.get('/admin/offers', { params }),
   getAdminOffer: (offerId) => api.get(`/admin/offers/${offerId}`),
   moderateOffer: (offerId, data) => api.put(`/admin/offers/${offerId}/moderate`, data),
+  updateOfferStatus: (offerId, status) => api.put(`/admin/offers/${offerId}/status`, { status }),
+  deleteOffer: (offerId) => api.delete(`/admin/offers/${offerId}`),
+  
+  // Gestion des produits/offres marketing
+  getAdminProducts: (params = {}) => api.get('/admin/offers', { params: { ...params, type: 'marketing' } }),
+  getAdminProduct: (productId) => api.get(`/admin/offers/${productId}`),
+  updateProductStatus: (productId, status) => api.put(`/admin/offers/${productId}/status`, { status }),
+  deleteProduct: (productId) => api.delete(`/admin/offers/${productId}`),
   
   // Gestion des transactions
   getAdminTransactions: (params = {}) => api.get('/admin/transactions', { params }),
