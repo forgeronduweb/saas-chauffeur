@@ -12,6 +12,7 @@ const getAllOffers = async (req, res) => {
       salaryMin, 
       salaryMax, 
       workType, 
+      employerId,
       page = 1, 
       limit = 10,
       sortBy = 'createdAt',
@@ -20,6 +21,9 @@ const getAllOffers = async (req, res) => {
 
     // Construire les filtres
     const filters = { status: 'active' };
+    
+    // Filtre par employeur
+    if (employerId) filters.employerId = employerId;
     
     // Gestion du type d'offre
     if (type) {

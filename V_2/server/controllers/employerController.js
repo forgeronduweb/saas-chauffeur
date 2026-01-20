@@ -173,3 +173,69 @@ exports.uploadDocuments = async (req, res) => {
     });
   }
 };
+
+// Récupérer un employeur par ID (public)
+exports.getEmployerById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const employer = await Employer.findById(id)
+      .populate('userId', 'email firstName lastName phone profilePhotoUrl createdAt');
+
+    if (!employer) {
+      return res.status(404).json({ error: 'Employeur non trouvé' });
+    }
+
+    res.status(200).json({ employer });
+  } catch (error) {
+    console.error('Erreur lors de la récupération de l\'employeur:', error);
+    res.status(500).json({ 
+      error: 'Erreur serveur lors de la récupération de l\'employeur',
+      details: error.message 
+    });
+  }
+};
+
+// Récupérer les entreprises partenaires (employeurs de type entreprise)
+exports.getPartners = async (req, res) => {
+  try {
+    const { page = 1, limit = 12, sector, city } = req.query;
+    
+    // Filtrer uniquement les employeurs de type entreprise
+    const filter = {
+      employerType: 'entreprise'
+    };
+    
+    // Filtres optionnels
+    if (sector) filter.sector = sector;
+    if (city) filter.city = { $regex: city, $options: 'i' };
+    
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    
+    const partners = await Employer.find(filter)
+      .populate('userId', 'profilePhotoUrl')
+      .select('companyName companyLogo sector city description website employeeCount foundedYear firstName lastName email userId')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(parseInt(limit))
+      .lean();
+    
+    const total = await Employer.countDocuments(filter);
+    
+    res.status(200).json({
+      partners,
+      pagination: {
+        total,
+        page: parseInt(page),
+        limit: parseInt(limit),
+        pages: Math.ceil(total / parseInt(limit))
+      }
+    });
+  } catch (error) {
+    console.error('Erreur lors de la récupération des partenaires:', error);
+    res.status(500).json({ 
+      error: 'Erreur serveur lors de la récupération des partenaires',
+      details: error.message 
+    });
+  }
+};

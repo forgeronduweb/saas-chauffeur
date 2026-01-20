@@ -68,14 +68,9 @@ const driverSchema = new mongoose.Schema(
     // Véhicule
     vehicleType: { 
       type: String, 
-      enum: ['berline', 'suv', 'utilitaire', 'moto', 'van', 'camion'],
-      required: true
-    },
-    vehicleBrand: { 
-      type: String,
       trim: true
     },
-    vehicleModel: { 
+    vehicleBrand: { 
       type: String,
       trim: true
     },
@@ -87,7 +82,7 @@ const driverSchema = new mongoose.Schema(
     vehicleSeats: { 
       type: Number,
       min: [1, 'Le véhicule doit avoir au moins 1 place'],
-      max: [50, 'Nombre de places trop élevé']
+      max: [9, 'Nombre de places trop élevé']
     },
     
     // Zone de travail et spécialités

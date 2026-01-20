@@ -73,7 +73,7 @@ const updateDriverProfile = async (req, res) => {
     const allowedFields = [
       'firstName', 'lastName', 'email', 'phone', 'licenseType', 'licenseNumber', 
       'licenseDate', 'vtcCard', 'experience', 'vehicleType', 'vehicleBrand', 
-      'vehicleModel', 'vehicleYear', 'vehicleSeats', 'workZone', 'specialties',
+      'vehicleYear', 'vehicleSeats', 'workZone', 'specialties',
       'isAvailable', 'notifications', 'workExperience', 'profilePhotoUrl'
     ];
 

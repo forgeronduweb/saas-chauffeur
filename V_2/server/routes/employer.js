@@ -3,20 +3,17 @@ const router = express.Router();
 const employerController = require('../controllers/employerController');
 const { requireAuth } = require('../middleware/auth');
 
-// Toutes les routes nécessitent une authentification
-router.use(requireAuth);
+// Routes publiques
+router.get('/partners', employerController.getPartners);
 
-// Créer ou mettre à jour le profil employeur
-router.post('/profile', employerController.createOrUpdateProfile);
-router.put('/profile', employerController.createOrUpdateProfile);
+// Routes protégées par authentification
+router.post('/profile', requireAuth, employerController.createOrUpdateProfile);
+router.put('/profile', requireAuth, employerController.createOrUpdateProfile);
+router.get('/profile', requireAuth, employerController.getProfile);
+router.delete('/profile', requireAuth, employerController.deleteProfile);
+router.post('/documents', requireAuth, employerController.uploadDocuments);
 
-// Récupérer le profil employeur
-router.get('/profile', employerController.getProfile);
-
-// Supprimer le profil employeur
-router.delete('/profile', employerController.deleteProfile);
-
-// Upload de documents
-router.post('/documents', employerController.uploadDocuments);
+// Route publique pour récupérer un employeur par ID (doit être après /profile pour éviter conflit)
+router.get('/:id', employerController.getEmployerById);
 
 module.exports = router;

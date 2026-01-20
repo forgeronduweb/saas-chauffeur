@@ -6,6 +6,7 @@ const Notification = require('../models/Notification');
 const Conversation = require('../models/Conversation');
 const Message = require('../models/Message');
 const ActivityLog = require('../models/ActivityLog');
+const Campaign = require('../models/Campaign');
 const { sendDriverValidationEmail, sendDriverRejectionEmail } = require('../services/emailService');
 
 // Récupérer les statistiques du dashboard admin
@@ -892,6 +893,20 @@ exports.getUserActivities = async (req, res) => {
   }
 };
 
+// Récupérer les campagnes existantes
+exports.getCampaigns = async (req, res) => {
+  try {
+    const campaigns = await Campaign.find()
+      .sort({ createdAt: -1 })
+      .select('name type audienceCount status scheduledDate sentAt stats');
+    
+    res.json({ campaigns });
+  } catch (error) {
+    console.error('Erreur getCampaigns:', error);
+    res.status(500).json({ error: 'Erreur lors de la récupération des campagnes' });
+  }
+};
+
 // Récupérer les groupes d'utilisateurs pour les campagnes
 exports.getUserGroups = async (req, res) => {
   try {
@@ -1095,6 +1110,29 @@ exports.sendCampaign = async (req, res) => {
       });
       notificationsSent++;
     }
+
+    // Enregistrer la campagne dans la base de données
+    const campaign = new Campaign({
+      name: `Campagne ${type === 'email' ? 'Email' : 'SMS'} du ${new Date().toLocaleDateString('fr-FR')}`,
+      type,
+      subject: subject || (type === 'email' ? 'Message de GoDriver' : undefined),
+      content,
+      groups,
+      audienceCount: uniqueUsers.length,
+      status: 'sent',
+      sendToMessaging,
+      noReply,
+      stats: {
+        totalRecipients: uniqueUsers.length,
+        messagesSent,
+        notificationsSent,
+        openRate: 0
+      },
+      sentBy: adminId,
+      sentAt: new Date()
+    });
+
+    await campaign.save();
 
     res.json({ 
       success: true,

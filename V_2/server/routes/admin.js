@@ -53,6 +53,7 @@ router.get('/configs', adminController.getPlatformConfigs);
 router.put('/configs/:configId', adminController.updatePlatformConfig);
 
 // Campagnes Email/SMS
+router.get('/campaigns', adminController.getCampaigns);
 router.get('/campaigns/user-groups', adminController.getUserGroups);
 router.post('/campaigns/send', adminController.sendCampaign);
 
