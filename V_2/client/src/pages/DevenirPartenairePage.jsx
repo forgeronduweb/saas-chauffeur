@@ -55,11 +55,11 @@ export default function DevenirPartenairePage() {
               <Card className="max-w-[280px] cursor-pointer">
                 <CardHeader className="text-center p-2 relative flex flex-col items-center justify-center w-full">
                   {/* Logo et Member en haut à gauche */}
-                  <div className="absolute -top-3 left-3 flex items-center gap-1">
-                    <svg className="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                  <div className="absolute -top-3 left-3 flex items-center gap-1.5">
+                    <svg className="w-4 h-4 text-blue-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
                     </svg>
-                    <span className="text-xs">Premier Partner</span>
+                    <span className="text-sm font-medium leading-none">Premier Partner</span>
                   </div>
 
                   {/* Logo */}
@@ -68,17 +68,17 @@ export default function DevenirPartenairePage() {
                       <img 
                         src={partner.companyLogo} 
                         alt={partner.companyName || 'Logo'}
-                        className="w-14 h-14 md:w-16 md:h-16 object-contain mx-auto"
+                        className="w-24 h-24 md:w-28 md:h-28 object-contain mx-auto"
                       />
                     ) : partner.userId?.profilePhotoUrl ? (
                       <img 
                         src={partner.userId.profilePhotoUrl} 
                         alt={partner.companyName || `${partner.firstName} ${partner.lastName}` || 'Photo'}
-                        className="w-14 h-14 md:w-16 md:h-16 object-cover rounded-xl mx-auto"
+                        className="w-24 h-24 md:w-28 md:h-28 object-cover rounded-xl mx-auto"
                       />
                     ) : (
-                      <div className="w-14 h-14 md:w-16 md:h-16 bg-gray-900 rounded-xl flex items-center justify-center mx-auto">
-                        <span className="text-lg md:text-2xl text-white">
+                      <div className="w-24 h-24 md:w-28 md:h-28 bg-gray-900 rounded-xl flex items-center justify-center mx-auto">
+                        <span className="text-2xl md:text-4xl text-white">
                           {(partner.companyName || partner.firstName || 'E')?.charAt(0)?.toUpperCase()}
                         </span>
                       </div>
