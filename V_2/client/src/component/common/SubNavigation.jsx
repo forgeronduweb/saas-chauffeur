@@ -35,15 +35,16 @@ export default function SubNavigation({ activeTab = '' }) {
           >
             Marketing & Vente
           </Link>
-          <span 
-            className={`py-2.5 lg:py-4 text-sm lg:text-base whitespace-nowrap flex-shrink-0 border-b-2 cursor-not-allowed opacity-50 ${
+          <Link 
+            to="/partenaire" 
+            className={`py-2.5 lg:py-4 text-sm lg:text-lg whitespace-nowrap flex-shrink-0 transition-colors border-b-2 ${
               activeTab === 'partenaire'
                 ? 'text-orange-600 border-orange-500'
-                : 'text-gray-400 border-transparent'
+                : 'text-gray-500 hover:text-gray-900 border-transparent'
             }`}
           >
             Partenaire
-          </span>
+          </Link>
           <span 
             className={`py-2.5 lg:py-4 text-sm lg:text-base whitespace-nowrap flex-shrink-0 border-b-2 cursor-not-allowed opacity-50 ${
               activeTab === 'formations'
