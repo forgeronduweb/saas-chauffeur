@@ -40,6 +40,8 @@ router.get('/vehicles', adminController.getVehicles);
 router.get('/offers', adminController.getOffers);
 router.get('/offers/:offerId', adminController.getOfferById);
 router.put('/offers/:offerId/moderate', adminController.moderateOffer);
+router.put('/offers/:offerId/status', adminController.updateOfferStatus);
+router.delete('/offers/:offerId', adminController.deleteOffer);
 
 // Gestion des transactions
 router.get('/transactions', adminController.getTransactions);
