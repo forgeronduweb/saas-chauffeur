@@ -46,6 +46,7 @@ function BannersPage() {
   useEffect(() => {
     fetchBanners()
     fetchUserGroups()
+    fetchCampaigns()
   }, [])
 
   const fetchUserGroups = async () => {
@@ -60,6 +61,21 @@ function BannersPage() {
       }
     } catch (error) {
       console.error('Erreur récupération groupes:', error)
+    }
+  }
+
+  const fetchCampaigns = async () => {
+    try {
+      const token = localStorage.getItem('admin_token')
+      const response = await fetch(`${API_URL}/api/admin/campaigns`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      const data = await response.json()
+      if (data.campaigns) {
+        setCampaigns(data.campaigns)
+      }
+    } catch (error) {
+      console.error('Erreur récupération campagnes:', error)
     }
   }
 
@@ -96,6 +112,7 @@ function BannersPage() {
         setCampaignContent('')
         setCampaignSubject('')
         setSelectedContacts([])
+        fetchCampaigns() // Rafraîchir la liste des campagnes
       } else {
         alert(data.error || 'Erreur lors de l\'envoi')
       }
@@ -344,13 +361,19 @@ function BannersPage() {
         <Card>
           <CardContent className="p-4">
             <p className="text-sm text-gray-500">Destinataires</p>
-            <p className="text-2xl font-semibold">0</p>
+            <p className="text-2xl font-semibold">
+              {campaigns.reduce((total, c) => total + (c.audienceCount || 0), 0)}
+            </p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
             <p className="text-sm text-gray-500">Taux d'ouverture</p>
-            <p className="text-2xl font-semibold">0%</p>
+            <p className="text-2xl font-semibold">
+              {campaigns.length > 0 
+                ? Math.round(campaigns.reduce((total, c) => total + (c.stats?.openRate || 0), 0) / campaigns.length)
+                : 0}%
+            </p>
           </CardContent>
         </Card>
       </div>
