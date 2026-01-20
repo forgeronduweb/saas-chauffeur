@@ -5,6 +5,12 @@ const { requireAuth } = require('../middleware/auth');
 
 // Routes publiques
 router.get('/partners', employerController.getPartners);
+router.get('/partners/stats', employerController.getPartnersStats);
+router.get('/:id/details', employerController.getPartnerDetails);
+
+// Routes d'enrichissement (protégées)
+router.post('/:id/enrich', requireAuth, employerController.enrichPartnerFromWeb);
+router.post('/enrich-all', requireAuth, employerController.enrichAllPartners);
 
 // Routes protégées par authentification
 router.post('/profile', requireAuth, employerController.createOrUpdateProfile);
