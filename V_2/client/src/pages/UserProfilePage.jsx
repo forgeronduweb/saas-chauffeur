@@ -32,7 +32,11 @@ export default function UserProfilePage() {
     licenseType: 'B',
     licenseExpiryDate: '',
     experience: '1-3',
-    workZone: ''
+    workZone: '',
+    vehicleType: '',
+    vehicleBrand: '',
+    vehicleYear: '',
+    vehicleSeats: ''
   });
 
   const [workExperiences, setWorkExperiences] = useState([
@@ -166,6 +170,10 @@ export default function UserProfilePage() {
           licenseExpiryDate: driver.licenseExpiryDate ? driver.licenseExpiryDate.split('T')[0] : '',
           experience: driver.experience || '1-3',
           workZone: driver.workZone || '',
+          vehicleType: driver.vehicleType || '',
+          vehicleBrand: driver.vehicleBrand || '',
+          vehicleYear: driver.vehicleYear || '',
+          vehicleSeats: driver.vehicleSeats || '',
           profilePhotoUrl: driver.profilePhotoUrl || ''
         });
         
@@ -188,8 +196,10 @@ export default function UserProfilePage() {
   const loadEmployerProfile = async () => {
     try {
       const response = await api.get('/employer/profile');
+      console.log('Profil employeur chargé:', response.data);
       if (response.data && response.data.employer) {
         const emp = response.data.employer;
+        console.log('employerType récupéré:', emp.employerType);
         setEmployerType(emp.employerType || 'particulier');
         setEmployerInfo({
           companyName: emp.companyName || '',
@@ -365,6 +375,10 @@ export default function UserProfilePage() {
           licenseExpiryDate: driverInfo.licenseExpiryDate,
           experience: driverInfo.experience,
           workZone: driverInfo.workZone,
+          vehicleType: driverInfo.vehicleType,
+          vehicleBrand: driverInfo.vehicleBrand,
+          vehicleYear: driverInfo.vehicleYear,
+          vehicleSeats: driverInfo.vehicleSeats,
           workExperience: workExperiences.filter(exp => 
             exp.company || exp.position || exp.startDate || exp.endDate || exp.description
           ),
@@ -391,10 +405,12 @@ export default function UserProfilePage() {
           }
         });
         
-        await api.post('/employer/profile', {
+        console.log('Envoi employerType:', employerType);
+        const empResponse = await api.post('/employer/profile', {
           employerType,
           ...filteredEmployerInfo
         });
+        console.log('Réponse employer:', empResponse.data);
       }
       
       setSuccess('Toutes les informations ont été mises à jour avec succès !');
@@ -792,6 +808,65 @@ export default function UserProfilePage() {
                 </div>
               </div>
 
+              {/* Informations sur le véhicule */}
+              <div className="mt-6">
+                <h3 className="text-lg text-gray-900 mb-4">Véhicule</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Type de véhicule</label>
+                    <input
+                      type="text"
+                      name="vehicleType"
+                      value={driverInfo.vehicleType}
+                      onChange={handleDriverInfoChange}
+                      disabled={!isEditing}
+                      placeholder="Ex: Berline, SUV, 4x4"
+                      className={`w-full px-4 py-2 border border-gray-300 rounded-lg ${isEditing ? 'focus:ring-2 focus:ring-orange-500' : 'bg-gray-50 cursor-not-allowed'}`}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Marque</label>
+                    <input
+                      type="text"
+                      name="vehicleBrand"
+                      value={driverInfo.vehicleBrand}
+                      onChange={handleDriverInfoChange}
+                      disabled={!isEditing}
+                      placeholder="Ex: Toyota, BMW, Mercedes"
+                      className={`w-full px-4 py-2 border border-gray-300 rounded-lg ${isEditing ? 'focus:ring-2 focus:ring-orange-500' : 'bg-gray-50 cursor-not-allowed'}`}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Année</label>
+                    <input
+                      type="number"
+                      name="vehicleYear"
+                      value={driverInfo.vehicleYear}
+                      onChange={handleDriverInfoChange}
+                      disabled={!isEditing}
+                      placeholder="Ex: 2020"
+                      min="1990"
+                      max={new Date().getFullYear() + 1}
+                      className={`w-full px-4 py-2 border border-gray-300 rounded-lg ${isEditing ? 'focus:ring-2 focus:ring-orange-500' : 'bg-gray-50 cursor-not-allowed'}`}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Nombre de places</label>
+                    <input
+                      type="number"
+                      name="vehicleSeats"
+                      value={driverInfo.vehicleSeats}
+                      onChange={handleDriverInfoChange}
+                      disabled={!isEditing}
+                      placeholder="Ex: 5"
+                      min="1"
+                      max="9"
+                      className={`w-full px-4 py-2 border border-gray-300 rounded-lg ${isEditing ? 'focus:ring-2 focus:ring-orange-500' : 'bg-gray-50 cursor-not-allowed'}`}
+                    />
+                  </div>
+                </div>
+              </div>
+
               {/* Documents du permis */}
               <div className="mt-6">
                 <h3 className="text-lg text-gray-900 mb-4">Documents du permis de conduire</h3>
@@ -943,7 +1018,7 @@ export default function UserProfilePage() {
                   disabled={!isEditing}
                   className={`flex-1 px-6 py-3 rounded-lg border-2 transition-all ${
                     employerType === 'particulier'
-                      ? 'border-orange-500 bg-orange-50 text-orange-700 font-semibold'
+                      ? 'border-orange-500 text-orange-700 font-semibold'
                       : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
                   } ${!isEditing ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}`}
                 >
@@ -960,7 +1035,7 @@ export default function UserProfilePage() {
                   disabled={!isEditing}
                   className={`flex-1 px-6 py-3 rounded-lg border-2 transition-all ${
                     employerType === 'entreprise'
-                      ? 'border-orange-500 bg-orange-50 text-orange-700 font-semibold'
+                      ? 'border-orange-500 text-orange-700 font-semibold'
                       : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
                   } ${!isEditing ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}`}
                 >
@@ -1181,33 +1256,7 @@ export default function UserProfilePage() {
           </div>
         )}
 
-        {!isDriver && (
-          <div className="bg-white rounded-lg border border-gray-200 p-6 mt-6">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-xl text-gray-900">Devenir Chauffeur</h2>
-                <p className="text-sm text-gray-600 mt-1">
-                  Complétez vos informations pour apparaître dans la liste des chauffeurs
-                </p>
-              </div>
-              
-              {!showDriverForm && (
-                <button
-                  onClick={() => setShowDriverForm(true)}
-                  className="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
-                >
-                  Commencer
-                </button>
-              )}
-            </div>
-
-            {showDriverForm && (
-              <div className="text-sm text-gray-600 bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p>Le formulaire "Devenir Chauffeur" sera affiché ici avec tous les champs nécessaires.</p>
-              </div>
-            )}
-          </div>
-        )}
+        
       </main>
     </div>
   );

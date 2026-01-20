@@ -92,6 +92,7 @@ api.interceptors.response.use(
       // Liste des routes publiques qui ne nécessitent pas de redirection
       const publicRoutes = ['/', '/auth', '/forgot-password', '/reset-password', 
                           '/offres', '/chauffeurs', '/marketing-vente', 
+                          '/partenaire', '/devenir-partenaire',
                           '/a-propos', '/contact', '/conditions', '/confidentialite',
                           '/compte-suspendu'];
       const currentPath = window.location.pathname;
@@ -355,6 +356,8 @@ export const employerService = {
   createOrUpdateProfile: (data) => api.post('/employer/profile', data),
   // Récupérer le profil employeur
   getProfile: () => api.get('/employer/profile'),
+  // Récupérer un employeur par ID (public)
+  getById: (id) => api.get(`/employer/${id}`),
   // Supprimer le profil employeur
   deleteProfile: () => api.delete('/employer/profile'),
   // Upload de documents

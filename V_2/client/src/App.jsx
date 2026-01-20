@@ -11,6 +11,8 @@ import OffersPage from './pages/OffersPage.jsx'
 import OfferDetailPage from './pages/OfferDetailPage.jsx'
 import CreateOfferPage from './pages/CreateOfferPage.jsx'
 import MarketingVentePage from './pages/MarketingVentePage.jsx'
+import DevenirPartenairePage from './pages/DevenirPartenairePage.jsx'
+import EmployerProfilePage from './pages/EmployerProfilePage.jsx'
 import ProductDetailPage from './pages/ProductDetailPage.jsx'
 import EditJobOfferPage from './pages/EditJobOfferPage.jsx'
 import EditProductOfferPage from './pages/EditProductOfferPage.jsx'
@@ -22,7 +24,6 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage.jsx'
 import ResetPasswordPage from './pages/ResetPasswordPage.jsx'
 import VerifyEmailPage from './pages/VerifyEmailPage.jsx'
 import TarifsPage from './pages/TarifsPage.jsx'
-import DevenirPartenairePage from './pages/DevenirPartenairePage.jsx'
 import FormationsPage from './pages/FormationsPage.jsx'
 import CertificationsPage from './pages/CertificationsPage.jsx'
 import CentreAidePage from './pages/CentreAidePage.jsx'
@@ -91,6 +92,22 @@ function App() {
             <Route 
               path="/marketing-vente" 
               element={<MarketingVentePage />} 
+            />
+
+            {/* Page Devenir Partenaire publique */}
+            <Route 
+              path="/partenaire" 
+              element={<DevenirPartenairePage />} 
+            />
+
+            {/* Page de profil entreprise (connexion requise) */}
+            <Route 
+              path="/entreprise/:id" 
+              element={
+                <PrivateRoute>
+                  <EmployerProfilePage />
+                </PrivateRoute>
+              } 
             />
 
             {/* Page de détails produit publique (contact nécessite connexion) */}

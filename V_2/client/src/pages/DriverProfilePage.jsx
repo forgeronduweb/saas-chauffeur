@@ -266,31 +266,10 @@ export default function DriverProfilePage() {
             </div>
           </div>
 
-          {/* Informations de contact */}
+          {/* Informations de contact - Masquées pour la protection des données */}
           <div className="border-t border-gray-200 bg-gray-50 px-6 lg:px-8 py-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {driver.phone && (
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                    <Phone className="w-5 h-5 text-orange-600" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500">Téléphone</p>
-                    <p className="text-sm text-gray-900">{driver.phone}</p>
-                  </div>
-                </div>
-              )}
-              {driver.workZone && (
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                    <MapPin className="w-5 h-5 text-orange-600" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500">Zone de travail</p>
-                    <p className="text-sm text-gray-900">{driver.workZone}</p>
-                  </div>
-                </div>
-              )}
+            <div className="text-center text-sm text-gray-500">
+              Les coordonnées du chauffeur sont protégées. Utilisez la messagerie pour communiquer.
             </div>
           </div>
         </div>
@@ -299,7 +278,7 @@ export default function DriverProfilePage() {
           {/* Colonne principale */}
           <div className="lg:col-span-2 space-y-8">
             {/* Informations sur le véhicule */}
-            {driver.vehicleType && (
+            {driver.vehicleType || driver.vehicleBrand || driver.vehicleYear || driver.vehicleSeats ? (
               <div className="bg-white border border-gray-200 p-6 lg:p-8">
                 <h2 className="text-gray-900 mb-6 flex items-center gap-2">
                   <Car className="w-5 h-5 sm:w-6 sm:h-6 text-orange-500" />
@@ -330,7 +309,7 @@ export default function DriverProfilePage() {
                   )}
                 </div>
               </div>
-            )}
+            ) : null}
           </div>
 
           {/* Colonne latérale */}
